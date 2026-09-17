@@ -51,11 +51,11 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="drones4health-ultra-high-resolution-drone-metrics-for-spatial-health-analysis-">drones4health: Ultra-High Resolution Drone Metrics for Spatial Health Analysis <img src="reference/figures/logo.png" align="right" width="120"><a class="anchor" aria-label="anchor" href="#drones4health-ultra-high-resolution-drone-metrics-for-spatial-health-analysis-"></a>
+<div class="page-header"><h1 id="drones4health-ultra-high-resolution-drone-metrics-for-spatial-health-analysis">drones4health: Ultra-High Resolution Drone Metrics for Spatial Health Analysis<a class="anchor" aria-label="anchor" href="#drones4health-ultra-high-resolution-drone-metrics-for-spatial-health-analysis"></a>
 </h1></div>
 <!-- badges: start -->
 <!-- badges: end -->
-<p>Calculate and extract ultra-high resolution remote sensing metrics for spatial health analysis 🚁. This package offers R users a quick and straightforward way to obtain continuous and zonal micro-environmental statistics and epidemiological indicators from UAV orthomosaics. Designed to map localized infection risks within a One Health framework.</p>
+<p>Calculate and extract ultra-high resolution remote sensing metrics for spatial health analysis. This package offers R users a straightforward way to obtain continuous and zonal micro-environmental statistics and epidemiological indicators from UAV orthomosaics. Designed to map localized infection risks within a One Health framework.</p>
 <div class="section level2">
 <h2 id="id_1-installation">1. Installation<a class="anchor" aria-label="anchor" href="#id_1-installation"></a>
 </h2>
@@ -69,7 +69,7 @@
 <div class="section level2">
 <h2 id="id_2-available-micro-environmental-and-epidemiological-metrics">2. Available Micro-Environmental and Epidemiological Metrics<a class="anchor" aria-label="anchor" href="#id_2-available-micro-environmental-and-epidemiological-metrics"></a>
 </h2>
-<p><code>drones4health</code> focuses on a curated, high-impact set of spectral, topographic, and epidemiological indicators:</p>
+<p><code>drones4health</code> focuses on a curated set of spectral, topographic, and epidemiological indicators:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/d4h_list_metrics.html">d4h_list_metrics</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 5 × 4</span></span>
@@ -104,18 +104,18 @@
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="id_4-example-generate-hexagonal-grid-and-ml-ready-matrix">4. Example: Generate Hexagonal Grid and ML-Ready Matrix<a class="anchor" aria-label="anchor" href="#id_4-example-generate-hexagonal-grid-and-ml-ready-matrix"></a>
+<h2 id="id_4-example-generate-hexagonal-surveillance-grid">4. Example: Generate Hexagonal Surveillance Grid<a class="anchor" aria-label="anchor" href="#id_4-example-generate-hexagonal-surveillance-grid"></a>
 </h2>
-<p>Integrate drone-derived indices into localized covariates to feed spatial Machine Learning models (Random Forest, XGBoost).</p>
+<p>Create operational spatial grids for active surveillance across the survey area:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Generate 50m operative surveillance grid</span></span>
 <span><span class="va">surveillance_grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/d4h_hex_grid.html">d4h_hex_grid</a></span><span class="op">(</span>aoi <span class="op">=</span> <span class="va">ndwi_continuous</span>, cell_size <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Build feature matrix across grid cells</span></span>
-<span><span class="va">ml_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/d4h_build_ml_matrix.html">d4h_build_ml_matrix</a></span><span class="op">(</span></span>
-<span>  hex_data <span class="op">=</span> <span class="va">surveillance_grid</span>, </span>
-<span>  raster_stack <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">ndwi_continuous</span>, <span class="va">twi_continuous</span><span class="op">)</span>,</span>
-<span>  funs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean"</span>, <span class="st">"max"</span><span class="op">)</span></span>
+<span><span class="co"># Summarize continuous raster layers over grid</span></span>
+<span><span class="va">grid_summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/d4h_summarize_grid.html">d4h_summarize_grid</a></span><span class="op">(</span></span>
+<span>  raster_in <span class="op">=</span> <span class="va">ndwi_continuous</span>, </span>
+<span>  cell_size <span class="op">=</span> <span class="fl">50</span>, </span>
+<span>  square <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">

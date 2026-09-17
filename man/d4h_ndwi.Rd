@@ -4,22 +4,16 @@
 \alias{d4h_ndwi}
 \title{Normalized Difference Water Index (NDWI)}
 \usage{
-d4h_ndwi(green, nir, cell_size = NULL, square = TRUE, scale = NULL)
+d4h_ndwi(green, nir)
 }
 \arguments{
-\item{green}{Character or SpatRaster. Green band or path to file.}
+\item{green}{SpatRaster or character. Green band.}
 
-\item{nir}{Character or SpatRaster. Near-infrared band or path to file.}
-
-\item{cell_size}{Numeric. Optional cell size in meters. If NULL, returns continuous raster (default: NULL).}
-
-\item{square}{Logical. If TRUE, square grid; if FALSE, hexagonal grid (default: TRUE).}
-
-\item{scale}{Numeric. Divisor to normalize pixel values (default: NULL).}
+\item{nir}{SpatRaster or character. Near-infrared band.}
 }
 \value{
-A SpatRaster (if cell_size = NULL) or SpatVector (if cell_size is numeric).
+A SpatRaster containing NDWI values.
 }
 \description{
-Calculates NDWI with optional zonal grid summarization (square or hexagonal).
+Calculates NDWI to identify water bodies and moisture with automatic alignment.
 }

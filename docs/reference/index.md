@@ -2,8 +2,6 @@
 
 ## All functions
 
-- [`d4h_build_ml_matrix()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_build_ml_matrix.md)
-  : Build Machine Learning Ready Matrix from Zonal Statistics
 - [`d4h_clean_band()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_clean_band.md)
   : Clean Raster Band Artefacts
 - [`d4h_hex_grid()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_hex_grid.md)
