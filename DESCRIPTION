@@ -1,0 +1,15 @@
+Package: drones4health
+Title: Ultra-High Resolution Drone Metrics for Spatial Health Analysis
+Version: 0.1.0
+Authors@R: 
+    person("Josue", "Florian", , "josue.florian@example.com", role = c("aut", "cre"))
+Description: Calculate and extract ultra-high resolution remote sensing metrics for spatial health analysis from UAV orthomosaics. Designed to map localized infection risks within a One Health framework.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+Imports: 
+    ggplot2,
+    sf,
+    terra,
+    tibble
+Config/roxygen2/version: 8.1.0

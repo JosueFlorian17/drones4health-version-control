@@ -1,0 +1,20 @@
+url: https://JosueFlorian17.github.io/drones4health-version-control/
+template:
+  bootstrap: 5
+  theme: light
+navbar:
+  title: "drones4health"
+  left:
+    - text: "Reference"
+      href: reference/index.html
+    - text: "Articles"
+      menu:
+        - text: "1. Drone Metrics for Epidemics"
+          href: articles/drone_metrics.html
+        - text: "2. Modeling Fasciola hepatica"
+          href: articles/fasciola_case.html
+    - text: "Changelog"
+      href: news/index.html
+  right:
+    - icon: fa-github fa-lg
+      href: https://github.com/JosueFlorian17/drones4health-version-control
