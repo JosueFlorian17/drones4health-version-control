@@ -3,7 +3,7 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-Calculate and extract ultra-high resolution remote sensing metrics for spatial health analysis 🚁. This package offers R users a quick and straightforward way to obtain micro-environmental statistics and epidemiological indicators (e.g., bare soil, stagnation, synthetic materials) from UAV orthomosaics. Designed to map localized infection risks, such as *Fasciola hepatica* and vector-borne diseases, within a One Health framework.
+Calculate and extract ultra-high resolution remote sensing metrics for spatial health analysis 🚁. This package offers R users a quick and straightforward way to obtain continuous and zonal micro-environmental statistics and epidemiological indicators from UAV orthomosaics. Designed to map localized infection risks within a One Health framework.
 
 ## 1. Installation
 
@@ -16,60 +16,45 @@ pak::pak("JosueFlorian17/drones4health-version-control")
 
 ```r
 library(drones4health)
-# Initialize Terra out-of-core processing automatically
 ```
 
-## 2. List of available micro-environmental metrics
+## 2. Available Micro-Environmental and Epidemiological Metrics
 
-`drones4health` implements standardized spectral indices alongside novel epidemiological indicators optimized for drone imagery.
+`drones4health` focuses on a curated, high-impact set of spectral, topographic, and epidemiological indicators:
 
 ```r
 d4h_list_metrics()
-#> # A tibble: 12 × 4
-#>    category          metric            resolution_cm  application
-#>    <chr>             <chr>             <dbl>          <chr>
-#>  1 Topographic       Slope             10             Runoff prediction
-#>  2 Topographic       TWI               10             Micro-hydrology
-#>  3 Spectral          NDVI              5              Vegetation vigor
-#>  4 Spectral          NDWI              5              Surface water
-#>  5 Spectral          LST (°C)          30             Thermal mapping
-#>  6 Epidemiological   Bare Soil Mask    5              Zoonotic/fecalism risk
-#>  7 Epidemiological   IMSR (Synthetics) 5              Aedes breeding sites
-#>  8 Epidemiological   IEV (Stagnation)  10             Snail/mosquito habitat
-#>  ...
+#> # A tibble: 5 × 4
+#>   category        metric            resolution_cm application                              
+#>   <chr>           <chr>                     <dbl> <chr>                                    
+#> 1 Spectral        NDVI                          5 Vegetation vigor & biomass               
+#> 2 Spectral        NDWI                          5 Surface water & moisture detection       
+#> 3 Topographic     TWI                          10 Topographic micro-hydrology & pooling    
+#> 4 Epidemiological IEV (Stagnation)             10 Vector / snail breeding micro-depressions
+#> 5 Epidemiological IMSR (Synthetics)             5 Artificial container & waste risk sites  
 ```
 
 ## 3. Example: Calculate Epidemiological Indices from UAV Imagery
 
-This example demonstrates how to calculate the Vulnerability Stagnation Indicator (IEV) and map *Fasciola hepatica* environmental suitability using multi-spectral and thermal drone surveys.
+Each indicator function accepts either a `SpatRaster` object or a direct file path string (`.tif`), and supports both continuous calculation (`d4h_*_general`) and on-the-fly grid aggregation (`cell_size`):
 
 ```r
 library(drones4health)
 library(terra)
 
-# Load drone bands (Red, NIR, Green, DEM)
-dsm_raster <- rast("data/huayllapata_dsm.tif")
-green_band <- rast("data/huayllapata_green.tif")
-nir_band   <- rast("data/huayllapata_nir.tif")
+# 1. Calculate base spectral indices
+ndwi_continuous <- d4h_ndwi_general(green = "data/green.tif", nir = "data/nir.tif")
 
-# Calculate base indices
-ndwi_layer <- d4h_ndwi(green_band, nir_band)
-slope_layer <- d4h_slope(dsm_raster)
+# 2. Calculate Topographic Wetness Index (TWI)
+twi_continuous  <- d4h_twi_general(dem = "data/dem.tif")
 
-# Calculate Vulnerability Stagnation Indicator (IEV)
-iev_risk <- d4h_iev(delta_ndwi = ndwi_layer, slope_dsm = slope_layer)
-```
-
-```r
-# Spatial visualization
-library(ggplot2)
-library(tidyterra)
-
-ggplot() +
-  geom_spatraster(data = iev_risk) +
-  scale_fill_viridis_c(name = "Stagnation Risk\n(IEV)", option = "magma") +
-  theme_minimal(base_size = 15) +
-  labs(title = "Fine-scale F. hepatica Risk Zones - Huayllapata")
+# 3. Calculate Vulnerability Stagnation Indicator (IEV) with 20m hexagonal grid summary
+iev_grid <- d4h_iev(
+  ndwi = ndwi_continuous, 
+  dem = "data/dem.tif", 
+  cell_size = 20, 
+  square = FALSE
+)
 ```
 
 ## 4. Example: Generate Hexagonal Grid and ML-Ready Matrix
@@ -77,13 +62,21 @@ ggplot() +
 Integrate drone-derived indices into localized covariates to feed spatial Machine Learning models (Random Forest, XGBoost).
 
 ```r
-# Generate 50m operative grid for active surveillance
-surveillance_grid <- d4h_hex_grid(aoi = iev_risk, cell_size = 50)
+# Generate 50m operative surveillance grid
+surveillance_grid <- d4h_hex_grid(aoi = ndwi_continuous, cell_size = 50)
 
-# Extract zonal statistics for Machine Learning Matrix
+# Build feature matrix across grid cells
 ml_matrix <- d4h_build_ml_matrix(
   hex_data = surveillance_grid, 
-  raster_stack = c(ndwi_layer, slope_layer, iev_risk),
+  raster_stack = c(ndwi_continuous, twi_continuous),
   funs = c("mean", "max")
 )
+```
+
+## 5. Visualization with ggplot2
+
+```r
+# Plot continuous layer or zonal summary
+d4h_plot(ndwi_continuous, title = "Continuous NDWI Extent")
+d4h_plot(iev_grid, title = "IEV Stagnation Risk (20m Hexagons)", palette = "magma")
 ```

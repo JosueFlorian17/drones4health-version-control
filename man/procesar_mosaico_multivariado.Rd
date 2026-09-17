@@ -2,7 +2,7 @@
 % Please edit documentation in R/procesar_mosaico.R
 \name{procesar_mosaico_multivariado}
 \alias{procesar_mosaico_multivariado}
-\title{Pipeline multivariado: Cálculo conjunto de NDVI y SAVI, grilla zonal y exportación}
+\title{Process Multivariate Mosaic (NDVI and SAVI)}
 \usage{
 procesar_mosaico_multivariado(
   nir,
@@ -13,6 +13,22 @@ procesar_mosaico_multivariado(
   out_csv = NULL
 )
 }
+\arguments{
+\item{nir}{SpatRaster or file path to NIR band.}
+
+\item{red}{SpatRaster or file path to Red band.}
+
+\item{tamano_grilla}{Grid cell size in meters (default: 50).}
+
+\item{square}{Logical. TRUE for square cells, FALSE for hexagons.}
+
+\item{out_tif}{Optional output path for stacked GeoTIFF.}
+
+\item{out_csv}{Optional output path for CSV.}
+}
+\value{
+List containing SpatRaster stack and grid SpatVector.
+}
 \description{
-Pipeline multivariado: Cálculo conjunto de NDVI y SAVI, grilla zonal y exportación
+Computes both NDVI and SAVI, stacks them, and extracts zonal stats.
 }

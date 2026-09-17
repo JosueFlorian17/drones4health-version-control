@@ -1,96 +1,100 @@
-#' @title Synthetic Materials Risk Index (IMSR)
-#' @description Detects non-natural materials (plastics, rubber, tires) that can serve as vector breeding sites.
-#' @param red_edge SpatRaster. Red Edge band.
-#' @param red SpatRaster. Red band.
-#' @param nir SpatRaster. Near-infrared band.
-#' @param veg_threshold Numeric. Threshold to differentiate vegetation from synthetics.
-#' @param eps Numeric. Small epsilon to prevent division by zero.
-#' @return A SpatRaster highlighting synthetic materials.
+#' @title Continuous Vulnerability Stagnation Indicator (General Area)
+#' @description Identifies micro-stagnation areas with high vector breeding suitability by combining moisture (NDWI) and terrain slope.
+#' @param ndwi Character or SpatRaster. NDWI layer or path to file.
+#' @param dem Character or SpatRaster. Digital Elevation/Surface Model (DEM/DSM) or path to file.
+#' @param eps Numeric. Small epsilon to prevent division by zero (default: 0.001).
+#' @return A SpatRaster containing continuous IEV stagnation risk values.
 #' @export
-d4h_imsr <- function(red_edge, red, nir, veg_threshold = 0.2, eps = 0.001) {
-  ndre_approx <- (red_edge - red) / (red_edge + red + eps)
-  abs(ndre_approx - veg_threshold) * nir
-}
+d4h_iev_general <- function(ndwi, dem, eps = 0.001) {
+  if (is.character(ndwi) && length(ndwi) == 1L) ndwi <- terra::rast(ndwi)
+  if (is.character(dem) && length(dem) == 1L) dem <- terra::rast(dem)
 
-#' @title Thermal Refuge and Shade Index (IRTS)
-#' @description Identifies cool, shaded microhabitats serving as vector refuges.
-#' @param ndre SpatRaster. NDRE index layer.
-#' @param lst_local SpatRaster. Local Land Surface Temperature.
-#' @param lst_surrounding SpatRaster. Focal mean surrounding Land Surface Temperature.
-#' @param nir SpatRaster. Near-infrared band.
-#' @param eps Numeric. Small epsilon to prevent division by zero.
-#' @return A SpatRaster representing thermal refuges.
-#' @export
-d4h_irts <- function(ndre, lst_local, lst_surrounding, nir, eps = 0.001) {
-  (ndre * (lst_surrounding - lst_local)) / (nir + eps)
+  if (!inherits(ndwi, "SpatRaster") || !inherits(dem, "SpatRaster")) {
+    stop("'ndwi' and 'dem' must be SpatRaster objects or valid file paths.", call. = FALSE)
+  }
+
+  slope_dem <- terra::terrain(dem[[1]], v = "slope", unit = "degrees")
+  aligned   <- .align_two_bands(ndwi[[1]], slope_dem)
+  ndwi_lyr  <- aligned[[1]]
+  slope_lyr <- aligned[[2]]
+
+  iev <- ndwi_lyr * (1 / (slope_lyr + eps))
+  iev[is.infinite(iev) | is.nan(iev)] <- NA
+  names(iev) <- "IEV"
+  iev
 }
 
 #' @title Vulnerability Stagnation Indicator (IEV)
-#' @description Locates areas where surface water is likely to stagnate due to micro-depressions.
-#' @param delta_ndwi SpatRaster. Temporal difference in NDWI or base NDWI.
-#' @param slope_dsm SpatRaster. Slope derived from the Digital Surface Model.
-#' @param eps Numeric. Small epsilon to prevent division by zero.
-#' @return A SpatRaster highlighting stagnation risk.
+#' @description Calculates Vulnerability Stagnation Indicator with optional zonal grid summarization.
+#' @param ndwi Character or SpatRaster. NDWI layer or path to file.
+#' @param dem Character or SpatRaster. Digital Elevation/Surface Model (DEM/DSM) or path to file.
+#' @param cell_size Numeric. Optional cell size in meters. If NULL, returns continuous raster (default: NULL).
+#' @param square Logical. If TRUE, square grid; if FALSE, hexagonal grid (default: TRUE).
+#' @param eps Numeric. Small epsilon to prevent division by zero (default: 0.001).
+#' @return A SpatRaster (if cell_size = NULL) or SpatVector (if cell_size is numeric).
 #' @export
-d4h_iev <- function(delta_ndwi, slope_dsm, eps = 0.001) {
-  delta_ndwi * (1 / (slope_dsm + eps))
+d4h_iev <- function(ndwi, dem, cell_size = NULL, square = TRUE, eps = 0.001) {
+  iev_raster <- d4h_iev_general(ndwi = ndwi, dem = dem, eps = eps)
+
+  if (!is.null(cell_size)) {
+    return(d4h_summarize_grid(iev_raster, cell_size = cell_size, square = square))
+  }
+
+  iev_raster
 }
 
-#' @title Breeding Site Stratification Index (IEC)
-#' @description Evaluates water bodies weighted by optimal thermal ranges for larval development.
-#' @param gndvi_water SpatRaster. GNDVI masked strictly to water bodies.
-#' @param lst SpatRaster. Land Surface Temperature in Celsius.
-#' @param t_opt Numeric. Optimal incubation temperature.
-#' @return A SpatRaster stratifying breeding site quality.
+#' @title Continuous Synthetic Materials Risk Index (General Area)
+#' @description Detects non-natural materials (plastics, rubber, tires) that serve as potential mosquito breeding containers.
+#' @param red_edge Character or SpatRaster. Red Edge band or path to file.
+#' @param red Character or SpatRaster. Red band or path to file.
+#' @param nir Character or SpatRaster. Near-infrared band or path to file.
+#' @param veg_threshold Numeric. Threshold to differentiate vegetation from synthetics (default: 0.2).
+#' @param eps Numeric. Small epsilon to prevent division by zero (default: 0.001).
+#' @param scale Numeric. Divisor to normalize pixel values (default: NULL).
+#' @return A SpatRaster containing continuous IMSR risk values.
 #' @export
-d4h_iec <- function(gndvi_water, lst, t_opt = 25) {
-  gndvi_water * (1 - (abs(lst - t_opt) / t_opt))
+d4h_imsr_general <- function(red_edge, red, nir, veg_threshold = 0.2, eps = 0.001, scale = NULL) {
+  re <- .read_and_calibrate_band(red_edge, scale = scale)
+  r  <- .read_and_calibrate_band(red, scale = scale)
+  n  <- .read_and_calibrate_band(nir, scale = scale)
+
+  aligned1 <- .align_two_bands(re, r)
+  re <- aligned1[[1]]
+  r  <- aligned1[[2]]
+
+  aligned2 <- .align_two_bands(re, n)
+  re <- aligned2[[1]]
+  n  <- aligned2[[2]]
+
+  ndre_approx <- (re - r) / (re + r + eps)
+  imsr        <- abs(ndre_approx - veg_threshold) * n
+
+  imsr[is.infinite(imsr) | is.nan(imsr)] <- NA
+  names(imsr) <- "IMSR"
+  imsr
 }
 
-#' @title Clearing Stagnation Index (IEAD)
-#' @description Detects puddles in recently cleared or deforested areas.
-#' @param grad_delta_ndvi SpatRaster. Gradient of NDVI change.
-#' @param depressions_dsm SpatRaster. Topographic depressions from DSM.
-#' @param red_edge SpatRaster. Red Edge band.
-#' @return A SpatRaster highlighting stagnation in clearings.
+#' @title Synthetic Materials Risk Index (IMSR)
+#' @description Calculates Synthetic Materials Risk Index with optional zonal grid summarization.
+#' @param red_edge Character or SpatRaster. Red Edge band or path to file.
+#' @param red Character or SpatRaster. Red band or path to file.
+#' @param nir Character or SpatRaster. Near-infrared band or path to file.
+#' @param veg_threshold Numeric. Threshold to differentiate vegetation from synthetics (default: 0.2).
+#' @param cell_size Numeric. Optional cell size in meters. If NULL, returns continuous raster (default: NULL).
+#' @param square Logical. If TRUE, square grid; if FALSE, hexagonal grid (default: TRUE).
+#' @param eps Numeric. Small epsilon to prevent division by zero (default: 0.001).
+#' @param scale Numeric. Divisor to normalize pixel values (default: NULL).
+#' @return A SpatRaster (if cell_size = NULL) or SpatVector (if cell_size is numeric).
 #' @export
-d4h_iead <- function(grad_delta_ndvi, depressions_dsm, red_edge) {
-  grad_delta_ndvi * depressions_dsm * red_edge
-}
+d4h_imsr <- function(red_edge, red, nir, veg_threshold = 0.2, cell_size = NULL, square = TRUE, eps = 0.001, scale = NULL) {
+  imsr_raster <- d4h_imsr_general(
+    red_edge = red_edge, red = red, nir = nir,
+    veg_threshold = veg_threshold, eps = eps, scale = scale
+  )
 
-#' @title Spectral Water Retention Index (IRHE)
-#' @description Highlights stable, cold water bodies with low evaporation rates.
-#' @param green SpatRaster. Green band.
-#' @param nir SpatRaster. Near-infrared band.
-#' @param lst SpatRaster. Land Surface Temperature.
-#' @param eps Numeric. Small epsilon to prevent division by zero.
-#' @return A SpatRaster representing water retention potential.
-#' @export
-d4h_irhe <- function(green, nir, lst, eps = 0.001) {
-  ndwi <- (green - nir) / (green + nir + eps)
-  ndwi * (1 / (lst + eps))
-}
+  if (!is.null(cell_size)) {
+    return(d4h_summarize_grid(imsr_raster, cell_size = cell_size, square = square))
+  }
 
-#' @title Fragmentation and Edge Effect Index (IFEB)
-#' @description Quantifies ecological transitions and borders between vegetation and urban/cleared soil.
-#' @param grad_red_edge SpatRaster. Focal standard deviation of the Red Edge band.
-#' @param red SpatRaster. Red band.
-#' @param nir SpatRaster. Near-infrared band.
-#' @param eps Numeric. Small epsilon to prevent division by zero.
-#' @return A SpatRaster quantifying edge effects.
-#' @export
-d4h_ifeb <- function(grad_red_edge, red, nir, eps = 0.001) {
-  abs(grad_red_edge) * (red / (nir + eps))
-}
-
-#' @title Human Interface Roughness Index (IRIH)
-#' @description Measures canopy structural heterogeneity in the forest-household interface.
-#' @param var_re_nir SpatRaster. Local variance of the RE/NIR ratio.
-#' @param red SpatRaster. Red band.
-#' @param green SpatRaster. Green band.
-#' @param eps Numeric. Small epsilon to prevent division by zero.
-#' @return A SpatRaster representing structural roughness.
-#' @export
-d4h_irih <- function(var_re_nir, red, green, eps = 0.001) {
-  var_re_nir * (red / (green + eps))
+  imsr_raster
 }
