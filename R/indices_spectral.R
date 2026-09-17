@@ -1,182 +1,162 @@
-# Helpers internos para validación, carga y alineación automática
-.ensure_raster <- function(x) {
-  if (is.character(x) && length(x) == 1L) {
-    if (!file.exists(x)) stop(paste("File does not exist:", x), call. = FALSE)
-    x <- terra::rast(x)
-  }
-  if (!inherits(x, "SpatRaster")) {
-    stop("Input must be a SpatRaster object or a valid file path.", call. = FALSE)
-  }
-  x[[1]]
-}
-
-.match_pair <- function(r_ref, r_sub) {
-  r_ref <- .ensure_raster(r_ref)
-  r_sub <- .ensure_raster(r_sub)
-
-  if (!terra::compareGeom(r_ref, r_sub, stopOnError = FALSE)) {
-    if (!terra::same.crs(r_ref, r_sub)) {
-      r_sub <- terra::project(r_sub, r_ref, method = "bilinear")
-    }
-    r_sub <- terra::resample(r_sub, r_ref, method = "bilinear")
-  }
-  list(ref = r_ref, sub = r_sub)
-}
-
 #' @title Normalized Difference Vegetation Index (NDVI)
-#' @description Calculates NDVI from SpatRaster objects or file paths, auto-aligning geometries.
-#' @param nir SpatRaster or character. Near-infrared band.
-#' @param red SpatRaster or character. Red band.
-#' @return A SpatRaster containing NDVI values.
+#' @description Calculates NDVI to quantify photosynthetic activity and vegetation vigor from SpatRaster objects or file paths.
+#' @param nir SpatRaster or character. Near-infrared band or path to file.
+#' @param red SpatRaster or character. Red band or path to file.
+#' @return A SpatRaster containing NDVI values in [-1, 1] with background masked to NA.
 #' @export
 d4h_ndvi <- function(nir, red) {
-  pair <- .match_pair(nir, red)
+  pair <- .match_pair(nir, red, mask_zeros = TRUE)
   n <- pair$ref
   r <- pair$sub
 
   den <- n + r
   res <- (n - r) / den
-  res[den <= 0 | is.infinite(res) | is.nan(res)] <- NA
+  res[den <= 0 | is.nan(res) | is.infinite(res) | res == 0] <- NA
   res <- terra::clamp(res, lower = -1, upper = 1)
   names(res) <- "NDVI"
   res
 }
 
 #' @title Soil Adjusted Vegetation Index (SAVI)
-#' @description Calculates SAVI, correcting for soil brightness with automatic band alignment.
-#' @param nir SpatRaster or character. Near-infrared band.
-#' @param red SpatRaster or character. Red band.
-#' @param l_factor Numeric. Soil brightness correction factor (default: 0.5).
-#' @return A SpatRaster containing SAVI values.
+#' @description Calculates SAVI to minimize soil brightness influences in sparse canopy areas.
+#' @param nir SpatRaster or character. Near-infrared band or path to file.
+#' @param red SpatRaster or character. Red band or path to file.
+#' @param l_factor Numeric. Soil adjustment factor (default: 0.5).
+#' @return A SpatRaster containing SAVI values in [-1, 1] with background masked to NA.
 #' @export
 d4h_savi <- function(nir, red, l_factor = 0.5) {
-  pair <- .match_pair(nir, red)
+  pair <- .match_pair(nir, red, mask_zeros = TRUE)
   n <- pair$ref
   r <- pair$sub
 
   den <- n + r + l_factor
   res <- ((n - r) / den) * (1 + l_factor)
-  res[den <= 0 | is.infinite(res) | is.nan(res)] <- NA
+  res[den <= 0 | is.nan(res) | is.infinite(res) | res == 0] <- NA
   res <- terra::clamp(res, lower = -1, upper = 1)
   names(res) <- "SAVI"
   res
 }
 
 #' @title Enhanced Vegetation Index (EVI)
-#' @description Calculates EVI for dense canopy backgrounds with automatic band alignment.
-#' @param nir SpatRaster or character. Near-infrared band.
-#' @param red SpatRaster or character. Red band.
-#' @param blue SpatRaster or character. Blue band.
+#' @description Calculates EVI optimized for high biomass canopy regions.
+#' @param nir SpatRaster or character. Near-infrared band or path to file.
+#' @param red SpatRaster or character. Red band or path to file.
+#' @param blue SpatRaster or character. Blue band or path to file.
 #' @param g_factor Numeric. Gain factor (default: 2.5).
 #' @param c1 Numeric. Aerosol resistance coefficient 1 (default: 6).
 #' @param c2 Numeric. Aerosol resistance coefficient 2 (default: 7.5).
 #' @param l_factor Numeric. Canopy background adjustment (default: 1).
-#' @return A SpatRaster containing EVI values.
+#' @return A SpatRaster containing EVI values with background masked to NA.
 #' @export
 d4h_evi <- function(nir, red, blue, g_factor = 2.5, c1 = 6, c2 = 7.5, l_factor = 1) {
-  p1 <- .match_pair(nir, red)
-  p2 <- .match_pair(p1$ref, blue)
-
-  n <- p1$ref
-  r <- p1$sub
-  b <- p2$sub
+  aligned <- .match_multi(nir, red, blue, mask_zeros = TRUE)
+  n <- aligned[[1]]
+  r <- aligned[[2]]
+  b <- aligned[[3]]
 
   den <- n + (c1 * r) - (c2 * b) + l_factor
   res <- g_factor * ((n - r) / den)
-  res[is.infinite(res) | is.nan(res)] <- NA
+  res[den <= 0 | is.nan(res) | is.infinite(res) | res == 0] <- NA
   names(res) <- "EVI"
   res
 }
 
 #' @title Normalized Difference Water Index (NDWI)
-#' @description Calculates NDWI to identify water bodies and moisture with automatic alignment.
-#' @param green SpatRaster or character. Green band.
-#' @param nir SpatRaster or character. Near-infrared band.
-#' @return A SpatRaster containing NDWI values.
+#' @description Calculates NDWI to detect open surface water bodies and moisture accumulation.
+#' @param green SpatRaster or character. Green band or path to file.
+#' @param nir SpatRaster or character. Near-infrared band or path to file.
+#' @return A SpatRaster containing NDWI values in [-1, 1] with background masked to NA.
 #' @export
 d4h_ndwi <- function(green, nir) {
-  pair <- .match_pair(green, nir)
+  pair <- .match_pair(green, nir, mask_zeros = TRUE)
   g <- pair$ref
   n <- pair$sub
 
   den <- g + n
   res <- (g - n) / den
-  res[den <= 0 | is.infinite(res) | is.nan(res)] <- NA
+  res[den <= 0 | is.nan(res) | is.infinite(res) | res == 0] <- NA
   res <- terra::clamp(res, lower = -1, upper = 1)
   names(res) <- "NDWI"
   res
 }
 
 #' @title Normalized Difference Red Edge Index (NDRE)
-#' @description Calculates NDRE using the Red Edge band with automatic alignment.
-#' @param nir SpatRaster or character. Near-infrared band.
-#' @param red_edge SpatRaster or character. Red Edge band.
-#' @return A SpatRaster containing NDRE values.
+#' @description Calculates NDRE to assess canopy chlorophyll content and plant health using the Red Edge band.
+#' @param nir SpatRaster or character. Near-infrared band or path to file.
+#' @param red_edge SpatRaster or character. Red Edge band or path to file.
+#' @return A SpatRaster containing NDRE values in [-1, 1] with background masked to NA.
 #' @export
 d4h_ndre <- function(nir, red_edge) {
-  pair <- .match_pair(nir, red_edge)
+  pair <- .match_pair(nir, red_edge, mask_zeros = TRUE)
   n  <- pair$ref
   re <- pair$sub
 
   den <- n + re
   res <- (n - re) / den
-  res[den <= 0 | is.infinite(res) | is.nan(res)] <- NA
+  res[den <= 0 | is.nan(res) | is.infinite(res) | res == 0] <- NA
   res <- terra::clamp(res, lower = -1, upper = 1)
   names(res) <- "NDRE"
   res
 }
 
 #' @title Green Normalized Difference Vegetation Index (GNDVI)
-#' @description Calculates GNDVI for chlorophyll concentration estimation with automatic alignment.
-#' @param nir SpatRaster or character. Near-infrared band.
-#' @param green SpatRaster or character. Green band.
-#' @return A SpatRaster containing GNDVI values.
+#' @description Calculates GNDVI for estimating chlorophyll concentration.
+#' @param nir SpatRaster or character. Near-infrared band or path to file.
+#' @param green SpatRaster or character. Green band or path to file.
+#' @return A SpatRaster containing GNDVI values in [-1, 1] with background masked to NA.
 #' @export
 d4h_gndvi <- function(nir, green) {
-  pair <- .match_pair(nir, green)
+  pair <- .match_pair(nir, green, mask_zeros = TRUE)
   n <- pair$ref
   g <- pair$sub
 
   den <- n + g
   res <- (n - g) / den
-  res[den <= 0 | is.infinite(res) | is.nan(res)] <- NA
+  res[den <= 0 | is.nan(res) | is.infinite(res) | res == 0] <- NA
   res <- terra::clamp(res, lower = -1, upper = 1)
   names(res) <- "GNDVI"
   res
 }
 
 #' @title Difference Vegetation Index (DVI)
-#' @description Calculates DVI with automatic band alignment.
-#' @param nir SpatRaster or character. Near-infrared band.
-#' @param red SpatRaster or character. Red band.
-#' @return A SpatRaster containing DVI values.
+#' @description Calculates DVI as the simple difference between NIR and Red reflectance.
+#' @param nir SpatRaster or character. Near-infrared band or path to file.
+#' @param red SpatRaster or character. Red band or path to file.
+#' @return A SpatRaster containing DVI values with background masked to NA.
 #' @export
 d4h_dvi <- function(nir, red) {
-  pair <- .match_pair(nir, red)
+  pair <- .match_pair(nir, red, mask_zeros = TRUE)
   res <- pair$ref - pair$sub
+  res[is.nan(res) | is.infinite(res) | res == 0] <- NA
   names(res) <- "DVI"
   res
 }
 
 #' @title Corrected Transformed Vegetation Index (CTVI)
-#' @description Calculates CTVI to normalize vegetation distributions.
-#' @param ndvi_raster SpatRaster or character. NDVI input layer or path.
-#' @return A SpatRaster containing CTVI values.
+#' @description Calculates CTVI to normalize vegetation index distributions.
+#' @param ndvi_raster SpatRaster or character. Input NDVI layer or path to file.
+#' @return A SpatRaster containing CTVI values with background masked to NA.
 #' @export
 d4h_ctvi <- function(ndvi_raster) {
-  r <- .ensure_raster(ndvi_raster)
+  r <- .ensure_raster(ndvi_raster, mask_zeros = FALSE)
+  r[is.nan(r) | is.infinite(r) | r == 0] <- NA
   res <- (r + 0.5) / sqrt(abs(r + 0.5))
+  res[is.nan(res) | is.infinite(res) | res == 0] <- NA
   names(res) <- "CTVI"
   res
 }
 
 #' @title Bare Soil Mask
 #' @description Generates a binary mask of bare or exposed soil based on an NDVI threshold.
-#' @param ndvi_raster SpatRaster or character. NDVI input layer or path.
+#' @param ndvi_raster SpatRaster or character. Input NDVI layer or path to file.
 #' @param threshold Numeric. Value below which pixels are classified as bare soil (default: 0.15).
-#' @return A binary SpatRaster (1 = bare soil, 0 = vegetation/water).
+#' @return A binary SpatRaster (1 = bare soil, 0 = vegetation/water) with background masked to NA.
 #' @export
 d4h_bare_soil <- function(ndvi_raster, threshold = 0.15) {
-  r <- .ensure_raster(ndvi_raster)
-  terra::ifel(r < threshold, 1, 0)
+  r <- .ensure_raster(ndvi_raster, mask_zeros = FALSE)
+  r[is.nan(r) | is.infinite(r) | r == 0] <- NA
+  mask <- terra::ifel(r < threshold, 1, 0)
+  mask[is.na(r)] <- NA
+  names(mask) <- "bare_soil_mask"
+  mask
 }

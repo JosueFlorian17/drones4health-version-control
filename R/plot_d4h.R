@@ -1,23 +1,29 @@
 #' @title Cartographic Visualization with ggplot2
-#' @description Plots continuous raster layers (SpatRaster) or zonal grids (SpatVector / sf) with ggplot2.
-#' @param x SpatRaster, SpatVector, or sf object to plot.
-#' @param grid Optional SpatVector or sf object to overlay grid borders.
-#' @param palette Character. Color palette ("viridis", "magma", "terrain" or custom colors vector).
-#' @param limits Numeric vector c(min, max) to fix the color scale limits.
-#' @param title Character. Plot title.
-#' @param max_pixels Integer. Maximum number of pixels to sample for fast rendering (default: 500000).
+#' @description Plots continuous raster layers (SpatRaster) or zonal grids (SpatVector / sf) using aggregation and geom_raster to prevent sampling artefacts.
+#' @param x SpatRaster, SpatVector, sf, or character path to plot.
+#' @param grid Optional SpatVector, sf, or character path to overlay grid boundaries.
+#' @param palette Character. Color palette name ("viridis", "magma", "terrain") or custom color vector (default: "viridis").
+#' @param limits Numeric vector c(min, max) to fix the color scale limits (default: NULL).
+#' @param title Character. Plot title (default: NULL).
+#' @param max_pixels Integer. Maximum number of pixels to display before regular aggregation (default: 500000).
 #' @return A ggplot object.
 #' @export
 d4h_plot <- function(x, grid = NULL, palette = "viridis", limits = NULL, title = NULL, max_pixels = 500000) {
+  if (is.character(x) && length(x) == 1L) {
+    if (!file.exists(x)) stop(paste("File not found:", x), call. = FALSE)
+    x <- terra::rast(x)
+  }
+
   if (inherits(x, "SpatRaster")) {
     r_layer <- x[[1]]
+    total_cells <- terra::ncell(r_layer)
 
-    if (terra::ncell(r_layer) > max_pixels) {
-      df_plot <- terra::spatSample(r_layer, size = max_pixels, method = "regular", na.rm = TRUE, xy = TRUE, as.df = TRUE)
-    } else {
-      df_plot <- as.data.frame(r_layer, xy = TRUE, na.rm = TRUE)
+    if (total_cells > max_pixels) {
+      agg_fact <- ceiling(sqrt(total_cells / max_pixels))
+      r_layer <- terra::aggregate(r_layer, fact = agg_fact, fun = "mean", na.rm = TRUE)
     }
 
+    df_plot <- as.data.frame(r_layer, xy = TRUE, na.rm = TRUE)
     var_name <- names(r_layer)[1]
     colnames(df_plot) <- c("x", "y", "value")
 
@@ -29,7 +35,7 @@ d4h_plot <- function(x, grid = NULL, palette = "viridis", limits = NULL, title =
     ]
 
     p <- ggplot2::ggplot() +
-      ggplot2::geom_tile(data = df_plot, ggplot2::aes(x = x, y = y, fill = value))
+      ggplot2::geom_raster(data = df_plot, ggplot2::aes(x = x, y = y, fill = value))
 
     if (palette == "viridis") {
       p <- p + ggplot2::scale_fill_viridis_c(limits = limits, na.value = "transparent", name = var_name)
@@ -44,6 +50,7 @@ d4h_plot <- function(x, grid = NULL, palette = "viridis", limits = NULL, title =
     }
 
     if (!is.null(grid)) {
+      if (is.character(grid) && length(grid) == 1L) grid <- terra::vect(grid)
       if (inherits(grid, "SpatVector")) grid <- sf::st_as_sf(grid)
       p <- p + ggplot2::geom_sf(data = grid, fill = NA, color = "black", linewidth = 0.25)
     }
@@ -63,7 +70,7 @@ d4h_plot <- function(x, grid = NULL, palette = "viridis", limits = NULL, title =
       p <- p + ggplot2::scale_fill_viridis_c(option = "magma", limits = limits, name = col_name)
     }
   } else {
-    stop("'x' must be a SpatRaster, SpatVector, or sf object.", call. = FALSE)
+    stop("'x' must be a SpatRaster, SpatVector, sf object, or valid file path.", call. = FALSE)
   }
 
   p <- p +
@@ -71,7 +78,9 @@ d4h_plot <- function(x, grid = NULL, palette = "viridis", limits = NULL, title =
     ggplot2::theme_minimal() +
     ggplot2::theme(
       panel.grid = ggplot2::element_blank(),
-      axis.title = ggplot2::element_blank()
+      axis.title = ggplot2::element_blank(),
+      panel.background = ggplot2::element_rect(fill = "transparent", color = NA),
+      plot.background = ggplot2::element_rect(fill = "transparent", color = NA)
     )
 
   if (!is.null(title)) p <- p + ggplot2::labs(title = title)

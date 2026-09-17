@@ -1,17 +1,22 @@
 #' @title Summarize Raster Indicator by Spatial Grid
 #' @description Generates a square or hexagonal grid and computes the mean value of raster layers per cell, discarding unpopulated areas.
-#' @param raster_in SpatRaster. Input raster layer or multi-layer raster stack.
+#' @param raster_in SpatRaster or character. Input raster layer, stack, or path to file.
 #' @param cell_size Numeric. Grid cell size in meters (default: 20).
 #' @param square Logical. If TRUE, creates square cells; if FALSE, hexagonal cells (default: TRUE).
 #' @param discard_na Logical. If TRUE, removes grid cells outside the valid raster data area (default: TRUE).
 #' @return A SpatVector containing the grid cells with extracted mean values.
 #' @export
 d4h_summarize_grid <- function(raster_in, cell_size = 20, square = TRUE, discard_na = TRUE) {
-  if (!inherits(raster_in, "SpatRaster")) {
-    stop("'raster_in' must be a SpatRaster.", call. = FALSE)
+  r <- if (is.character(raster_in) && length(raster_in) == 1L) {
+    if (!file.exists(raster_in)) stop(paste("File not found:", raster_in), call. = FALSE)
+    terra::rast(raster_in)
+  } else if (inherits(raster_in, "SpatRaster")) {
+    raster_in
+  } else {
+    stop("'raster_in' must be a SpatRaster object or a valid file path string.", call. = FALSE)
   }
 
-  boundary_sf <- sf::st_as_sf(terra::as.polygons(terra::ext(raster_in), crs = terra::crs(raster_in)))
+  boundary_sf <- sf::st_as_sf(terra::as.polygons(terra::ext(r), crs = terra::crs(r)))
   grid_sf <- sf::st_make_grid(boundary_sf, cellsize = cell_size, square = square)
 
   prefix <- if (square) "G%04d" else "H%04d"
@@ -21,10 +26,10 @@ d4h_summarize_grid <- function(raster_in, cell_size = 20, square = TRUE, discard
   )
   grid_vect <- terra::vect(grid_sf)
 
-  summary_vect <- terra::extract(raster_in, grid_vect, fun = mean, na.rm = TRUE, bind = TRUE)
+  summary_vect <- terra::extract(r, grid_vect, fun = mean, na.rm = TRUE, bind = TRUE)
 
   if (discard_na) {
-    first_layer <- names(raster_in)[1]
+    first_layer <- names(r)[1]
     vals <- summary_vect[[first_layer]][, 1]
     summary_vect <- summary_vect[!is.na(vals) & !is.nan(vals) & vals != 0, ]
   }
@@ -34,11 +39,16 @@ d4h_summarize_grid <- function(raster_in, cell_size = 20, square = TRUE, discard
 
 #' @title Generate Hexagonal Surveillance Grid
 #' @description Creates an operative hexagonal grid over an Area of Interest (AOI).
-#' @param aoi SpatRaster, SpatVector, or sf object defining the spatial bounds.
+#' @param aoi SpatRaster, SpatVector, sf, or character path defining the spatial bounds.
 #' @param cell_size Numeric. Cell diameter in meters (default: 50).
-#' @return A SpatVector containing the hexagonal grid polygons.
+#' @return A SpatVector containing the hexagonal grid polygons with unique IDs.
 #' @export
 d4h_hex_grid <- function(aoi, cell_size = 50) {
+  if (is.character(aoi) && length(aoi) == 1L) {
+    if (!file.exists(aoi)) stop(paste("File not found:", aoi), call. = FALSE)
+    aoi <- terra::rast(aoi)
+  }
+
   if (inherits(aoi, "SpatRaster")) {
     boundary_sf <- sf::st_as_sf(terra::as.polygons(terra::ext(aoi), crs = terra::crs(aoi)))
   } else if (inherits(aoi, "SpatVector")) {
@@ -46,7 +56,7 @@ d4h_hex_grid <- function(aoi, cell_size = 50) {
   } else if (inherits(aoi, "sf")) {
     boundary_sf <- aoi
   } else {
-    stop("'aoi' must be a SpatRaster, SpatVector, or sf object.", call. = FALSE)
+    stop("'aoi' must be a SpatRaster, SpatVector, sf object, or valid file path.", call. = FALSE)
   }
 
   grid_sf <- sf::st_make_grid(boundary_sf, cellsize = cell_size, square = FALSE)
