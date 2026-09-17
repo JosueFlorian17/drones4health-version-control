@@ -12,11 +12,11 @@ d4h_normalize_reflectance(raster_layer, scale_factor = 65535)
 
 - raster_layer:
 
-  SpatRaster. The raw input band.
+  Character or SpatRaster. Raw input band or path to file.
 
 - scale_factor:
 
-  Numeric. The divisor to scale the raster (default: 65535).
+  Numeric. Divisor to scale the raster (default: 65535).
 
 ## Value
 

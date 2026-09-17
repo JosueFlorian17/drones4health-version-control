@@ -1,18 +1,16 @@
-# Synthetic Materials Risk Index (IMSR)
+# Continuous Synthetic Materials Risk Index (General Area)
 
-Calculates Synthetic Materials Risk Index with optional zonal grid
-summarization.
+Detects non-natural materials (plastics, rubber, tires) that serve as
+potential mosquito breeding containers.
 
 ## Usage
 
 ``` r
-d4h_imsr(
+d4h_imsr_general(
   red_edge,
   red,
   nir,
   veg_threshold = 0.2,
-  cell_size = NULL,
-  square = TRUE,
   eps = 0.001,
   scale = NULL
 )
@@ -37,16 +35,6 @@ d4h_imsr(
   Numeric. Threshold to differentiate vegetation from synthetics
   (default: 0.2).
 
-- cell_size:
-
-  Numeric. Optional cell size in meters. If NULL, returns continuous
-  raster (default: NULL).
-
-- square:
-
-  Logical. If TRUE, square grid; if FALSE, hexagonal grid (default:
-  TRUE).
-
 - eps:
 
   Numeric. Small epsilon to prevent division by zero (default: 0.001).
@@ -57,5 +45,4 @@ d4h_imsr(
 
 ## Value
 
-A SpatRaster (if cell_size = NULL) or SpatVector (if cell_size is
-numeric).
+A SpatRaster containing continuous IMSR risk values.

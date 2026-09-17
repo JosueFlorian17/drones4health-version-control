@@ -2,34 +2,33 @@
 % Please edit documentation in R/plot_d4h.R
 \name{d4h_plot}
 \alias{d4h_plot}
-\title{Visualización cartográfica con ggplot2}
+\title{Cartographic Visualization with ggplot2}
 \usage{
 d4h_plot(
   x,
-  grilla = NULL,
-  paleta = "viridis",
-  limites = NULL,
-  titulo = NULL,
+  grid = NULL,
+  palette = "viridis",
+  limits = NULL,
+  title = NULL,
   max_pixels = 5e+05
 )
 }
 \arguments{
-\item{x}{Objeto SpatRaster o SpatVector a graficar.}
+\item{x}{SpatRaster, SpatVector, or sf object to plot.}
 
-\item{grilla}{Objeto SpatVector o sf opcional para superponer bordes de malla.}
+\item{grid}{Optional SpatVector or sf object to overlay grid borders.}
 
-\item{paleta}{Opciones: "viridis", "magma", "terrain" o vector de colores.}
+\item{palette}{Character. Color palette ("viridis", "magma", "terrain" or custom colors vector).}
 
-\item{limites}{Vector numérico c(min, max) para fijar la escala de color.}
+\item{limits}{Numeric vector c(min, max) to fix the color scale limits.}
 
-\item{titulo}{Título del gráfico.}
+\item{title}{Character. Plot title.}
 
-\item{max_pixels}{Número máximo de píxeles a muestrear para visualización ágil (default: 500000).}
+\item{max_pixels}{Integer. Maximum number of pixels to sample for fast rendering (default: 500000).}
 }
 \value{
-Objeto ggplot.
+A ggplot object.
 }
 \description{
-Grafica capas ráster (SpatRaster) o grillas zonales (SpatVector / sf) con ggplot2.
-Omite el área fuera del vuelo del dron y permite superponer grillas.
+Plots continuous raster layers (SpatRaster) or zonal grids (SpatVector / sf) with ggplot2.
 }

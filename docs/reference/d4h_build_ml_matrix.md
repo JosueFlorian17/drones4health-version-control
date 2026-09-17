@@ -26,4 +26,4 @@ d4h_build_ml_matrix(hex_data, raster_stack, funs = c("mean", "max"))
 
 ## Value
 
-A data.frame or tibble with grid IDs and extracted features.
+A tibble with grid IDs and extracted features.

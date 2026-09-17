@@ -4,16 +4,20 @@
 \alias{d4h_twi}
 \title{Topographic Wetness Index (TWI)}
 \usage{
-d4h_twi(dem_raster, eps = 0.001)
+d4h_twi(dem, cell_size = NULL, square = TRUE, eps = 0.001)
 }
 \arguments{
-\item{dem_raster}{SpatRaster. Digital Elevation Model.}
+\item{dem}{Character or SpatRaster. Digital Elevation/Surface Model (DEM/DSM) or path to file.}
 
-\item{eps}{Numeric. Small epsilon to prevent division by zero.}
+\item{cell_size}{Numeric. Optional cell size in meters. If NULL, returns continuous raster (default: NULL).}
+
+\item{square}{Logical. If TRUE, square grid; if FALSE, hexagonal grid (default: TRUE).}
+
+\item{eps}{Numeric. Small epsilon to prevent division by zero (default: 0.001).}
 }
 \value{
-A SpatRaster containing TWI values.
+A SpatRaster (if cell_size = NULL) or SpatVector (if cell_size is numeric).
 }
 \description{
-Calculates TWI to identify potential water accumulation areas based on terrain.
+Calculates Topographic Wetness Index with optional zonal grid summarization.
 }

@@ -1,7 +1,6 @@
-# Generate Hexagonal Grid Over Area of Interest
+# Generate Hexagonal Surveillance Grid
 
-Creates an operative hexagonal grid for active epidemiological
-surveillance.
+Creates an operative hexagonal grid over an Area of Interest (AOI).
 
 ## Usage
 
@@ -13,12 +12,12 @@ d4h_hex_grid(aoi, cell_size = 50)
 
 - aoi:
 
-  SpatRaster, SpatVector, or sf object defining the area of interest.
+  SpatRaster, SpatVector, or sf object defining the spatial bounds.
 
 - cell_size:
 
-  Numeric. Cell size in meters (default: 50).
+  Numeric. Cell diameter in meters (default: 50).
 
 ## Value
 
-A SpatVector containing the hexagonal grid polygons with unique IDs.
+A SpatVector containing the hexagonal grid polygons.

@@ -13,15 +13,15 @@ d4h_clean_band(raster_layer, min_val = -1, max_val = 1)
 
 - raster_layer:
 
-  SpatRaster. The input band to clean.
+  SpatRaster. Input band to clean.
 
 - min_val:
 
-  Numeric. Minimum valid value.
+  Numeric. Minimum valid value (default: -1).
 
 - max_val:
 
-  Numeric. Maximum valid value.
+  Numeric. Maximum valid value (default: 1).
 
 ## Value
 

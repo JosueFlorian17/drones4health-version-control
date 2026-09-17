@@ -1,9 +1,9 @@
-# drones4health: Ultra-High Resolution Drone Metrics for Spatial Health Analysis <img src="man/figures/logo.png" align="right" width="120" />
+# drones4health: Ultra-High Resolution Drone Metrics for Spatial Health Analysis
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-Calculate and extract ultra-high resolution remote sensing metrics for spatial health analysis 🚁. This package offers R users a quick and straightforward way to obtain continuous and zonal micro-environmental statistics and epidemiological indicators from UAV orthomosaics. Designed to map localized infection risks within a One Health framework.
+Calculate and extract ultra-high resolution remote sensing metrics for spatial health analysis. This package offers R users a straightforward way to obtain continuous and zonal micro-environmental statistics and epidemiological indicators from UAV orthomosaics. Designed to map localized infection risks within a One Health framework.
 
 ## 1. Installation
 
@@ -20,7 +20,7 @@ library(drones4health)
 
 ## 2. Available Micro-Environmental and Epidemiological Metrics
 
-`drones4health` focuses on a curated, high-impact set of spectral, topographic, and epidemiological indicators:
+`drones4health` focuses on a curated set of spectral, topographic, and epidemiological indicators:
 
 ```r
 d4h_list_metrics()
@@ -57,19 +57,19 @@ iev_grid <- d4h_iev(
 )
 ```
 
-## 4. Example: Generate Hexagonal Grid and ML-Ready Matrix
+## 4. Example: Generate Hexagonal Surveillance Grid
 
-Integrate drone-derived indices into localized covariates to feed spatial Machine Learning models (Random Forest, XGBoost).
+Create operational spatial grids for active surveillance across the survey area:
 
 ```r
 # Generate 50m operative surveillance grid
 surveillance_grid <- d4h_hex_grid(aoi = ndwi_continuous, cell_size = 50)
 
-# Build feature matrix across grid cells
-ml_matrix <- d4h_build_ml_matrix(
-  hex_data = surveillance_grid, 
-  raster_stack = c(ndwi_continuous, twi_continuous),
-  funs = c("mean", "max")
+# Summarize continuous raster layers over grid
+grid_summary <- d4h_summarize_grid(
+  raster_in = ndwi_continuous, 
+  cell_size = 50, 
+  square = FALSE
 )
 ```
 

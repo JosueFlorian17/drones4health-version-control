@@ -1,18 +1,17 @@
-# Visualización cartográfica con ggplot2
+# Cartographic Visualization with ggplot2
 
-Grafica capas ráster (SpatRaster) o grillas zonales (SpatVector / sf)
-con ggplot2. Omite el área fuera del vuelo del dron y permite superponer
-grillas.
+Plots continuous raster layers (SpatRaster) or zonal grids (SpatVector /
+sf) with ggplot2.
 
 ## Usage
 
 ``` r
 d4h_plot(
   x,
-  grilla = NULL,
-  paleta = "viridis",
-  limites = NULL,
-  titulo = NULL,
+  grid = NULL,
+  palette = "viridis",
+  limits = NULL,
+  title = NULL,
   max_pixels = 5e+05
 )
 ```
@@ -21,29 +20,30 @@ d4h_plot(
 
 - x:
 
-  Objeto SpatRaster o SpatVector a graficar.
+  SpatRaster, SpatVector, or sf object to plot.
 
-- grilla:
+- grid:
 
-  Objeto SpatVector o sf opcional para superponer bordes de malla.
+  Optional SpatVector or sf object to overlay grid borders.
 
-- paleta:
+- palette:
 
-  Opciones: "viridis", "magma", "terrain" o vector de colores.
+  Character. Color palette ("viridis", "magma", "terrain" or custom
+  colors vector).
 
-- limites:
+- limits:
 
-  Vector numérico c(min, max) para fijar la escala de color.
+  Numeric vector c(min, max) to fix the color scale limits.
 
-- titulo:
+- title:
 
-  Título del gráfico.
+  Character. Plot title.
 
 - max_pixels:
 
-  Número máximo de píxeles a muestrear para visualización ágil (default:
-  500000).
+  Integer. Maximum number of pixels to sample for fast rendering
+  (default: 500000).
 
 ## Value
 
-Objeto ggplot.
+A ggplot object.

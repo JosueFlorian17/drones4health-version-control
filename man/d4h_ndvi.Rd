@@ -4,16 +4,22 @@
 \alias{d4h_ndvi}
 \title{Normalized Difference Vegetation Index (NDVI)}
 \usage{
-d4h_ndvi(nir, red)
+d4h_ndvi(nir, red, cell_size = NULL, square = TRUE, scale = NULL)
 }
 \arguments{
-\item{nir}{SpatRaster. Near-infrared band.}
+\item{nir}{Character or SpatRaster. Near-infrared band or path to file.}
 
-\item{red}{SpatRaster. Red band.}
+\item{red}{Character or SpatRaster. Red band or path to file.}
+
+\item{cell_size}{Numeric. Optional cell size in meters. If NULL, returns continuous raster (default: NULL).}
+
+\item{square}{Logical. If TRUE, square grid; if FALSE, hexagonal grid (default: TRUE).}
+
+\item{scale}{Numeric. Divisor to normalize pixel values (default: NULL).}
 }
 \value{
-A SpatRaster containing NDVI values.
+A SpatRaster (if cell_size = NULL) or SpatVector (if cell_size is numeric).
 }
 \description{
-Calculates NDVI to measure vegetation vigor.
+Calculates NDVI with optional zonal grid summarization (square or hexagonal).
 }

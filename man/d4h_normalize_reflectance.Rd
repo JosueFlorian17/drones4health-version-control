@@ -7,9 +7,9 @@
 d4h_normalize_reflectance(raster_layer, scale_factor = 65535)
 }
 \arguments{
-\item{raster_layer}{SpatRaster. The raw input band.}
+\item{raster_layer}{Character or SpatRaster. Raw input band or path to file.}
 
-\item{scale_factor}{Numeric. The divisor to scale the raster (default: 65535).}
+\item{scale_factor}{Numeric. Divisor to scale the raster (default: 65535).}
 }
 \value{
 A SpatRaster clamped between 0 and 1.
