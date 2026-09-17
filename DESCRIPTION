@@ -5,6 +5,8 @@ Authors@R:
     person("Josue", "Florian", , "josue.florian@example.com", role = c("aut", "cre"))
 Description: Calculate and extract ultra-high resolution remote sensing metrics for spatial health analysis from UAV orthomosaics. Designed to map localized infection risks within a One Health framework.
 License: MIT + file LICENSE
+URL: https://github.com/JosueFlorian17/drones4health-version-control
+BugReports: https://github.com/JosueFlorian17/drones4health-version-control/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Imports: 

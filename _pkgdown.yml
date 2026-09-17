@@ -1,7 +1,7 @@
 url: https://JosueFlorian17.github.io/drones4health-version-control/
 template:
   bootstrap: 5
-  theme: light
+  light-switch: true
 navbar:
   title: "drones4health"
   left:
