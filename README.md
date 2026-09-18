@@ -1,9 +1,9 @@
-# drones4health: Ultra-High Resolution Drone Metrics for Spatial Health Analysis
+# drones4health: High Resolution Drone Metrics for Spatial Health Analysis
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-Calculate and extract ultra-high resolution remote sensing metrics for spatial health analysis. This package offers R users a straightforward way to obtain continuous and zonal micro-environmental statistics and epidemiological indicators from UAV orthomosaics. Designed to map localized infection risks within a One Health framework.
+Calculate and extract high resolution remote sensing metrics for spatial analysis. This package offers R users a straightforward way to obtain continuous and zonal micro-environmental statistics and epidemiological indicators from proccessed orthomosaics. 
 
 ## 1. Installation
 
@@ -36,7 +36,7 @@ d4h_list_metrics()
 
 ## 3. Example: Calculate Epidemiological Indices from UAV Imagery
 
-All indicator functions accept either `terra::SpatRaster` objects or direct file paths (`character`), automatically handle CRS/extent alignment, and mask background NoData to `NA`:
+All indicator functions accept either `terra::SpatRaster` objects or direct file paths, automatically handle CRS/extent alignment, and mask background NoData to `NA`:
 
 ```r
 library(drones4health)
