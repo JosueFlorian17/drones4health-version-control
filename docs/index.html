@@ -50,11 +50,11 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="drones4health-high-resolution-drone-metrics-for-spatial-environmental-analysis">drones4health: High Resolution Drone Metrics for Spatial Environmental Analysis<a class="anchor" aria-label="anchor" href="#drones4health-high-resolution-drone-metrics-for-spatial-environmental-analysis"></a>
+<div class="page-header"><h1 id="drones4health-high-resolution-drone-metrics-for-spatial-health-analysis">drones4health: High Resolution Drone Metrics for Spatial Health Analysis<a class="anchor" aria-label="anchor" href="#drones4health-high-resolution-drone-metrics-for-spatial-health-analysis"></a>
 </h1></div>
 <!-- badges: start -->
 <!-- badges: end -->
-<p>Calculate and extract remote sensing metrics for spatial analysis. This package offers R users a straightforward way to obtain continuous and zonal micro-environmental statistics and epidemiological indicators from proccessed orthomosaics.</p>
+<p>Calculate and extract high resolution remote sensing metrics for spatial analysis. This package offers R users a straightforward way to obtain continuous and zonal micro-environmental statistics and epidemiological indicators from processed orthomosaics.</p>
 <div class="section level2">
 <h2 id="id_1-installation">1. Installation<a class="anchor" aria-label="anchor" href="#id_1-installation"></a>
 </h2>
@@ -83,7 +83,7 @@
 <div class="section level2">
 <h2 id="id_3-example-calculate-epidemiological-indices-from-uav-imagery">3. Example: Calculate Epidemiological Indices from UAV Imagery<a class="anchor" aria-label="anchor" href="#id_3-example-calculate-epidemiological-indices-from-uav-imagery"></a>
 </h2>
-<p>All indicator functions accept either <code><a href="https://rspatial.github.io/terra/reference/SpatRaster-class.html" class="external-link">terra::SpatRaster</a></code> objects or direct file paths, automatically handle CRS/extent alignment, and mask background NoData:</p>
+<p>All indicator functions accept either <code><a href="https://rspatial.github.io/terra/reference/SpatRaster-class.html" class="external-link">terra::SpatRaster</a></code> objects or direct file paths, automatically handle CRS/extent alignment, and mask background NoData to <code>NA</code>:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JosueFlorian17/drones4health-version-control" class="external-link">drones4health</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/" class="external-link">terra</a></span><span class="op">)</span></span>
@@ -114,12 +114,21 @@
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="id_5-visualization-with-ggplot2">5. Visualization with ggplot2<a class="anchor" aria-label="anchor" href="#id_5-visualization-with-ggplot2"></a>
+<h2 id="id_5-visualization-with-ggplot2-and-interactive-swipe-viewer">5. Visualization with ggplot2 and Interactive Swipe Viewer<a class="anchor" aria-label="anchor" href="#id_5-visualization-with-ggplot2-and-interactive-swipe-viewer"></a>
 </h2>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Plot continuous raster or zonal grid with automatic aggregation and transparent background</span></span>
 <span><span class="fu"><a href="reference/d4h_plot.html">d4h_plot</a></span><span class="op">(</span><span class="va">iev_risk</span>, title <span class="op">=</span> <span class="st">"Continuous IEV Stagnation Risk"</span>, palette <span class="op">=</span> <span class="st">"magma"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/d4h_plot.html">d4h_plot</a></span><span class="op">(</span><span class="va">grid_summary</span>, title <span class="op">=</span> <span class="st">"IEV Stagnation Risk (50m Hexagons)"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="reference/d4h_plot.html">d4h_plot</a></span><span class="op">(</span><span class="va">grid_summary</span>, title <span class="op">=</span> <span class="st">"IEV Stagnation Risk (50m Hexagons)"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Interactive side-by-side swipe comparison</span></span>
+<span><span class="fu"><a href="reference/d4h_mapview_swipe.html">d4h_mapview_swipe</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">ndwi_layer</span>, </span>
+<span>  y <span class="op">=</span> <span class="va">iev_risk</span>, </span>
+<span>  basemap <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  col_x <span class="op">=</span> <span class="st">"viridis"</span>, </span>
+<span>  col_y <span class="op">=</span> <span class="st">"magma"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">

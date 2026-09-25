@@ -21,5 +21,5 @@ d4h_ndre(nir, red_edge)
 
 ## Value
 
-A SpatRaster containing NDRE values in -1, 1 with background masked to
-NA.
+A SpatRaster containing NDRE values in `[-1, 1]` with background masked
+to NA.

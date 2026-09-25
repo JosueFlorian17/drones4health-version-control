@@ -1,9 +1,9 @@
-# drones4health: High Resolution Drone Metrics for Spatial Environmental Analysis
+# drones4health: High Resolution Drone Metrics for Spatial Health Analysis
 
-Calculate and extract remote sensing metrics for spatial analysis. This
-package offers R users a straightforward way to obtain continuous and
-zonal micro-environmental statistics and epidemiological indicators from
-proccessed orthomosaics.
+Calculate and extract high resolution remote sensing metrics for spatial
+analysis. This package offers R users a straightforward way to obtain
+continuous and zonal micro-environmental statistics and epidemiological
+indicators from processed orthomosaics.
 
 ## 1. Installation
 
@@ -43,7 +43,7 @@ d4h_list_metrics()
 All indicator functions accept either
 [`terra::SpatRaster`](https://rspatial.github.io/terra/reference/SpatRaster-class.html)
 objects or direct file paths, automatically handle CRS/extent alignment,
-and mask background NoData:
+and mask background NoData to `NA`:
 
 ``` r
 
@@ -79,11 +79,20 @@ grid_summary <- d4h_summarize_grid(
 )
 ```
 
-## 5. Visualization with ggplot2
+## 5. Visualization with ggplot2 and Interactive Swipe Viewer
 
 ``` r
 
 # Plot continuous raster or zonal grid with automatic aggregation and transparent background
 d4h_plot(iev_risk, title = "Continuous IEV Stagnation Risk", palette = "magma")
 d4h_plot(grid_summary, title = "IEV Stagnation Risk (50m Hexagons)")
+
+# Interactive side-by-side swipe comparison
+d4h_mapview_swipe(
+  x = ndwi_layer, 
+  y = iev_risk, 
+  basemap = TRUE,
+  col_x = "viridis", 
+  col_y = "magma"
+)
 ```

@@ -34,5 +34,5 @@ d4h_imsr(red_edge, red, nir, veg_threshold = 0.2, eps = 0.001)
 
 ## Value
 
-A SpatRaster containing IMSR values in 0, 1 with background masked to
-NA.
+A SpatRaster containing IMSR values in `[0, 1]` with background masked
+to NA.

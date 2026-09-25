@@ -19,6 +19,8 @@ Suggests:
     leaflet,
     leaflet.extras2,
     mapview,
+    openxlsx,
     raster,
-    viridisLite
+    viridisLite,
+    writexl
 Config/roxygen2/version: 8.1.0

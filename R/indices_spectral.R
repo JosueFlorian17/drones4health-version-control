@@ -17,6 +17,24 @@ d4h_ndvi <- function(nir, red) {
   res
 }
 
+#' @title Difference Vegetation Index (DVI)
+#' @description Calculates DVI as the simple difference between NIR and Red reflectance.
+#' @param nir SpatRaster or character. Near-infrared band or path to file.
+#' @param red SpatRaster or character. Red band or path to file.
+#' @return A SpatRaster containing DVI values with background masked to NA.
+#' @export
+d4h_dvi <- function(nir, red) {
+  pair <- .match_pair(nir, red, mask_zeros = TRUE)
+  n <- pair$ref
+  r <- pair$sub
+
+  res <- n - r
+  res[is.nan(res) | is.infinite(res) | res == 0] <- NA
+
+  names(res) <- "DVI"
+  res
+}
+
 #' @title Soil Adjusted Vegetation Index (SAVI)
 #' @description Calculates SAVI to minimize soil brightness influences in sparse canopy areas.
 #' @param nir SpatRaster or character. Near-infrared band or path to file.
@@ -34,6 +52,57 @@ d4h_savi <- function(nir, red, l_factor = 0.5) {
   res[den <= 0 | is.nan(res) | is.infinite(res) | res == 0] <- NA
   res <- terra::clamp(res, lower = -1, upper = 1)
   names(res) <- "SAVI"
+  res
+}
+
+#' @title Modified Soil Adjusted Vegetation Index 2 (MSAVI2)
+#' @description Computes MSAVI2 to evaluate vegetation cover in sparse or arid canopies without requiring an empirical soil adjustment factor.
+#' @param nir SpatRaster or character. Near-infrared band or path to file.
+#' @return A SpatRaster containing MSAVI2 values in \code{[-1, 1]} with background masked to NA.
+#' @export
+d4h_msavi2 <- function(nir, red) {
+  pair <- .match_pair(nir, red, mask_zeros = TRUE)
+  n <- pair$ref
+  r <- pair$sub
+
+  # Normalizacion a reflectancia [0, 1] si viene en enteros de 16 bits
+  max_sample <- max(terra::spatSample(n, size = 100, na.rm = TRUE)[, 1], na.rm = TRUE)
+  if (is.finite(max_sample) && max_sample > 1) {
+    n <- n / 65535
+    r <- r / 65535
+  }
+
+  term_sqrt <- (2 * n + 1)^2 - 8 * (n - r)
+  term_sqrt[term_sqrt < 0] <- NA
+
+  res <- (2 * n + 1 - sqrt(term_sqrt)) / 2
+  res[is.nan(res) | is.infinite(res) | res == 0] <- NA
+  res <- terra::clamp(res, lower = -1, upper = 1)
+
+  names(res) <- "MSAVI2"
+  res
+}
+
+#' @title Visible Atmospherically Resistant Index (VARI)
+#' @description Computes VARI to assess vegetation fraction while minimizing atmospheric and illumination sensitivity.
+#' @param green SpatRaster or character. Green band or path to file.
+#' @param red SpatRaster or character. Red band or path to file.
+#' @param blue SpatRaster or character. Blue band (or Red Edge / NIR if Blue unavailable) or path to file.
+#' @param eps Numeric. Small epsilon to prevent zero division (default: 0.001).
+#' @return A SpatRaster containing VARI values in \code{[-1, 1]} with background masked to NA.
+#' @export
+d4h_vari <- function(green, red, blue, eps = 0.001) {
+  aligned <- .match_multi(green, red, blue, mask_zeros = TRUE)
+  g <- aligned[[1]]
+  r <- aligned[[2]]
+  b <- aligned[[3]]
+
+  den <- g + r - b + eps
+  res <- (g - r) / den
+  res[is.nan(res) | is.infinite(res) | res == 0] <- NA
+  res <- terra::clamp(res, lower = -1, upper = 1)
+
+  names(res) <- "VARI"
   res
 }
 
@@ -115,20 +184,6 @@ d4h_gndvi <- function(nir, green) {
   res[den <= 0 | is.nan(res) | is.infinite(res) | res == 0] <- NA
   res <- terra::clamp(res, lower = -1, upper = 1)
   names(res) <- "GNDVI"
-  res
-}
-
-#' @title Difference Vegetation Index (DVI)
-#' @description Calculates DVI as the simple difference between NIR and Red reflectance.
-#' @param nir SpatRaster or character. Near-infrared band or path to file.
-#' @param red SpatRaster or character. Red band or path to file.
-#' @return A SpatRaster containing DVI values with background masked to NA.
-#' @export
-d4h_dvi <- function(nir, red) {
-  pair <- .match_pair(nir, red, mask_zeros = TRUE)
-  res <- pair$ref - pair$sub
-  res[is.nan(res) | is.infinite(res) | res == 0] <- NA
-  names(res) <- "DVI"
   res
 }
 

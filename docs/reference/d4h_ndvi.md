@@ -21,5 +21,5 @@ d4h_ndvi(nir, red)
 
 ## Value
 
-A SpatRaster containing NDVI values in -1, 1 with background masked to
-NA.
+A SpatRaster containing NDVI values in `[-1, 1]` with background masked
+to NA.

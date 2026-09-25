@@ -34,6 +34,8 @@
   : Thermal Refuge and Shade Index (IRTS)
 - [`d4h_list_metrics()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_list_metrics.md)
   : List Available Micro-Environmental and Epidemiological Metrics
+- [`d4h_mapview_swipe()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_mapview_swipe.md)
+  : Interactive Side-by-Side Raster Swipe Viewer
 - [`d4h_ndre()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_ndre.md)
   : Normalized Difference Red Edge Index (NDRE)
 - [`d4h_ndvi()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_ndvi.md)
@@ -46,10 +48,17 @@
   : Cartographic Visualization with ggplot2
 - [`d4h_process_mosaic()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_process_mosaic.md)
   : End-to-End Drone Mosaic Processing Pipeline
+- [`d4h_raster_general()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_raster_general.md)
+  : Convert Raster Indicator to General Homogeneous Mosaic
 - [`d4h_savi()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_savi.md)
   : Soil Adjusted Vegetation Index (SAVI)
 - [`d4h_slope()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_slope.md)
   : Topographic Slope
+- [`d4h_summarize_general()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_summarize_general.md)
+  : Summarize Raster Indicator for the General Mosaic Footprint
+- [`d4h_summarize_global()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_summarize_global.md)
+  [`d4h_global_summary()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_summarize_global.md)
+  : Global Statistical Summary of Raster Indicators
 - [`d4h_summarize_grid()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_summarize_grid.md)
   : Summarize Raster Indicator by Spatial Grid
 - [`d4h_thermal_to_celsius()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_thermal_to_celsius.md)

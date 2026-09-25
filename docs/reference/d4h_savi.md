@@ -25,5 +25,5 @@ d4h_savi(nir, red, l_factor = 0.5)
 
 ## Value
 
-A SpatRaster containing SAVI values in -1, 1 with background masked to
-NA.
+A SpatRaster containing SAVI values in `[-1, 1]` with background masked
+to NA.

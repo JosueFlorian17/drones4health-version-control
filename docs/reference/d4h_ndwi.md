@@ -21,5 +21,5 @@ d4h_ndwi(green, nir)
 
 ## Value
 
-A SpatRaster containing NDWI values in -1, 1 with background masked to
-NA.
+A SpatRaster containing NDWI values in `[-1, 1]` with background masked
+to NA.

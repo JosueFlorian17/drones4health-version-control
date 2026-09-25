@@ -20,5 +20,5 @@ d4h_gndvi(nir, green)
 
 ## Value
 
-A SpatRaster containing GNDVI values in -1, 1 with background masked to
-NA.
+A SpatRaster containing GNDVI values in `[-1, 1]` with background masked
+to NA.
