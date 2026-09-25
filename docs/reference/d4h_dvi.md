@@ -1,6 +1,6 @@
 # Difference Vegetation Index (DVI)
 
-Calculates DVI.
+Calculates DVI as the simple difference between NIR and Red reflectance.
 
 ## Usage
 
@@ -12,12 +12,12 @@ d4h_dvi(nir, red)
 
 - nir:
 
-  SpatRaster. Near-infrared band.
+  SpatRaster or character. Near-infrared band or path to file.
 
 - red:
 
-  SpatRaster. Red band.
+  SpatRaster or character. Red band or path to file.
 
 ## Value
 
-A SpatRaster containing DVI values.
+A SpatRaster containing DVI values with background masked to NA.

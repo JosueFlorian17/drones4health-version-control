@@ -13,12 +13,14 @@ d4h_bare_soil(ndvi_raster, threshold = 0.15)
 
 - ndvi_raster:
 
-  SpatRaster. NDVI input layer.
+  SpatRaster or character. Input NDVI layer or path to file.
 
 - threshold:
 
-  Numeric. Value below which pixels are classified as bare soil.
+  Numeric. Value below which pixels are classified as bare soil
+  (default: 0.15).
 
 ## Value
 
-A binary SpatRaster (1 = bare soil, 0 = vegetation/water).
+A binary SpatRaster (1 = bare soil, 0 = vegetation/water) with
+background masked to NA.

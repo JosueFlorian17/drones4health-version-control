@@ -7,13 +7,13 @@
 d4h_ndvi(nir, red)
 }
 \arguments{
-\item{nir}{SpatRaster or character. Near-infrared band.}
+\item{nir}{SpatRaster or character. Near-infrared band or path to file.}
 
-\item{red}{SpatRaster or character. Red band.}
+\item{red}{SpatRaster or character. Red band or path to file.}
 }
 \value{
-A SpatRaster containing NDVI values.
+A SpatRaster containing NDVI values in \code{[-1, 1]} with background masked to NA.
 }
 \description{
-Calculates NDVI from SpatRaster objects or file paths, auto-aligning geometries.
+Calculates NDVI to quantify photosynthetic activity and vegetation vigor from SpatRaster objects or file paths.
 }

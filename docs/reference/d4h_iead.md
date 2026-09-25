@@ -1,6 +1,6 @@
 # Clearing Stagnation Index (IEAD)
 
-Detects puddles in recently cleared or deforested areas.
+Detects surface water pooling in recently cleared or deforested areas.
 
 ## Usage
 
@@ -12,16 +12,19 @@ d4h_iead(grad_delta_ndvi, depressions_dsm, red_edge)
 
 - grad_delta_ndvi:
 
-  SpatRaster. Gradient of NDVI change.
+  SpatRaster or character. Gradient of NDVI change layer or path to
+  file.
 
 - depressions_dsm:
 
-  SpatRaster. Topographic depressions from DSM.
+  SpatRaster or character. Topographic depressions layer from DSM or
+  path to file.
 
 - red_edge:
 
-  SpatRaster. Red Edge band.
+  SpatRaster or character. Red Edge band or path to file.
 
 ## Value
 
-A SpatRaster highlighting stagnation in clearings.
+A SpatRaster highlighting stagnation risk in clearings with background
+masked to NA.

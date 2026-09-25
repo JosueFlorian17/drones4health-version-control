@@ -7,13 +7,13 @@
 d4h_ndwi(green, nir)
 }
 \arguments{
-\item{green}{SpatRaster or character. Green band.}
+\item{green}{SpatRaster or character. Green band or path to file.}
 
-\item{nir}{SpatRaster or character. Near-infrared band.}
+\item{nir}{SpatRaster or character. Near-infrared band or path to file.}
 }
 \value{
-A SpatRaster containing NDWI values.
+A SpatRaster containing NDWI values in \code{[-1, 1]} with background masked to NA.
 }
 \description{
-Calculates NDWI to identify water bodies and moisture with automatic alignment.
+Calculates NDWI to detect open surface water bodies and moisture accumulation.
 }

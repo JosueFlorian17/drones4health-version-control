@@ -2,7 +2,7 @@
 #' @description Calculates NDVI to quantify photosynthetic activity and vegetation vigor from SpatRaster objects or file paths.
 #' @param nir SpatRaster or character. Near-infrared band or path to file.
 #' @param red SpatRaster or character. Red band or path to file.
-#' @return A SpatRaster containing NDVI values in [-1, 1] with background masked to NA.
+#' @return A SpatRaster containing NDVI values in \code{[-1, 1]} with background masked to NA.
 #' @export
 d4h_ndvi <- function(nir, red) {
   pair <- .match_pair(nir, red, mask_zeros = TRUE)
@@ -22,7 +22,7 @@ d4h_ndvi <- function(nir, red) {
 #' @param nir SpatRaster or character. Near-infrared band or path to file.
 #' @param red SpatRaster or character. Red band or path to file.
 #' @param l_factor Numeric. Soil adjustment factor (default: 0.5).
-#' @return A SpatRaster containing SAVI values in [-1, 1] with background masked to NA.
+#' @return A SpatRaster containing SAVI values in \code{[-1, 1]} with background masked to NA.
 #' @export
 d4h_savi <- function(nir, red, l_factor = 0.5) {
   pair <- .match_pair(nir, red, mask_zeros = TRUE)
@@ -65,7 +65,7 @@ d4h_evi <- function(nir, red, blue, g_factor = 2.5, c1 = 6, c2 = 7.5, l_factor =
 #' @description Calculates NDWI to detect open surface water bodies and moisture accumulation.
 #' @param green SpatRaster or character. Green band or path to file.
 #' @param nir SpatRaster or character. Near-infrared band or path to file.
-#' @return A SpatRaster containing NDWI values in [-1, 1] with background masked to NA.
+#' @return A SpatRaster containing NDWI values in \code{[-1, 1]} with background masked to NA.
 #' @export
 d4h_ndwi <- function(green, nir) {
   pair <- .match_pair(green, nir, mask_zeros = TRUE)
@@ -84,7 +84,7 @@ d4h_ndwi <- function(green, nir) {
 #' @description Calculates NDRE to assess canopy chlorophyll content and plant health using the Red Edge band.
 #' @param nir SpatRaster or character. Near-infrared band or path to file.
 #' @param red_edge SpatRaster or character. Red Edge band or path to file.
-#' @return A SpatRaster containing NDRE values in [-1, 1] with background masked to NA.
+#' @return A SpatRaster containing NDRE values in \code{[-1, 1]} with background masked to NA.
 #' @export
 d4h_ndre <- function(nir, red_edge) {
   pair <- .match_pair(nir, red_edge, mask_zeros = TRUE)
@@ -103,7 +103,7 @@ d4h_ndre <- function(nir, red_edge) {
 #' @description Calculates GNDVI for estimating chlorophyll concentration.
 #' @param nir SpatRaster or character. Near-infrared band or path to file.
 #' @param green SpatRaster or character. Green band or path to file.
-#' @return A SpatRaster containing GNDVI values in [-1, 1] with background masked to NA.
+#' @return A SpatRaster containing GNDVI values in \code{[-1, 1]} with background masked to NA.
 #' @export
 d4h_gndvi <- function(nir, green) {
   pair <- .match_pair(nir, green, mask_zeros = TRUE)

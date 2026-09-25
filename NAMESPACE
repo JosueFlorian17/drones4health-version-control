@@ -5,34 +5,48 @@ export(d4h_clean_band)
 export(d4h_ctvi)
 export(d4h_dvi)
 export(d4h_evi)
+export(d4h_global_summary)
 export(d4h_gndvi)
 export(d4h_hex_grid)
+export(d4h_iead)
+export(d4h_iec)
 export(d4h_iev)
-export(d4h_iev_general)
+export(d4h_ifeb)
 export(d4h_imsr)
-export(d4h_imsr_general)
+export(d4h_irhe)
+export(d4h_irih)
+export(d4h_irts)
 export(d4h_list_metrics)
+export(d4h_mapview_swipe)
 export(d4h_ndre)
 export(d4h_ndvi)
 export(d4h_ndwi)
 export(d4h_normalize_reflectance)
 export(d4h_plot)
 export(d4h_process_mosaic)
+export(d4h_raster_general)
 export(d4h_savi)
+export(d4h_slope)
+export(d4h_summarize_general)
+export(d4h_summarize_global)
 export(d4h_summarize_grid)
+export(d4h_thermal_to_celsius)
 export(d4h_twi)
-export(d4h_twi_general)
 importFrom(ggplot2,
   aes,
   coord_sf,
   element_blank,
+  element_rect,
+  geom_col,
+  geom_errorbar,
+  geom_raster,
   geom_sf,
-  geom_tile,
   ggplot,
   labs,
   scale_fill_continuous,
   scale_fill_gradientn,
   scale_fill_viridis_c,
+  scale_fill_viridis_d,
   theme,
   theme_minimal
 )
@@ -41,7 +55,9 @@ importFrom(sf,
   st_make_grid,
   st_sf
 )
+importFrom(stats,quantile)
 importFrom(terra,
+  aggregate,
   as.polygons,
   clamp,
   classify,
@@ -50,11 +66,17 @@ importFrom(terra,
   datatype,
   ext,
   extract,
+  global,
+  ifel,
+  ncell,
+  plot,
   project,
   rast,
   resample,
+  same.crs,
   spatSample,
   terrain,
+  vect,
   writeRaster
 )
 importFrom(tibble,

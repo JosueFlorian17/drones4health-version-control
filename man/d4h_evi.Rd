@@ -7,11 +7,11 @@
 d4h_evi(nir, red, blue, g_factor = 2.5, c1 = 6, c2 = 7.5, l_factor = 1)
 }
 \arguments{
-\item{nir}{SpatRaster or character. Near-infrared band.}
+\item{nir}{SpatRaster or character. Near-infrared band or path to file.}
 
-\item{red}{SpatRaster or character. Red band.}
+\item{red}{SpatRaster or character. Red band or path to file.}
 
-\item{blue}{SpatRaster or character. Blue band.}
+\item{blue}{SpatRaster or character. Blue band or path to file.}
 
 \item{g_factor}{Numeric. Gain factor (default: 2.5).}
 
@@ -22,8 +22,8 @@ d4h_evi(nir, red, blue, g_factor = 2.5, c1 = 6, c2 = 7.5, l_factor = 1)
 \item{l_factor}{Numeric. Canopy background adjustment (default: 1).}
 }
 \value{
-A SpatRaster containing EVI values.
+A SpatRaster containing EVI values with background masked to NA.
 }
 \description{
-Calculates EVI for dense canopy backgrounds with automatic band alignment.
+Calculates EVI optimized for high biomass canopy regions.
 }

@@ -7,12 +7,12 @@
 d4h_bare_soil(ndvi_raster, threshold = 0.15)
 }
 \arguments{
-\item{ndvi_raster}{SpatRaster or character. NDVI input layer or path.}
+\item{ndvi_raster}{SpatRaster or character. Input NDVI layer or path to file.}
 
 \item{threshold}{Numeric. Value below which pixels are classified as bare soil (default: 0.15).}
 }
 \value{
-A binary SpatRaster (1 = bare soil, 0 = vegetation/water).
+A binary SpatRaster (1 = bare soil, 0 = vegetation/water) with background masked to NA.
 }
 \description{
 Generates a binary mask of bare or exposed soil based on an NDVI threshold.

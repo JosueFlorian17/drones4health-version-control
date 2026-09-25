@@ -16,13 +16,13 @@ d4h_process_mosaic(
 )
 }
 \arguments{
-\item{nir}{Character or SpatRaster. Near-infrared band.}
+\item{nir}{SpatRaster or character. Near-infrared band or path to file.}
 
-\item{red}{Character or SpatRaster. Red band.}
+\item{red}{SpatRaster or character. Red band or path to file.}
 
-\item{green}{Character or SpatRaster. Green band (optional).}
+\item{green}{SpatRaster or character. Green band or path to file (optional).}
 
-\item{dem}{Character or SpatRaster. DEM/DSM (optional).}
+\item{dem}{SpatRaster or character. DEM/DSM or path to file (optional).}
 
 \item{cell_size}{Numeric. Grid cell size in meters (default: 50).}
 
@@ -36,5 +36,5 @@ d4h_process_mosaic(
 A list containing the SpatRaster stack of indicators and the SpatVector grid summary.
 }
 \description{
-Computes continuous indices (NDVI, NDWI, TWI), creates zonal grids, and optionally exports results.
+Computes continuous indices (NDVI, NDWI, TWI, IEV), creates zonal grids, and optionally exports results.
 }

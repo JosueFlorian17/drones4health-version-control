@@ -3,7 +3,7 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-Calculate and extract high resolution remote sensing metrics for spatial analysis. This package offers R users a straightforward way to obtain continuous and zonal micro-environmental statistics and epidemiological indicators from proccessed orthomosaics. 
+Calculate and extract high resolution remote sensing metrics for spatial analysis. This package offers R users a straightforward way to obtain continuous and zonal micro-environmental statistics and epidemiological indicators from processed orthomosaics.
 
 ## 1. Installation
 
@@ -20,7 +20,7 @@ library(drones4health)
 
 ## 2. Available Micro-Environmental and Epidemiological Metrics
 
-`drones4health` focuses on a curated set of spectral, topographic, and epidemiological indicators:
+`drones4health` focuses on a set of spectral, topographic, and epidemiological indicators:
 
 ```r
 d4h_list_metrics()
@@ -69,10 +69,19 @@ grid_summary <- d4h_summarize_grid(
 )
 ```
 
-## 5. Visualization with ggplot2
+## 5. Visualization with ggplot2 and Interactive Swipe Viewer
 
 ```r
 # Plot continuous raster or zonal grid with automatic aggregation and transparent background
 d4h_plot(iev_risk, title = "Continuous IEV Stagnation Risk", palette = "magma")
 d4h_plot(grid_summary, title = "IEV Stagnation Risk (50m Hexagons)")
+
+# Interactive side-by-side swipe comparison
+d4h_mapview_swipe(
+  x = ndwi_layer, 
+  y = iev_risk, 
+  basemap = TRUE,
+  col_x = "viridis", 
+  col_y = "magma"
+)
 ```

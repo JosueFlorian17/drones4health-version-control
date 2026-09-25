@@ -1,6 +1,7 @@
 # Thermal Refuge and Shade Index (IRTS)
 
-Identifies cool, shaded microhabitats serving as vector refuges.
+Identifies cool, shaded microhabitats serving as vector microclimate
+refuges.
 
 ## Usage
 
@@ -12,24 +13,27 @@ d4h_irts(ndre, lst_local, lst_surrounding, nir, eps = 0.001)
 
 - ndre:
 
-  SpatRaster. NDRE index layer.
+  SpatRaster or character. NDRE index layer or path to file.
 
 - lst_local:
 
-  SpatRaster. Local Land Surface Temperature.
+  SpatRaster or character. Local Land Surface Temperature or path to
+  file.
 
 - lst_surrounding:
 
-  SpatRaster. Focal mean surrounding Land Surface Temperature.
+  SpatRaster or character. Focal mean surrounding Land Surface
+  Temperature or path to file.
 
 - nir:
 
-  SpatRaster. Near-infrared band.
+  SpatRaster or character. Near-infrared band or path to file.
 
 - eps:
 
-  Numeric. Small epsilon to prevent division by zero.
+  Numeric. Small epsilon to prevent division by zero (default: 0.001).
 
 ## Value
 
-A SpatRaster representing thermal refuges.
+A SpatRaster representing thermal refuge intensity with background
+masked to NA.

@@ -7,13 +7,13 @@
 d4h_gndvi(nir, green)
 }
 \arguments{
-\item{nir}{SpatRaster or character. Near-infrared band.}
+\item{nir}{SpatRaster or character. Near-infrared band or path to file.}
 
-\item{green}{SpatRaster or character. Green band.}
+\item{green}{SpatRaster or character. Green band or path to file.}
 }
 \value{
-A SpatRaster containing GNDVI values.
+A SpatRaster containing GNDVI values in \code{[-1, 1]} with background masked to NA.
 }
 \description{
-Calculates GNDVI for chlorophyll concentration estimation with automatic alignment.
+Calculates GNDVI for estimating chlorophyll concentration.
 }

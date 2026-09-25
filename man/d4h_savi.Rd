@@ -7,15 +7,15 @@
 d4h_savi(nir, red, l_factor = 0.5)
 }
 \arguments{
-\item{nir}{SpatRaster or character. Near-infrared band.}
+\item{nir}{SpatRaster or character. Near-infrared band or path to file.}
 
-\item{red}{SpatRaster or character. Red band.}
+\item{red}{SpatRaster or character. Red band or path to file.}
 
-\item{l_factor}{Numeric. Soil brightness correction factor (default: 0.5).}
+\item{l_factor}{Numeric. Soil adjustment factor (default: 0.5).}
 }
 \value{
-A SpatRaster containing SAVI values.
+A SpatRaster containing SAVI values in \code{[-1, 1]} with background masked to NA.
 }
 \description{
-Calculates SAVI, correcting for soil brightness with automatic band alignment.
+Calculates SAVI to minimize soil brightness influences in sparse canopy areas.
 }

@@ -14,4 +14,11 @@ Imports:
     sf,
     terra,
     tibble
+Suggests: 
+    leafsync,
+    leaflet,
+    leaflet.extras2,
+    mapview,
+    raster,
+    viridisLite
 Config/roxygen2/version: 8.1.0

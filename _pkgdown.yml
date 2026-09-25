@@ -9,10 +9,8 @@ navbar:
       href: reference/index.html
     - text: "Articles"
       menu:
-        - text: "1. Drone Metrics for Epidemics"
+        - text: "1. TBD"
           href: articles/drone_metrics.html
-        - text: "2. Modeling Fasciola hepatica"
-          href: articles/fasciola_case.html
     - text: "Changelog"
       href: news/index.html
   right:

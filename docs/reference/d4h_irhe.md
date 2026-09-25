@@ -1,6 +1,7 @@
 # Spectral Water Retention Index (IRHE)
 
-Highlights stable, cold water bodies with low evaporation rates.
+Highlights persistent, cold surface water bodies with low evaporation
+rates.
 
 ## Usage
 
@@ -12,20 +13,22 @@ d4h_irhe(green, nir, lst, eps = 0.001)
 
 - green:
 
-  SpatRaster. Green band.
+  SpatRaster or character. Green band or path to file.
 
 - nir:
 
-  SpatRaster. Near-infrared band.
+  SpatRaster or character. Near-infrared band or path to file.
 
 - lst:
 
-  SpatRaster. Land Surface Temperature.
+  SpatRaster or character. Land Surface Temperature layer or path to
+  file.
 
 - eps:
 
-  Numeric. Small epsilon to prevent division by zero.
+  Numeric. Small epsilon to prevent division by zero (default: 0.001).
 
 ## Value
 
-A SpatRaster representing water retention potential.
+A SpatRaster representing water retention potential with background
+masked to NA.

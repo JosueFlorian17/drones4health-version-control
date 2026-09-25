@@ -12,7 +12,8 @@ d4h_hex_grid(aoi, cell_size = 50)
 
 - aoi:
 
-  SpatRaster, SpatVector, or sf object defining the spatial bounds.
+  SpatRaster, SpatVector, sf, or character path defining the spatial
+  bounds.
 
 - cell_size:
 
@@ -20,4 +21,4 @@ d4h_hex_grid(aoi, cell_size = 50)
 
 ## Value
 
-A SpatVector containing the hexagonal grid polygons.
+A SpatVector containing the hexagonal grid polygons with unique IDs.

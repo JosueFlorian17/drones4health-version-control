@@ -18,8 +18,7 @@
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/drone_metrics.html">1. Drone Metrics for Epidemics</a></li>
-    <li><a class="dropdown-item" href="../articles/fasciola_case.html">2. Modeling Fasciola hepatica</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/drone_metrics.html">1. TBD</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><a class="external-link nav-link" href="https://github.com/JosueFlorian17/drones4health-version-control"><span class="fa fa-github fa-lg"></span></a></li>
@@ -50,20 +49,20 @@
 
 
 <dl><dt id="arg-thermal-raster">thermal_raster<a class="anchor" aria-label="anchor" href="#arg-thermal-raster"></a></dt>
-<dd><p>SpatRaster. The thermal band.</p></dd>
+<dd><p>SpatRaster or character. Thermal band or path to file.</p></dd>
 
 
 <dt id="arg-gain">gain<a class="anchor" aria-label="anchor" href="#arg-gain"></a></dt>
-<dd><p>Numeric. Calibration gain multiplier.</p></dd>
+<dd><p>Numeric. Calibration gain multiplier (default: 0.01).</p></dd>
 
 
 <dt id="arg-offset">offset<a class="anchor" aria-label="anchor" href="#arg-offset"></a></dt>
-<dd><p>Numeric. Calibration offset value.</p></dd>
+<dd><p>Numeric. Calibration offset value (default: -273.15).</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A SpatRaster representing temperature in Celsius.</p>
+    <p>A SpatRaster representing temperature in degrees Celsius.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

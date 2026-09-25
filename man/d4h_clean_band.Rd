@@ -7,7 +7,7 @@
 d4h_clean_band(raster_layer, min_val = -1, max_val = 1)
 }
 \arguments{
-\item{raster_layer}{SpatRaster. Input band to clean.}
+\item{raster_layer}{SpatRaster or character. Input band or path to file.}
 
 \item{min_val}{Numeric. Minimum valid value (default: -1).}
 
@@ -17,5 +17,5 @@ d4h_clean_band(raster_layer, min_val = -1, max_val = 1)
 A cleaned SpatRaster.
 }
 \description{
-Replaces NaN and Infinite values with NA and clamps the raster to physically valid limits.
+Replaces non-finite and zero values with NA and clamps the raster to valid bio-physical limits.
 }

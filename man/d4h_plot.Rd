@@ -14,21 +14,21 @@ d4h_plot(
 )
 }
 \arguments{
-\item{x}{SpatRaster, SpatVector, or sf object to plot.}
+\item{x}{SpatRaster, SpatVector, sf, or character path to plot.}
 
-\item{grid}{Optional SpatVector or sf object to overlay grid borders.}
+\item{grid}{Optional SpatVector, sf, or character path to overlay grid boundaries.}
 
-\item{palette}{Character. Color palette ("viridis", "magma", "terrain" or custom colors vector).}
+\item{palette}{Character. Color palette name ("viridis", "magma", "terrain") or custom color vector (default: "viridis").}
 
-\item{limits}{Numeric vector c(min, max) to fix the color scale limits.}
+\item{limits}{Numeric vector c(min, max) to fix the color scale limits (default: NULL).}
 
-\item{title}{Character. Plot title.}
+\item{title}{Character. Plot title (default: NULL).}
 
-\item{max_pixels}{Integer. Maximum number of pixels to sample for fast rendering (default: 500000).}
+\item{max_pixels}{Integer. Maximum number of pixels to display before regular aggregation (default: 500000).}
 }
 \value{
 A ggplot object.
 }
 \description{
-Plots continuous raster layers (SpatRaster) or zonal grids (SpatVector / sf) with ggplot2.
+Plots continuous raster layers or zonal grids using aggregation and geom_raster.
 }

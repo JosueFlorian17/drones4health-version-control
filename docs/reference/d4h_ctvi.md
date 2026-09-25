@@ -1,6 +1,6 @@
 # Corrected Transformed Vegetation Index (CTVI)
 
-Calculates CTVI to normalize vegetation distributions.
+Calculates CTVI to normalize vegetation index distributions.
 
 ## Usage
 
@@ -12,8 +12,8 @@ d4h_ctvi(ndvi_raster)
 
 - ndvi_raster:
 
-  SpatRaster. NDVI input layer.
+  SpatRaster or character. Input NDVI layer or path to file.
 
 ## Value
 
-A SpatRaster containing CTVI values.
+A SpatRaster containing CTVI values with background masked to NA.

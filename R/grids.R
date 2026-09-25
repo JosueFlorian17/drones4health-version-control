@@ -66,3 +66,68 @@ d4h_hex_grid <- function(aoi, cell_size = 50) {
   )
   terra::vect(grid_sf)
 }
+
+#' @title Summarize Raster Indicator for the General Mosaic Footprint
+#' @description Computes the overall mean value of raster layers across the entire area of interest (AOI) as a single spatial vector polygon (SpatVector), formatted identically to zonal grid summaries for consistent map plotting.
+#' @param raster_in SpatRaster or character. Input raster layer, stack, or path to file.
+#' @param exact_boundary Logical. If TRUE, traces the exact outer boundary of valid non-NA flight data; if FALSE, uses the bounding box extent (default: TRUE).
+#' @return A SpatVector with a single polygon containing the overall mean value(s).
+#' @export
+d4h_summarize_general <- function(raster_in, exact_boundary = TRUE) {
+  r <- if (is.character(raster_in) && length(raster_in) == 1L) {
+    if (!file.exists(raster_in)) stop(paste("File not found:", raster_in), call. = FALSE)
+    terra::rast(raster_in)
+  } else if (inherits(raster_in, "SpatRaster")) {
+    raster_in
+  } else {
+    stop("'raster_in' must be a SpatRaster object or a valid file path string.", call. = FALSE)
+  }
+
+  boundary_vect <- if (exact_boundary) {
+    r1 <- r[[1]]
+    total_cells <- terra::ncell(r1)
+    agg_fact <- if (total_cells > 100000) ceiling(sqrt(total_cells / 50000)) else 1
+    r_agg <- if (agg_fact > 1) {
+      terra::aggregate(!is.na(r1) & r1 != 0, fact = agg_fact, fun = "max", na.rm = TRUE)
+    } else {
+      !is.na(r1) & r1 != 0
+    }
+    poly <- terra::as.polygons(r_agg, dissolve = TRUE)
+    poly <- poly[poly[[1]][, 1] == 1, ]
+    sf_poly <- sf::st_as_sf(poly)
+    sf_poly <- sf::st_sf(grid_id = "GENERAL", geometry = sf::st_geometry(sf_poly))
+    terra::vect(sf_poly)
+  } else {
+    boundary_sf <- sf::st_as_sf(terra::as.polygons(terra::ext(r), crs = terra::crs(r)))
+    sf_poly <- sf::st_sf(grid_id = "GENERAL", geometry = sf::st_geometry(boundary_sf))
+    terra::vect(sf_poly)
+  }
+
+  summary_vect <- terra::extract(r, boundary_vect, fun = mean, na.rm = TRUE, bind = TRUE)
+  summary_vect
+}
+
+#' @title Convert Raster Indicator to General Homogeneous Mosaic
+#' @description Creates a continuous SpatRaster matching the exact spatial footprint of the input raster where all valid pixels are assigned the overall global mean value.
+#' @param raster_in SpatRaster or character. Input raster layer, stack, or path to file.
+#' @return A SpatRaster with the mosaic footprint filled with the global mean value.
+#' @export
+d4h_raster_general <- function(raster_in) {
+  r <- if (is.character(raster_in) && length(raster_in) == 1L) {
+    if (!file.exists(raster_in)) stop(paste("File not found:", raster_in), call. = FALSE)
+    terra::rast(raster_in)
+  } else if (inherits(raster_in, "SpatRaster")) {
+    raster_in
+  } else {
+    stop("'raster_in' must be a SpatRaster object or a valid file path string.", call. = FALSE)
+  }
+
+  r_out <- r
+  for (i in seq_len(terra::nlyr(r))) {
+    lyr <- r[[i]]
+    m_val <- as.numeric(terra::global(lyr, "mean", na.rm = TRUE)[, 1])
+    r_out[[i]] <- terra::ifel(!is.na(lyr) & lyr != 0, m_val, NA)
+  }
+  names(r_out) <- names(r)
+  r_out
+}

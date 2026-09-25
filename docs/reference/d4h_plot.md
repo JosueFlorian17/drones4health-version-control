@@ -1,7 +1,7 @@
 # Cartographic Visualization with ggplot2
 
-Plots continuous raster layers (SpatRaster) or zonal grids (SpatVector /
-sf) with ggplot2.
+Plots continuous raster layers or zonal grids using aggregation and
+geom_raster.
 
 ## Usage
 
@@ -20,29 +20,30 @@ d4h_plot(
 
 - x:
 
-  SpatRaster, SpatVector, or sf object to plot.
+  SpatRaster, SpatVector, sf, or character path to plot.
 
 - grid:
 
-  Optional SpatVector or sf object to overlay grid borders.
+  Optional SpatVector, sf, or character path to overlay grid boundaries.
 
 - palette:
 
-  Character. Color palette ("viridis", "magma", "terrain" or custom
-  colors vector).
+  Character. Color palette name ("viridis", "magma", "terrain") or
+  custom color vector (default: "viridis").
 
 - limits:
 
-  Numeric vector c(min, max) to fix the color scale limits.
+  Numeric vector c(min, max) to fix the color scale limits (default:
+  NULL).
 
 - title:
 
-  Character. Plot title.
+  Character. Plot title (default: NULL).
 
 - max_pixels:
 
-  Integer. Maximum number of pixels to sample for fast rendering
-  (default: 500000).
+  Integer. Maximum number of pixels to display before regular
+  aggregation (default: 500000).
 
 ## Value
 

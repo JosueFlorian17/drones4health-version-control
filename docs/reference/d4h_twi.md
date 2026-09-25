@@ -1,36 +1,25 @@
 # Topographic Wetness Index (TWI)
 
-Calculates Topographic Wetness Index with optional zonal grid
-summarization.
+Calculates Topographic Wetness Index to model micro-scale hydrological
+accumulation zones.
 
 ## Usage
 
 ``` r
-d4h_twi(dem, cell_size = NULL, square = TRUE, eps = 0.001)
+d4h_twi(dem_raster, eps = 0.001)
 ```
 
 ## Arguments
 
-- dem:
+- dem_raster:
 
-  Character or SpatRaster. Digital Elevation/Surface Model (DEM/DSM) or
-  path to file.
-
-- cell_size:
-
-  Numeric. Optional cell size in meters. If NULL, returns continuous
-  raster (default: NULL).
-
-- square:
-
-  Logical. If TRUE, square grid; if FALSE, hexagonal grid (default:
-  TRUE).
+  SpatRaster or character. Input DEM/DSM or path to file.
 
 - eps:
 
-  Numeric. Small epsilon to prevent division by zero (default: 0.001).
+  Numeric. Small epsilon to prevent division by zero in flat areas
+  (default: 0.001).
 
 ## Value
 
-A SpatRaster (if cell_size = NULL) or SpatVector (if cell_size is
-numeric).
+A SpatRaster containing TWI values with background masked to NA.

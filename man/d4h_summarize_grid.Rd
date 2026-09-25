@@ -7,7 +7,7 @@
 d4h_summarize_grid(raster_in, cell_size = 20, square = TRUE, discard_na = TRUE)
 }
 \arguments{
-\item{raster_in}{SpatRaster. Input raster layer or multi-layer raster stack.}
+\item{raster_in}{SpatRaster or character. Input raster layer, stack, or path to file.}
 
 \item{cell_size}{Numeric. Grid cell size in meters (default: 20).}
 

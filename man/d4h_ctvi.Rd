@@ -7,11 +7,11 @@
 d4h_ctvi(ndvi_raster)
 }
 \arguments{
-\item{ndvi_raster}{SpatRaster or character. NDVI input layer or path.}
+\item{ndvi_raster}{SpatRaster or character. Input NDVI layer or path to file.}
 }
 \value{
-A SpatRaster containing CTVI values.
+A SpatRaster containing CTVI values with background masked to NA.
 }
 \description{
-Calculates CTVI to normalize vegetation distributions.
+Calculates CTVI to normalize vegetation index distributions.
 }

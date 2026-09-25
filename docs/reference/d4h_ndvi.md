@@ -1,39 +1,25 @@
 # Normalized Difference Vegetation Index (NDVI)
 
-Calculates NDVI with optional zonal grid summarization (square or
-hexagonal).
+Calculates NDVI to quantify photosynthetic activity and vegetation vigor
+from SpatRaster objects or file paths.
 
 ## Usage
 
 ``` r
-d4h_ndvi(nir, red, cell_size = NULL, square = TRUE, scale = NULL)
+d4h_ndvi(nir, red)
 ```
 
 ## Arguments
 
 - nir:
 
-  Character or SpatRaster. Near-infrared band or path to file.
+  SpatRaster or character. Near-infrared band or path to file.
 
 - red:
 
-  Character or SpatRaster. Red band or path to file.
-
-- cell_size:
-
-  Numeric. Optional cell size in meters. If NULL, returns continuous
-  raster (default: NULL).
-
-- square:
-
-  Logical. If TRUE, square grid; if FALSE, hexagonal grid (default:
-  TRUE).
-
-- scale:
-
-  Numeric. Divisor to normalize pixel values (default: NULL).
+  SpatRaster or character. Red band or path to file.
 
 ## Value
 
-A SpatRaster (if cell_size = NULL) or SpatVector (if cell_size is
-numeric).
+A SpatRaster containing NDVI values in -1, 1 with background masked to
+NA.

@@ -35,8 +35,7 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/drone_metrics.html">1. Drone Metrics for Epidemics</a></li>
-    <li><a class="dropdown-item" href="articles/fasciola_case.html">2. Modeling Fasciola hepatica</a></li>
+<li><a class="dropdown-item" href="articles/drone_metrics.html">1. TBD</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
@@ -51,11 +50,11 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="drones4health-ultra-high-resolution-drone-metrics-for-spatial-health-analysis">drones4health: Ultra-High Resolution Drone Metrics for Spatial Health Analysis<a class="anchor" aria-label="anchor" href="#drones4health-ultra-high-resolution-drone-metrics-for-spatial-health-analysis"></a>
+<div class="page-header"><h1 id="drones4health-high-resolution-drone-metrics-for-spatial-environmental-analysis">drones4health: High Resolution Drone Metrics for Spatial Environmental Analysis<a class="anchor" aria-label="anchor" href="#drones4health-high-resolution-drone-metrics-for-spatial-environmental-analysis"></a>
 </h1></div>
 <!-- badges: start -->
 <!-- badges: end -->
-<p>Calculate and extract ultra-high resolution remote sensing metrics for spatial health analysis. This package offers R users a straightforward way to obtain continuous and zonal micro-environmental statistics and epidemiological indicators from UAV orthomosaics. Designed to map localized infection risks within a One Health framework.</p>
+<p>Calculate and extract remote sensing metrics for spatial analysis. This package offers R users a straightforward way to obtain continuous and zonal micro-environmental statistics and epidemiological indicators from proccessed orthomosaics.</p>
 <div class="section level2">
 <h2 id="id_1-installation">1. Installation<a class="anchor" aria-label="anchor" href="#id_1-installation"></a>
 </h2>
@@ -69,7 +68,7 @@
 <div class="section level2">
 <h2 id="id_2-available-micro-environmental-and-epidemiological-metrics">2. Available Micro-Environmental and Epidemiological Metrics<a class="anchor" aria-label="anchor" href="#id_2-available-micro-environmental-and-epidemiological-metrics"></a>
 </h2>
-<p><code>drones4health</code> focuses on a curated set of spectral, topographic, and epidemiological indicators:</p>
+<p><code>drones4health</code> focuses on a set of spectral, topographic, and epidemiological indicators:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/d4h_list_metrics.html">d4h_list_metrics</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 5 × 4</span></span>
@@ -84,36 +83,32 @@
 <div class="section level2">
 <h2 id="id_3-example-calculate-epidemiological-indices-from-uav-imagery">3. Example: Calculate Epidemiological Indices from UAV Imagery<a class="anchor" aria-label="anchor" href="#id_3-example-calculate-epidemiological-indices-from-uav-imagery"></a>
 </h2>
-<p>Each indicator function accepts either a <code>SpatRaster</code> object or a direct file path string (<code>.tif</code>), and supports both continuous calculation (<code>d4h_*_general</code>) and on-the-fly grid aggregation (<code>cell_size</code>):</p>
+<p>All indicator functions accept either <code><a href="https://rspatial.github.io/terra/reference/SpatRaster-class.html" class="external-link">terra::SpatRaster</a></code> objects or direct file paths, automatically handle CRS/extent alignment, and mask background NoData:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JosueFlorian17/drones4health-version-control" class="external-link">drones4health</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/" class="external-link">terra</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># 1. Calculate base spectral indices</span></span>
-<span><span class="va">ndwi_continuous</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/d4h_ndwi_general.html">d4h_ndwi_general</a></span><span class="op">(</span>green <span class="op">=</span> <span class="st">"data/green.tif"</span>, nir <span class="op">=</span> <span class="st">"data/nir.tif"</span><span class="op">)</span></span>
+<span><span class="va">ndwi_layer</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/d4h_ndwi.html">d4h_ndwi</a></span><span class="op">(</span>green <span class="op">=</span> <span class="st">"data/green.tif"</span>, nir <span class="op">=</span> <span class="st">"data/nir.tif"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># 2. Calculate Topographic Wetness Index (TWI)</span></span>
-<span><span class="va">twi_continuous</span>  <span class="op">&lt;-</span> <span class="fu"><a href="reference/d4h_twi_general.html">d4h_twi_general</a></span><span class="op">(</span>dem <span class="op">=</span> <span class="st">"data/dem.tif"</span><span class="op">)</span></span>
+<span><span class="co"># 2. Derive topographic indicators</span></span>
+<span><span class="va">twi_layer</span>   <span class="op">&lt;-</span> <span class="fu"><a href="reference/d4h_twi.html">d4h_twi</a></span><span class="op">(</span>dem_raster <span class="op">=</span> <span class="st">"data/dem.tif"</span><span class="op">)</span></span>
+<span><span class="va">slope_layer</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/d4h_slope.html">d4h_slope</a></span><span class="op">(</span>dem_raster <span class="op">=</span> <span class="st">"data/dem.tif"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># 3. Calculate Vulnerability Stagnation Indicator (IEV) with 20m hexagonal grid summary</span></span>
-<span><span class="va">iev_grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/d4h_iev.html">d4h_iev</a></span><span class="op">(</span></span>
-<span>  ndwi <span class="op">=</span> <span class="va">ndwi_continuous</span>, </span>
-<span>  dem <span class="op">=</span> <span class="st">"data/dem.tif"</span>, </span>
-<span>  cell_size <span class="op">=</span> <span class="fl">20</span>, </span>
-<span>  square <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># 3. Calculate Vulnerability Stagnation Indicator (IEV)</span></span>
+<span><span class="va">iev_risk</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/d4h_iev.html">d4h_iev</a></span><span class="op">(</span>delta_ndwi <span class="op">=</span> <span class="va">ndwi_layer</span>, slope_dsm <span class="op">=</span> <span class="va">slope_layer</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="id_4-example-generate-hexagonal-surveillance-grid">4. Example: Generate Hexagonal Surveillance Grid<a class="anchor" aria-label="anchor" href="#id_4-example-generate-hexagonal-surveillance-grid"></a>
 </h2>
-<p>Create operational spatial grids for active surveillance across the survey area:</p>
+<p>Create operational spatial grids and extract zonal summaries across the survey area:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Generate 50m operative surveillance grid</span></span>
-<span><span class="va">surveillance_grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/d4h_hex_grid.html">d4h_hex_grid</a></span><span class="op">(</span>aoi <span class="op">=</span> <span class="va">ndwi_continuous</span>, cell_size <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span>
+<span><span class="va">surveillance_grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/d4h_hex_grid.html">d4h_hex_grid</a></span><span class="op">(</span>aoi <span class="op">=</span> <span class="va">iev_risk</span>, cell_size <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Summarize continuous raster layers over grid</span></span>
 <span><span class="va">grid_summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/d4h_summarize_grid.html">d4h_summarize_grid</a></span><span class="op">(</span></span>
-<span>  raster_in <span class="op">=</span> <span class="va">ndwi_continuous</span>, </span>
+<span>  raster_in <span class="op">=</span> <span class="va">iev_risk</span>, </span>
 <span>  cell_size <span class="op">=</span> <span class="fl">50</span>, </span>
 <span>  square <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -122,9 +117,9 @@
 <h2 id="id_5-visualization-with-ggplot2">5. Visualization with ggplot2<a class="anchor" aria-label="anchor" href="#id_5-visualization-with-ggplot2"></a>
 </h2>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Plot continuous layer or zonal summary</span></span>
-<span><span class="fu"><a href="reference/d4h_plot.html">d4h_plot</a></span><span class="op">(</span><span class="va">ndwi_continuous</span>, title <span class="op">=</span> <span class="st">"Continuous NDWI Extent"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/d4h_plot.html">d4h_plot</a></span><span class="op">(</span><span class="va">iev_grid</span>, title <span class="op">=</span> <span class="st">"IEV Stagnation Risk (20m Hexagons)"</span>, palette <span class="op">=</span> <span class="st">"magma"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># Plot continuous raster or zonal grid with automatic aggregation and transparent background</span></span>
+<span><span class="fu"><a href="reference/d4h_plot.html">d4h_plot</a></span><span class="op">(</span><span class="va">iev_risk</span>, title <span class="op">=</span> <span class="st">"Continuous IEV Stagnation Risk"</span>, palette <span class="op">=</span> <span class="st">"magma"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/d4h_plot.html">d4h_plot</a></span><span class="op">(</span><span class="va">grid_summary</span>, title <span class="op">=</span> <span class="st">"IEV Stagnation Risk (50m Hexagons)"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">

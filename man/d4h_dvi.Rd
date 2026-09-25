@@ -7,13 +7,13 @@
 d4h_dvi(nir, red)
 }
 \arguments{
-\item{nir}{SpatRaster or character. Near-infrared band.}
+\item{nir}{SpatRaster or character. Near-infrared band or path to file.}
 
-\item{red}{SpatRaster or character. Red band.}
+\item{red}{SpatRaster or character. Red band or path to file.}
 }
 \value{
-A SpatRaster containing DVI values.
+A SpatRaster containing DVI values with background masked to NA.
 }
 \description{
-Calculates DVI with automatic band alignment.
+Calculates DVI as the simple difference between NIR and Red reflectance.
 }

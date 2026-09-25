@@ -1,34 +1,24 @@
 # Vulnerability Stagnation Indicator (IEV)
 
-Calculates Vulnerability Stagnation Indicator with optional zonal grid
-summarization.
+Locates areas where surface water is prone to micro-stagnation by
+combining surface moisture and micro-topography.
 
 ## Usage
 
 ``` r
-d4h_iev(ndwi, dem, cell_size = NULL, square = TRUE, eps = 0.001)
+d4h_iev(delta_ndwi, slope_dsm, eps = 0.001)
 ```
 
 ## Arguments
 
-- ndwi:
+- delta_ndwi:
 
-  Character or SpatRaster. NDWI layer or path to file.
+  SpatRaster or character. Temporal difference in NDWI or base NDWI
+  layer or path to file.
 
-- dem:
+- slope_dsm:
 
-  Character or SpatRaster. Digital Elevation/Surface Model (DEM/DSM) or
-  path to file.
-
-- cell_size:
-
-  Numeric. Optional cell size in meters. If NULL, returns continuous
-  raster (default: NULL).
-
-- square:
-
-  Logical. If TRUE, square grid; if FALSE, hexagonal grid (default:
-  TRUE).
+  SpatRaster or character. Slope layer derived from DSM or path to file.
 
 - eps:
 
@@ -36,5 +26,5 @@ d4h_iev(ndwi, dem, cell_size = NULL, square = TRUE, eps = 0.001)
 
 ## Value
 
-A SpatRaster (if cell_size = NULL) or SpatVector (if cell_size is
-numeric).
+A SpatRaster containing IEV stagnation risk values with background
+masked to NA.

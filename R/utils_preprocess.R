@@ -1,7 +1,8 @@
-#' @importFrom terra rast compareGeom project resample clamp datatype spatSample writeRaster extract as.polygons ext crs classify terrain aggregate ncell plot ifel vect same.crs
-#' @importFrom ggplot2 ggplot aes geom_raster geom_sf scale_fill_viridis_c scale_fill_gradientn scale_fill_continuous coord_sf theme_minimal theme element_blank labs
+#' @importFrom terra rast compareGeom project resample clamp datatype spatSample writeRaster extract as.polygons ext crs classify terrain aggregate ncell plot ifel vect same.crs global
+#' @importFrom ggplot2 ggplot aes geom_raster geom_sf geom_col geom_errorbar scale_fill_viridis_c scale_fill_viridis_d scale_fill_gradientn scale_fill_continuous coord_sf theme_minimal theme element_blank element_rect labs
 #' @importFrom sf st_as_sf st_make_grid st_sf
 #' @importFrom tibble tibble as_tibble tribble
+#' @importFrom stats quantile
 NULL
 
 .ensure_raster <- function(x, mask_zeros = FALSE) {

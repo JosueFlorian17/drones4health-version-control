@@ -1,7 +1,7 @@
 # End-to-End Drone Mosaic Processing Pipeline
 
-Computes continuous indices (NDVI, NDWI, TWI), creates zonal grids, and
-optionally exports results.
+Computes continuous indices (NDVI, NDWI, TWI, IEV), creates zonal grids,
+and optionally exports results.
 
 ## Usage
 
@@ -22,19 +22,19 @@ d4h_process_mosaic(
 
 - nir:
 
-  Character or SpatRaster. Near-infrared band.
+  SpatRaster or character. Near-infrared band or path to file.
 
 - red:
 
-  Character or SpatRaster. Red band.
+  SpatRaster or character. Red band or path to file.
 
 - green:
 
-  Character or SpatRaster. Green band (optional).
+  SpatRaster or character. Green band or path to file (optional).
 
 - dem:
 
-  Character or SpatRaster. DEM/DSM (optional).
+  SpatRaster or character. DEM/DSM or path to file (optional).
 
 - cell_size:
 

@@ -7,12 +7,12 @@
 d4h_hex_grid(aoi, cell_size = 50)
 }
 \arguments{
-\item{aoi}{SpatRaster, SpatVector, or sf object defining the spatial bounds.}
+\item{aoi}{SpatRaster, SpatVector, sf, or character path defining the spatial bounds.}
 
 \item{cell_size}{Numeric. Cell diameter in meters (default: 50).}
 }
 \value{
-A SpatVector containing the hexagonal grid polygons.
+A SpatVector containing the hexagonal grid polygons with unique IDs.
 }
 \description{
 Creates an operative hexagonal grid over an Area of Interest (AOI).

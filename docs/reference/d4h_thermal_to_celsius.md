@@ -13,16 +13,16 @@ d4h_thermal_to_celsius(thermal_raster, gain = 0.01, offset = -273.15)
 
 - thermal_raster:
 
-  SpatRaster. The thermal band.
+  SpatRaster or character. Thermal band or path to file.
 
 - gain:
 
-  Numeric. Calibration gain multiplier.
+  Numeric. Calibration gain multiplier (default: 0.01).
 
 - offset:
 
-  Numeric. Calibration offset value.
+  Numeric. Calibration offset value (default: -273.15).
 
 ## Value
 
-A SpatRaster representing temperature in Celsius.
+A SpatRaster representing temperature in degrees Celsius.

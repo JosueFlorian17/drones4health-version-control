@@ -1,6 +1,7 @@
 # Topographic Slope
 
-Derives terrain slope from a Digital Elevation Model (DEM).
+Derives terrain slope in degrees or radians from a Digital Elevation
+Model (DEM) or Digital Surface Model (DSM).
 
 ## Usage
 
@@ -12,12 +13,12 @@ d4h_slope(dem_raster, unit = "degrees")
 
 - dem_raster:
 
-  SpatRaster. Digital Elevation Model.
+  SpatRaster or character. Input DEM/DSM or path to file.
 
 - unit:
 
-  Character. Output unit ("degrees" or "radians").
+  Character. Slope unit: "degrees" or "radians" (default: "degrees").
 
 ## Value
 
-A SpatRaster representing terrain slope.
+A SpatRaster containing slope values with background masked to NA.

@@ -1,61 +1,38 @@
 # Synthetic Materials Risk Index (IMSR)
 
-Calculates Synthetic Materials Risk Index with optional zonal grid
-summarization.
+Detects non-natural materials (plastics, rubber, discarded tires) that
+serve as potential vector breeding containers.
 
 ## Usage
 
 ``` r
-d4h_imsr(
-  red_edge,
-  red,
-  nir,
-  veg_threshold = 0.2,
-  cell_size = NULL,
-  square = TRUE,
-  eps = 0.001,
-  scale = NULL
-)
+d4h_imsr(red_edge, red, nir, veg_threshold = 0.2, eps = 0.001)
 ```
 
 ## Arguments
 
 - red_edge:
 
-  Character or SpatRaster. Red Edge band or path to file.
+  SpatRaster or character. Red Edge band or path to file.
 
 - red:
 
-  Character or SpatRaster. Red band or path to file.
+  SpatRaster or character. Red band or path to file.
 
 - nir:
 
-  Character or SpatRaster. Near-infrared band or path to file.
+  SpatRaster or character. Near-infrared band or path to file.
 
 - veg_threshold:
 
   Numeric. Threshold to differentiate vegetation from synthetics
   (default: 0.2).
 
-- cell_size:
-
-  Numeric. Optional cell size in meters. If NULL, returns continuous
-  raster (default: NULL).
-
-- square:
-
-  Logical. If TRUE, square grid; if FALSE, hexagonal grid (default:
-  TRUE).
-
 - eps:
 
   Numeric. Small epsilon to prevent division by zero (default: 0.001).
 
-- scale:
-
-  Numeric. Divisor to normalize pixel values (default: NULL).
-
 ## Value
 
-A SpatRaster (if cell_size = NULL) or SpatVector (if cell_size is
-numeric).
+A SpatRaster containing IMSR values in 0, 1 with background masked to
+NA.

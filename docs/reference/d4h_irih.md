@@ -1,6 +1,6 @@
 # Human Interface Roughness Index (IRIH)
 
-Measures canopy structural heterogeneity in the forest-household
+Measures canopy structural heterogeneity in the forest-household ecotone
 interface.
 
 ## Usage
@@ -13,20 +13,22 @@ d4h_irih(var_re_nir, red, green, eps = 0.001)
 
 - var_re_nir:
 
-  SpatRaster. Local variance of the RE/NIR ratio.
+  SpatRaster or character. Local variance of RE/NIR ratio or path to
+  file.
 
 - red:
 
-  SpatRaster. Red band.
+  SpatRaster or character. Red band or path to file.
 
 - green:
 
-  SpatRaster. Green band.
+  SpatRaster or character. Green band or path to file.
 
 - eps:
 
-  Numeric. Small epsilon to prevent division by zero.
+  Numeric. Small epsilon to prevent division by zero (default: 0.001).
 
 ## Value
 
-A SpatRaster representing structural roughness.
+A SpatRaster representing structural roughness with background masked to
+NA.

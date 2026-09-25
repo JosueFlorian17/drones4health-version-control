@@ -5,20 +5,35 @@
 #' @param nir SpatRaster or character. Near-infrared band or path to file.
 #' @param veg_threshold Numeric. Threshold to differentiate vegetation from synthetics (default: 0.2).
 #' @param eps Numeric. Small epsilon to prevent division by zero (default: 0.001).
-#' @return A SpatRaster containing IMSR values with background masked to NA.
+#' @return A SpatRaster containing IMSR values in \code{[0, 1]} with background masked to NA.
 #' @export
 d4h_imsr <- function(red_edge, red, nir, veg_threshold = 0.2, eps = 0.001) {
+  # 1. Alinear enmascarando ceros estrictos de origen
   aligned <- .match_multi(red_edge, red, nir, mask_zeros = TRUE)
   re <- aligned[[1]]
   r  <- aligned[[2]]
   n  <- aligned[[3]]
 
-  ndre_approx <- (re - r) / (re + r + eps)
+  # 2. Normalizar NIR si viene en enteros de 16 bits
+  max_sample <- max(terra::spatSample(n, size = 100, na.rm = TRUE)[, 1], na.rm = TRUE)
+  if (is.finite(max_sample) && max_sample > 1) {
+    n <- n / 65535
+  }
+
+  # 3. Cálculo de NDRE aproximado y de IMSR
+  den_ndre <- re + r + eps
+  ndre_approx <- (re - r) / den_ndre
   res <- abs(ndre_approx - veg_threshold) * n
-  res[is.nan(res) | is.infinite(res) | res == 0] <- NA
+
+  # 4. Máscara estricta: si cualquiera de las bandas originales fue NA o <= 0, res es NA
+  res[is.na(re) | is.na(r) | is.na(n) | is.nan(res) | is.infinite(res)] <- NA
+  res[res <= 1e-5] <- NA
+  res <- terra::clamp(res, lower = 0, upper = 1)
+
   names(res) <- "IMSR"
   res
 }
+
 
 #' @title Thermal Refuge and Shade Index (IRTS)
 #' @description Identifies cool, shaded microhabitats serving as vector microclimate refuges.

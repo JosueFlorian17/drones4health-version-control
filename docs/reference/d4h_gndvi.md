@@ -1,6 +1,6 @@
 # Green Normalized Difference Vegetation Index (GNDVI)
 
-Calculates GNDVI for chlorophyll concentration estimation.
+Calculates GNDVI for estimating chlorophyll concentration.
 
 ## Usage
 
@@ -12,12 +12,13 @@ d4h_gndvi(nir, green)
 
 - nir:
 
-  SpatRaster. Near-infrared band.
+  SpatRaster or character. Near-infrared band or path to file.
 
 - green:
 
-  SpatRaster. Green band.
+  SpatRaster or character. Green band or path to file.
 
 ## Value
 
-A SpatRaster containing GNDVI values.
+A SpatRaster containing GNDVI values in -1, 1 with background masked to
+NA.

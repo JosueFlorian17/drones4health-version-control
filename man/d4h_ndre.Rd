@@ -7,13 +7,13 @@
 d4h_ndre(nir, red_edge)
 }
 \arguments{
-\item{nir}{SpatRaster or character. Near-infrared band.}
+\item{nir}{SpatRaster or character. Near-infrared band or path to file.}
 
-\item{red_edge}{SpatRaster or character. Red Edge band.}
+\item{red_edge}{SpatRaster or character. Red Edge band or path to file.}
 }
 \value{
-A SpatRaster containing NDRE values.
+A SpatRaster containing NDRE values in \code{[-1, 1]} with background masked to NA.
 }
 \description{
-Calculates NDRE using the Red Edge band with automatic alignment.
+Calculates NDRE to assess canopy chlorophyll content and plant health using the Red Edge band.
 }
