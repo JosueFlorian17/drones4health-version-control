@@ -11,21 +11,27 @@ d4h_mapview_swipe(
   basemap = TRUE,
   col_x = "viridis",
   col_y = "magma",
+  limits_x = NULL,
+  limits_y = NULL,
   max_pixels = 5e+05
 )
 }
 \arguments{
-\item{x}{SpatRaster or character path. Left layer to compare (e.g., NDVI, RGB, or orthomosaic).}
+\item{x}{SpatRaster or character path. Left layer to compare (e.g., NDVI, RGB, Bare Soil Mask, or orthomosaic).}
 
-\item{y}{SpatRaster or character path. Right layer to compare (e.g., SAVI, Slope, Thermal, or DSM).}
+\item{y}{SpatRaster or character path. Right layer to compare (e.g., MSAVI2, SAVI, NDRE, Slope, Thermal, or DSM).}
 
-\item{grid}{Optional SpatVector, sf, or character path. Zonal grid boundaries to overlay on the map.}
+\item{grid}{Optional SpatVector, sf, or character path. Zonal grid boundaries to overlay on the map. Default: NULL (no grid).}
 
 \item{basemap}{Logical or character. If TRUE, includes satellite (Esri.WorldImagery) and OpenStreetMap base layers. If FALSE or NULL, disables the background map. You can also specify a provider tile name (default: TRUE).}
 
-\item{col_x}{Character or color vector. Color palette for layer x (default: "viridis"). Options include "viridis", "magma", "terrain", or custom color vectors.}
+\item{col_x}{Character or color vector. Color palette for layer x (default: "viridis"). Options include "viridis", "magma", "terrain", or custom color vectors like \code{"#2a9d8f"}.}
 
 \item{col_y}{Character or color vector. Color palette for layer y (default: "magma"). Options include "viridis", "magma", "terrain", or custom color vectors.}
+
+\item{limits_x}{Numeric vector c(min, max). Explicit color scale limits for layer x. If NULL (default), robust 2\%-98\% quantiles are used for continuous layers.}
+
+\item{limits_y}{Numeric vector c(min, max). Explicit color scale limits for layer y (e.g., c(0, 0.8)). If NULL (default), robust 2\%-98\% quantiles are used for continuous layers.}
 
 \item{max_pixels}{Integer. Maximum cell count for fast interactive rendering (default: 500000). Downsample with \code{terra::aggregate()} if exceeded.}
 }
