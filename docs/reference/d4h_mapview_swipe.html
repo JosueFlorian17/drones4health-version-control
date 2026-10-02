@@ -15,13 +15,10 @@
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/drone_metrics.html">1. TBD</a></li>
-  </ul></li>
+      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../index.html">Get Started</a></li>
+<li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
-      </ul><ul class="navbar-nav"><li class="nav-item"><a class="external-link nav-link" href="https://github.com/JosueFlorian17/drones4health-version-control"><span class="fa fa-github fa-lg"></span></a></li>
+      </ul><ul class="navbar-nav"><li class="nav-item"><a class="external-link nav-link" href="https://github.com/JosueFlorian17/drones4health-version-control" aria-label="GitHub Repository"><span class="fa fa-github fa-lg"></span></a></li>
       </ul></div>
 
 
@@ -48,6 +45,8 @@
 <span>  basemap <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  col_x <span class="op">=</span> <span class="st">"viridis"</span>,</span>
 <span>  col_y <span class="op">=</span> <span class="st">"magma"</span>,</span>
+<span>  limits_x <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  limits_y <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  max_pixels <span class="op">=</span> <span class="fl">5e+05</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -57,15 +56,15 @@
 
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>SpatRaster or character path. Left layer to compare (e.g., NDVI, RGB, or orthomosaic).</p></dd>
+<dd><p>SpatRaster or character path. Left layer to compare (e.g., NDVI, RGB, Bare Soil Mask, or orthomosaic).</p></dd>
 
 
 <dt id="arg-y">y<a class="anchor" aria-label="anchor" href="#arg-y"></a></dt>
-<dd><p>SpatRaster or character path. Right layer to compare (e.g., SAVI, Slope, Thermal, or DSM).</p></dd>
+<dd><p>SpatRaster or character path. Right layer to compare (e.g., MSAVI2, SAVI, NDRE, Slope, Thermal, or DSM).</p></dd>
 
 
 <dt id="arg-grid">grid<a class="anchor" aria-label="anchor" href="#arg-grid"></a></dt>
-<dd><p>Optional SpatVector, sf, or character path. Zonal grid boundaries to overlay on the map.</p></dd>
+<dd><p>Optional SpatVector, sf, or character path. Zonal grid boundaries to overlay on the map. Default: NULL (no grid).</p></dd>
 
 
 <dt id="arg-basemap">basemap<a class="anchor" aria-label="anchor" href="#arg-basemap"></a></dt>
@@ -73,11 +72,19 @@
 
 
 <dt id="arg-col-x">col_x<a class="anchor" aria-label="anchor" href="#arg-col-x"></a></dt>
-<dd><p>Character or color vector. Color palette for layer x (default: "viridis"). Options include "viridis", "magma", "terrain", or custom color vectors.</p></dd>
+<dd><p>Character or color vector. Color palette for layer x (default: "viridis"). Options include "viridis", "magma", "terrain", or custom color vectors like <code>"#2a9d8f"</code>.</p></dd>
 
 
 <dt id="arg-col-y">col_y<a class="anchor" aria-label="anchor" href="#arg-col-y"></a></dt>
 <dd><p>Character or color vector. Color palette for layer y (default: "magma"). Options include "viridis", "magma", "terrain", or custom color vectors.</p></dd>
+
+
+<dt id="arg-limits-x">limits_x<a class="anchor" aria-label="anchor" href="#arg-limits-x"></a></dt>
+<dd><p>Numeric vector c(min, max). Explicit color scale limits for layer x. If NULL (default), robust 2%-98% quantiles are used for continuous layers.</p></dd>
+
+
+<dt id="arg-limits-y">limits_y<a class="anchor" aria-label="anchor" href="#arg-limits-y"></a></dt>
+<dd><p>Numeric vector c(min, max). Explicit color scale limits for layer y (e.g., c(0, 0.8)). If NULL (default), robust 2%-98% quantiles are used for continuous layers.</p></dd>
 
 
 <dt id="arg-max-pixels">max_pixels<a class="anchor" aria-label="anchor" href="#arg-max-pixels"></a></dt>

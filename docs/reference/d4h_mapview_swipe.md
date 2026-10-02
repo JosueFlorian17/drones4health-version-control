@@ -13,6 +13,8 @@ d4h_mapview_swipe(
   basemap = TRUE,
   col_x = "viridis",
   col_y = "magma",
+  limits_x = NULL,
+  limits_y = NULL,
   max_pixels = 5e+05
 )
 ```
@@ -22,17 +24,17 @@ d4h_mapview_swipe(
 - x:
 
   SpatRaster or character path. Left layer to compare (e.g., NDVI, RGB,
-  or orthomosaic).
+  Bare Soil Mask, or orthomosaic).
 
 - y:
 
-  SpatRaster or character path. Right layer to compare (e.g., SAVI,
-  Slope, Thermal, or DSM).
+  SpatRaster or character path. Right layer to compare (e.g., MSAVI2,
+  SAVI, NDRE, Slope, Thermal, or DSM).
 
 - grid:
 
   Optional SpatVector, sf, or character path. Zonal grid boundaries to
-  overlay on the map.
+  overlay on the map. Default: NULL (no grid).
 
 - basemap:
 
@@ -45,13 +47,25 @@ d4h_mapview_swipe(
 
   Character or color vector. Color palette for layer x (default:
   "viridis"). Options include "viridis", "magma", "terrain", or custom
-  color vectors.
+  color vectors like `"#2a9d8f"`.
 
 - col_y:
 
   Character or color vector. Color palette for layer y (default:
   "magma"). Options include "viridis", "magma", "terrain", or custom
   color vectors.
+
+- limits_x:
+
+  Numeric vector c(min, max). Explicit color scale limits for layer x.
+  If NULL (default), robust 2%-98% quantiles are used for continuous
+  layers.
+
+- limits_y:
+
+  Numeric vector c(min, max). Explicit color scale limits for layer y
+  (e.g., c(0, 0.8)). If NULL (default), robust 2%-98% quantiles are used
+  for continuous layers.
 
 - max_pixels:
 
