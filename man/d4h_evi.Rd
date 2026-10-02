@@ -13,17 +13,25 @@ d4h_evi(nir, red, blue, g_factor = 2.5, c1 = 6, c2 = 7.5, l_factor = 1)
 
 \item{blue}{SpatRaster or character. Blue band or path to file.}
 
-\item{g_factor}{Numeric. Gain factor (default: 2.5).}
+\item{g_factor}{Numeric. Gain factor \eqn{G} (default: 2.5).}
 
-\item{c1}{Numeric. Aerosol resistance coefficient 1 (default: 6).}
+\item{c1}{Numeric. Aerosol resistance coefficient 1 \eqn{C_1} (default: 6.0).}
 
-\item{c2}{Numeric. Aerosol resistance coefficient 2 (default: 7.5).}
+\item{c2}{Numeric. Aerosol resistance coefficient 2 \eqn{C_2} (default: 7.5).}
 
-\item{l_factor}{Numeric. Canopy background adjustment (default: 1).}
+\item{l_factor}{Numeric. Canopy background adjustment \eqn{L} (default: 1.0).}
 }
 \value{
-A SpatRaster containing EVI values with background masked to NA.
+A SpatRaster containing EVI values with background masked to \code{NA}.
 }
 \description{
-Calculates EVI optimized for high biomass canopy regions.
+Calculates the Enhanced Vegetation Index (EVI) optimized for high-biomass canopy regions with improved atmospheric resistance.
+}
+\details{
+The Enhanced Vegetation Index is computed as:
+\deqn{\text{EVI} = G \times \frac{\text{NIR} - \text{Red}}{\text{NIR} + C_1 \cdot \text{Red} - C_2 \cdot \text{Blue} + L}}
+where \eqn{G = 2.5} is the gain factor, \eqn{C_1 = 6.0} and \eqn{C_2 = 7.5} are aerosol resistance coefficients, and \eqn{L = 1.0} is the canopy background factor.
+}
+\references{
+Huete, A., Didan, K., Miura, T., Rodriguez, E. P., Gao, X., & Ferreira, L. G. (2002). Overview of the radiometric and biophysical performance of the MODIS vegetation indices. \emph{Remote Sensing of Environment}, 83(1-2), 195-213. \doi{10.1016/S0034-4257(02)00096-2}
 }

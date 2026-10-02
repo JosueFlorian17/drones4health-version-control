@@ -12,8 +12,16 @@ d4h_ndwi(green, nir)
 \item{nir}{SpatRaster or character. Near-infrared band or path to file.}
 }
 \value{
-A SpatRaster containing NDWI values in \code{[-1, 1]} with background masked to NA.
+A SpatRaster containing NDWI values in \code{[-1, 1]} with background masked to \code{NA}.
 }
 \description{
-Calculates NDWI to detect open surface water bodies and moisture accumulation.
+Calculates the Normalized Difference Water Index (NDWI) to identify open surface water bodies, irrigation canals, and localized moisture pooling.
+}
+\details{
+The Normalized Difference Water Index is calculated as:
+\deqn{\text{NDWI} = \frac{\text{Green} - \text{NIR}}{\text{Green} + \text{NIR}}}
+Positive values (\eqn{\text{NDWI} > 0}) typically demarcate water surfaces, while negative values represent terrestrial vegetation and dry bare soil.
+}
+\references{
+McFeeters, S. K. (1996). The use of the Normalized Difference Water Index (NDWI) in the delineation of open water features. \emph{International Journal of Remote Sensing}, 17(7), 1425-1432. \doi{10.1080/01431169608948714}
 }

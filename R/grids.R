@@ -1,10 +1,15 @@
 #' @title Summarize Raster Indicator by Spatial Grid
-#' @description Generates a square or hexagonal grid and computes the mean value of raster layers per cell, discarding unpopulated areas.
+#' @description Generates a square or hexagonal spatial grid and extracts zonal summary statistics (mean, quantiles) of raster indicators per grid cell.
+#' @details Zonal extraction aggregates high-resolution pixel values into operational territorial units:
+#' \deqn{\bar{x}_k = \frac{1}{N_k} \sum_{i \in \text{Cell}_k} x_i}
+#' Empty grid cells outside the valid flight footprint are automatically pruned when \code{discard_na = TRUE}.
 #' @param raster_in SpatRaster or character. Input raster layer, stack, or path to file.
-#' @param cell_size Numeric. Grid cell size in meters (default: 20).
+#' @param cell_size Numeric. Grid cell size / diameter in meters (default: 20).
 #' @param square Logical. If TRUE, creates square cells; if FALSE, hexagonal cells (default: TRUE).
 #' @param discard_na Logical. If TRUE, removes grid cells outside the valid raster data area (default: TRUE).
 #' @return A SpatVector containing the grid cells with extracted mean values.
+#' @references
+#' Birch, C. P., Oom, S. P., & Beecham, J. A. (2007). Rectangular and hexagonal grids used for observation, experiment and simulation in ecology. \emph{Ecological Modelling}, 206(3-4), 347-359. \doi{10.1016/j.ecolmodel.2007.03.041}
 #' @export
 d4h_summarize_grid <- function(raster_in, cell_size = 20, square = TRUE, discard_na = TRUE) {
   r <- if (is.character(raster_in) && length(raster_in) == 1L) {
@@ -38,10 +43,15 @@ d4h_summarize_grid <- function(raster_in, cell_size = 20, square = TRUE, discard
 }
 
 #' @title Generate Hexagonal Surveillance Grid
-#' @description Creates an operative hexagonal grid over an Area of Interest (AOI).
+#' @description Creates an operative hexagonal surveillance grid with unique alphanumeric identifiers over an Area of Interest (AOI).
+#' @details Hexagonal spatial partitions minimize perimeter-to-area ratio and provide equidistant neighborhood connectivity:
+#' \deqn{A_{\text{hex}} = \frac{3\sqrt{3}}{2} r^2}
+#' Ideal for vector control teams, larviciding deployments, and spatial health sampling.
 #' @param aoi SpatRaster, SpatVector, sf, or character path defining the spatial bounds.
-#' @param cell_size Numeric. Cell diameter in meters (default: 50).
+#' @param cell_size Numeric. Hexagon diameter in meters (default: 50).
 #' @return A SpatVector containing the hexagonal grid polygons with unique IDs.
+#' @references
+#' Carr, D. B., Olsen, A. R., & White, D. (1992). Hexagon mosaic maps for display of univariate and bivariate data. \emph{Cartography and Geographic Information Systems}, 19(4), 228-236. \doi{10.1559/152304092783721231}
 #' @export
 d4h_hex_grid <- function(aoi, cell_size = 50) {
   if (is.character(aoi) && length(aoi) == 1L) {

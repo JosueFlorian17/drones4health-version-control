@@ -16,8 +16,15 @@ d4h_ifeb(grad_red_edge, red, nir, eps = 0.001)
 \item{eps}{Numeric. Small epsilon to prevent division by zero (default: 0.001).}
 }
 \value{
-A SpatRaster quantifying edge effects with background masked to NA.
+A SpatRaster quantifying edge effects with background masked to \code{NA}.
 }
 \description{
-Quantifies ecological transitions and borders between canopy and urban/cleared soil.
+Quantifies ecological transitions and ecotone borders between tree canopies and urban or cleared soil substrates.
+}
+\details{
+The Forest Edge & Environmental Barrier Index is formulated as:
+\deqn{\text{IFEB} = |\nabla(\text{RedEdge})| \times \frac{\text{Red}}{\text{NIR} + \epsilon}}
+}
+\references{
+Laurance, W. F., et al. (2011). The impact of forest fragmentation on disease ecology. \emph{Biological Conservation}, 144(1), 56-68.
 }

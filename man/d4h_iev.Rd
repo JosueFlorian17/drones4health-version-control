@@ -9,13 +9,21 @@ d4h_iev(delta_ndwi, slope_dsm, eps = 0.001)
 \arguments{
 \item{delta_ndwi}{SpatRaster or character. Temporal difference in NDWI or base NDWI layer or path to file.}
 
-\item{slope_dsm}{SpatRaster or character. Slope layer derived from DSM or path to file.}
+\item{slope_dsm}{SpatRaster or character. Slope layer derived from DSM/DEM or path to file.}
 
 \item{eps}{Numeric. Small epsilon to prevent division by zero (default: 0.001).}
 }
 \value{
-A SpatRaster containing IEV stagnation risk values with background masked to NA.
+A SpatRaster containing IEV stagnation risk values with background masked to \code{NA}.
 }
 \description{
-Locates areas where surface water is prone to micro-stagnation by combining surface moisture and micro-topography.
+Locates areas where surface water is prone to micro-stagnation and persistent pooling by synthesizing surface moisture and terrain slope.
+}
+\details{
+The Entomological Vector Suitability / Stagnation Indicator combines moisture accumulation with micro-topographical slope inverse:
+\deqn{\text{IEV} = \text{NDWI} \times \frac{1}{\text{Slope} + \epsilon}}
+High values indicate flat micro-depressions with significant moisture content suitable for mosquito and snail vector colonization.
+}
+\references{
+Hardy, A., Makame, M., Cross, D., Majambere, S., & Msellem, M. (2017). Using low-cost drones to map malaria vector habitats. \emph{Parasites & Vectors}, 10(1), 29. \doi{10.1186/s13071-017-1973-3}
 }

@@ -12,8 +12,16 @@ d4h_slope(dem_raster, unit = "degrees")
 \item{unit}{Character. Slope unit: "degrees" or "radians" (default: "degrees").}
 }
 \value{
-A SpatRaster containing slope values with background masked to NA.
+A SpatRaster containing slope values with background masked to \code{NA}.
 }
 \description{
-Derives terrain slope in degrees or radians from a Digital Elevation Model (DEM) or Digital Surface Model (DSM).
+Derives micro-terrain slope in degrees or radians from a high-resolution Digital Elevation Model (DEM) or Digital Surface Model (DSM).
+}
+\details{
+Topographic slope represents the rate of maximum elevation change:
+\deqn{\beta = \arctan\left(\sqrt{\left(\frac{\partial z}{\partial x}\right)^2 + \left(\frac{\partial z}{\partial y}\right)^2}\right)}
+Flat terrains (\eqn{\beta < 5^\circ}) are critical in spatial epidemiology as they favor persistent micro-pooling and water stagnation.
+}
+\references{
+Burrough, P. A., & McDonnell, R. A. (1998). \emph{Principles of Geographical Information Systems}. Oxford University Press.
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/indices_spectral.R
 \name{d4h_savi}
 \alias{d4h_savi}
-\title{Soil Adjusted Vegetation Index (SAVI)}
+\title{Soil-Adjusted Vegetation Index (SAVI)}
 \usage{
 d4h_savi(nir, red, l_factor = 0.5)
 }
@@ -11,11 +11,19 @@ d4h_savi(nir, red, l_factor = 0.5)
 
 \item{red}{SpatRaster or character. Red band or path to file.}
 
-\item{l_factor}{Numeric. Soil adjustment factor (default: 0.5).}
+\item{l_factor}{Numeric. Soil adjustment factor \eqn{L} (default: 0.5).}
 }
 \value{
-A SpatRaster containing SAVI values in \code{[-1, 1]} with background masked to NA.
+A SpatRaster containing SAVI values in \code{[-1, 1]} with background masked to \code{NA}.
 }
 \description{
-Calculates SAVI to minimize soil brightness influences in sparse canopy areas.
+Calculates the Soil-Adjusted Vegetation Index (SAVI) to minimize soil brightness background effects in sparse or arid vegetation canopies.
+}
+\details{
+The Soil-Adjusted Vegetation Index is defined as:
+\deqn{\text{SAVI} = \frac{\text{NIR} - \text{Red}}{\text{NIR} + \text{Red} + L} \times (1 + L)}
+where \eqn{L} is a canopy background adjustment factor typically set to \eqn{L = 0.5} for intermediate vegetation densities.
+}
+\references{
+Huete, A. R. (1988). A soil-adjusted vegetation index (SAVI). \emph{Remote Sensing of Environment}, 25(3), 295-309. \doi{10.1016/0034-4257(88)90106-X}
 }

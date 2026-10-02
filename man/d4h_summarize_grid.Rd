@@ -9,7 +9,7 @@ d4h_summarize_grid(raster_in, cell_size = 20, square = TRUE, discard_na = TRUE)
 \arguments{
 \item{raster_in}{SpatRaster or character. Input raster layer, stack, or path to file.}
 
-\item{cell_size}{Numeric. Grid cell size in meters (default: 20).}
+\item{cell_size}{Numeric. Grid cell size / diameter in meters (default: 20).}
 
 \item{square}{Logical. If TRUE, creates square cells; if FALSE, hexagonal cells (default: TRUE).}
 
@@ -19,5 +19,13 @@ d4h_summarize_grid(raster_in, cell_size = 20, square = TRUE, discard_na = TRUE)
 A SpatVector containing the grid cells with extracted mean values.
 }
 \description{
-Generates a square or hexagonal grid and computes the mean value of raster layers per cell, discarding unpopulated areas.
+Generates a square or hexagonal spatial grid and extracts zonal summary statistics (mean, quantiles) of raster indicators per grid cell.
+}
+\details{
+Zonal extraction aggregates high-resolution pixel values into operational territorial units:
+\deqn{\bar{x}_k = \frac{1}{N_k} \sum_{i \in \text{Cell}_k} x_i}
+Empty grid cells outside the valid flight footprint are automatically pruned when \code{discard_na = TRUE}.
+}
+\references{
+Birch, C. P., Oom, S. P., & Beecham, J. A. (2007). Rectangular and hexagonal grids used for observation, experiment and simulation in ecology. \emph{Ecological Modelling}, 206(3-4), 347-359. \doi{10.1016/j.ecolmodel.2007.03.041}
 }

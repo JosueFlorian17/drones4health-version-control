@@ -12,8 +12,15 @@ d4h_gndvi(nir, green)
 \item{green}{SpatRaster or character. Green band or path to file.}
 }
 \value{
-A SpatRaster containing GNDVI values in \code{[-1, 1]} with background masked to NA.
+A SpatRaster containing GNDVI values in \code{[-1, 1]} with background masked to \code{NA}.
 }
 \description{
-Calculates GNDVI for estimating chlorophyll concentration.
+Calculates the Green Normalized Difference Vegetation Index (GNDVI) for assessing chlorophyll concentration and photosynthetic activity.
+}
+\details{
+The Green Normalized Difference Vegetation Index is defined as:
+\deqn{\text{GNDVI} = \frac{\text{NIR} - \text{Green}}{\text{NIR} + \text{Green}}}
+}
+\references{
+Gitelson, A. A., Merzlyak, M. N., & Lichtenthaler, H. K. (1996). Detection of red edge position and chlorophyll content by reflectance spectra. \emph{Journal of Plant Physiology}, 148(3-4), 494-508. \doi{10.1016/S0176-1617(96)80285-9}
 }

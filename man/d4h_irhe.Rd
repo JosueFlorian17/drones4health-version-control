@@ -11,13 +11,20 @@ d4h_irhe(green, nir, lst, eps = 0.001)
 
 \item{nir}{SpatRaster or character. Near-infrared band or path to file.}
 
-\item{lst}{SpatRaster or character. Land Surface Temperature layer or path to file.}
+\item{lst}{SpatRaster or character. Land Surface Temperature layer (°C) or path to file.}
 
 \item{eps}{Numeric. Small epsilon to prevent division by zero (default: 0.001).}
 }
 \value{
-A SpatRaster representing water retention potential with background masked to NA.
+A SpatRaster representing water retention potential with background masked to \code{NA}.
 }
 \description{
-Highlights persistent, cold surface water bodies with low evaporation rates.
+Highlights persistent, cold surface water bodies with low evaporation rates prone to long-term mosquito colonization.
+}
+\details{
+The High-Risk Hydric Environment Index is computed as:
+\deqn{\text{IRHE} = \text{NDWI} \times \frac{1}{\text{LST} + \epsilon}}
+}
+\references{
+McFeeters, S. K. (1996). The use of the Normalized Difference Water Index (NDWI) in the delineation of open water features. \emph{International Journal of Remote Sensing}, 17(7), 1425-1432.
 }

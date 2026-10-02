@@ -12,8 +12,16 @@ d4h_bare_soil(ndvi_raster, threshold = 0.15)
 \item{threshold}{Numeric. Value below which pixels are classified as bare soil (default: 0.15).}
 }
 \value{
-A binary SpatRaster (1 = bare soil, 0 = vegetation/water) with background masked to NA.
+A binary SpatRaster (1 = bare soil, 0 = vegetation/water) with background masked to \code{NA}.
 }
 \description{
-Generates a binary mask of bare or exposed soil based on an NDVI threshold.
+Generates a binary mask of bare, exposed, or degraded soil based on an NDVI threshold.
+}
+\details{
+The Bare Soil Mask is computed as a binary classification:
+\deqn{\text{BareSoilMask} = \begin{cases} 1 & \text{if } \text{NDVI} < \theta \\ 0 & \text{otherwise} \end{cases}}
+where \eqn{\theta} is an empirical threshold (default: \eqn{\theta = 0.15}).
+}
+\references{
+Montandon, L. M., & Small, E. E. (2008). The impact of soil reflectance on the quantification of green vegetation fraction in arid and semi-arid environments. \emph{Remote Sensing of Environment}, 112(2), 635-645. \doi{10.1016/j.rse.2007.05.016}
 }

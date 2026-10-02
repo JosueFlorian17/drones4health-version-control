@@ -14,8 +14,15 @@ d4h_iead(grad_delta_ndvi, depressions_dsm, red_edge)
 \item{red_edge}{SpatRaster or character. Red Edge band or path to file.}
 }
 \value{
-A SpatRaster highlighting stagnation risk in clearings with background masked to NA.
+A SpatRaster highlighting stagnation risk in clearings with background masked to \code{NA}.
 }
 \description{
-Detects surface water pooling in recently cleared or deforested areas.
+Detects surface water pooling and vector vulnerability in recently cleared, excavated, or deforested micro-zones.
+}
+\details{
+The Deforestation Micro-Habitat Exposure Index integrates vegetation change gradients, elevation depressions, and Red Edge reflectance:
+\deqn{\text{IEAD} = \nabla(\Delta\text{NDVI}) \times \text{Depressions}_{\text{DSM}} \times \text{RedEdge}}
+}
+\references{
+Castro, M. C., Kanamori, S., Kannady, K., Mkude, S., Killeen, G. F., & Fillinger, U. (2010). The importance of drains for the emergence of anopheline mosquitoes in urban Dar es Salaam, Tanzania. \emph{BMC Public Health}, 10, 344.
 }

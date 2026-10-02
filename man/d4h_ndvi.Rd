@@ -12,8 +12,18 @@ d4h_ndvi(nir, red)
 \item{red}{SpatRaster or character. Red band or path to file.}
 }
 \value{
-A SpatRaster containing NDVI values in \code{[-1, 1]} with background masked to NA.
+A SpatRaster containing NDVI values in \code{[-1, 1]} with background masked to \code{NA}.
 }
 \description{
-Calculates NDVI to quantify photosynthetic activity and vegetation vigor from SpatRaster objects or file paths.
+Calculates the Normalized Difference Vegetation Index (NDVI) to quantify photosynthetic activity, biomass density, and vegetative vigor from UAV imagery.
+}
+\details{
+The Normalized Difference Vegetation Index is computed according to the formula:
+\deqn{\text{NDVI} = \frac{\text{NIR} - \text{Red}}{\text{NIR} + \text{Red}}}
+Pixel values are clamped to \code{[-1, 1]} with background non-data values masked to \code{NA}.
+}
+\references{
+Rouse, J. W., Haas, R. H., Schell, J. A., & Deering, D. W. (1974). Monitoring vegetation systems in the Great Plains with ERTS. \emph{NASA Special Publication}, 351, 309-317.
+
+Tucker, C. J. (1979). Red and photographic infrared linear combinations for monitoring vegetation. \emph{Remote Sensing of Environment}, 8(2), 127-150. \doi{10.1016/0034-4257(79)90013-0}
 }

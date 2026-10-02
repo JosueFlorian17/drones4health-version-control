@@ -2,16 +2,26 @@
 % Please edit documentation in R/indices_spectral.R
 \name{d4h_msavi2}
 \alias{d4h_msavi2}
-\title{Modified Soil Adjusted Vegetation Index 2 (MSAVI2)}
+\title{Modified Soil-Adjusted Vegetation Index 2 (MSAVI2)}
 \usage{
 d4h_msavi2(nir, red)
 }
 \arguments{
 \item{nir}{SpatRaster or character. Near-infrared band or path to file.}
+
+\item{red}{SpatRaster or character. Red band or path to file.}
 }
 \value{
-A SpatRaster containing MSAVI2 values in \code{[-1, 1]} with background masked to NA.
+A SpatRaster containing MSAVI2 values in \code{[-1, 1]} with background masked to \code{NA}.
 }
 \description{
-Computes MSAVI2 to evaluate vegetation cover in sparse or arid canopies without requiring an empirical soil adjustment factor.
+Computes the Modified Soil-Adjusted Vegetation Index 2 (MSAVI2) for evaluating vegetation cover in sparse, arid, or degraded landscapes without requiring an empirical soil adjustment factor.
+}
+\details{
+The Modified Soil-Adjusted Vegetation Index 2 utilizes an inductive equation based on the soil line:
+\deqn{\text{MSAVI2} = \frac{2 \cdot \text{NIR} + 1 - \sqrt{(2 \cdot \text{NIR} + 1)^2 - 8 \cdot (\text{NIR} - \text{Red})}}{2}}
+It dynamically adjusts for soil brightness variations across complex terrain.
+}
+\references{
+Qi, J., Chehbouni, A., Huete, A. R., Kerr, Y. H., & Sorooshian, S. (1994). A modified soil adjusted vegetation index. \emph{Remote Sensing of Environment}, 48(2), 119-126. \doi{10.1016/0034-4257(94)90134-1}
 }

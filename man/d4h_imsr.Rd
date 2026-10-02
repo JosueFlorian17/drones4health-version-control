@@ -18,8 +18,19 @@ d4h_imsr(red_edge, red, nir, veg_threshold = 0.2, eps = 0.001)
 \item{eps}{Numeric. Small epsilon to prevent division by zero (default: 0.001).}
 }
 \value{
-A SpatRaster containing IMSR values in \code{[0, 1]} with background masked to NA.
+A SpatRaster containing IMSR values in \code{[0, 1]} with background masked to \code{NA}.
 }
 \description{
-Detects non-natural materials (plastics, rubber, discarded tires) that serve as potential vector breeding containers.
+Detects non-natural solid waste materials (plastics, discarded tires, tarps, and artificial containers) that serve as potential \emph{Aedes aegypti} oviposition and larval habitats.
+}
+\details{
+The Index of Micro-accumulation of Solid Waste (IMSR) evaluates spectral deviations in the Red Edge - Red transition weighted by Near-Infrared reflectance:
+\deqn{\text{NDRE}_{\text{approx}} = \frac{\text{RedEdge} - \text{Red}}{\text{RedEdge} + \text{Red} + \epsilon}}
+\deqn{\text{IMSR} = |\text{NDRE}_{\text{approx}} - \theta_{\text{veg}}| \times \text{NIR}_{\text{norm}}}
+where \eqn{\theta_{\text{veg}}} is a threshold separating natural vegetation from synthetic polymer surfaces. Output values are clamped between 0 and 1.
+}
+\references{
+World Health Organization. (2020). \emph{Comprehensive guidelines for prevention and control of dengue and dengue haemorrhagic fever}. WHO Regional Office for South-East Asia.
+
+Fornace, K. M., Drakeley, C. J., William, T., Espino, F., & Cox, J. (2014). Mapping infectious disease landscapes: unmanned aerial vehicles and epidemiology. \emph{Trends in Parasitology}, 30(11), 514-519. \doi{10.1016/j.pt.2014.09.001}
 }

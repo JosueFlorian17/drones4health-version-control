@@ -29,3 +29,12 @@ An object of class \code{d4h_executive_summary} containing a structured list of 
 \description{
 Generates a comprehensive executive report for a given raster layer or multi-band mosaic. It extracts key statistical moments, spatial extent and resolution metrics, Tukey outlier diagnostics, domain-specific bio-physical/epidemiological stratum interpretations, and optionally exports a formatted multi-sheet Excel spreadsheet.
 }
+\details{
+The executive summary computes descriptive moments (mean, standard deviation, coefficient of variation, median, interquartile range) and identifies spatial anomalies using Tukey's IQR outlier fences:
+\deqn{\text{Lower Fence} = Q_{25} - 1.5 \times \text{IQR}}
+\deqn{\text{Upper Fence} = Q_{75} + 1.5 \times \text{IQR}}
+Surface strata are categorized by biophysical domain thresholds and translated into percentage and hectare metrics.
+}
+\references{
+Tukey, J. W. (1977). \emph{Exploratory Data Analysis}. Addison-Wesley.
+}

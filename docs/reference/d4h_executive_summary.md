@@ -45,3 +45,17 @@ d4h_report(raster_in, out_xlsx = NULL, sample_size = 1e+06, digits = 3)
 An object of class `d4h_executive_summary` containing a structured list
 of metrics, spatial coverage metadata, outlier diagnostics, and thematic
 stratum distributions.
+
+## Details
+
+The executive summary computes descriptive moments (mean, standard
+deviation, coefficient of variation, median, interquartile range) and
+identifies spatial anomalies using Tukey's IQR outlier fences:
+\$\$\text{Lower Fence} = Q\_{25} - 1.5 \times \text{IQR}\$\$
+\$\$\text{Upper Fence} = Q\_{75} + 1.5 \times \text{IQR}\$\$ Surface
+strata are categorized by biophysical domain thresholds and translated
+into percentage and hectare metrics.
+
+## References
+
+Tukey, J. W. (1977). *Exploratory Data Analysis*. Addison-Wesley.

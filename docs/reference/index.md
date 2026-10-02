@@ -9,9 +9,9 @@ masks.
 - [`d4h_ndvi()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_ndvi.md)
   : Normalized Difference Vegetation Index (NDVI)
 - [`d4h_msavi2()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_msavi2.md)
-  : Modified Soil Adjusted Vegetation Index 2 (MSAVI2)
+  : Modified Soil-Adjusted Vegetation Index 2 (MSAVI2)
 - [`d4h_savi()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_savi.md)
-  : Soil Adjusted Vegetation Index (SAVI)
+  : Soil-Adjusted Vegetation Index (SAVI)
 - [`d4h_bare_soil()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_bare_soil.md)
   : Bare Soil Mask
 - [`d4h_vari()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_vari.md)

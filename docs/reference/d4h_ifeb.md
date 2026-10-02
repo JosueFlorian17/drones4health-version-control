@@ -1,7 +1,7 @@
 # Fragmentation and Edge Effect Index (IFEB)
 
-Quantifies ecological transitions and borders between canopy and
-urban/cleared soil.
+Quantifies ecological transitions and ecotone borders between tree
+canopies and urban or cleared soil substrates.
 
 ## Usage
 
@@ -30,4 +30,15 @@ d4h_ifeb(grad_red_edge, red, nir, eps = 0.001)
 
 ## Value
 
-A SpatRaster quantifying edge effects with background masked to NA.
+A SpatRaster quantifying edge effects with background masked to `NA`.
+
+## Details
+
+The Forest Edge & Environmental Barrier Index is formulated as:
+\$\$\text{IFEB} = \|\nabla(\text{RedEdge})\| \times
+\frac{\text{Red}}{\text{NIR} + \epsilon}\$\$
+
+## References
+
+Laurance, W. F., et al. (2011). The impact of forest fragmentation on
+disease ecology. *Biological Conservation*, 144(1), 56-68.

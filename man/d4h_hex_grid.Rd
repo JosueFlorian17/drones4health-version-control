@@ -9,11 +9,19 @@ d4h_hex_grid(aoi, cell_size = 50)
 \arguments{
 \item{aoi}{SpatRaster, SpatVector, sf, or character path defining the spatial bounds.}
 
-\item{cell_size}{Numeric. Cell diameter in meters (default: 50).}
+\item{cell_size}{Numeric. Hexagon diameter in meters (default: 50).}
 }
 \value{
 A SpatVector containing the hexagonal grid polygons with unique IDs.
 }
 \description{
-Creates an operative hexagonal grid over an Area of Interest (AOI).
+Creates an operative hexagonal surveillance grid with unique alphanumeric identifiers over an Area of Interest (AOI).
+}
+\details{
+Hexagonal spatial partitions minimize perimeter-to-area ratio and provide equidistant neighborhood connectivity:
+\deqn{A_{\text{hex}} = \frac{3\sqrt{3}}{2} r^2}
+Ideal for vector control teams, larviciding deployments, and spatial health sampling.
+}
+\references{
+Carr, D. B., Olsen, A. R., & White, D. (1992). Hexagon mosaic maps for display of univariate and bivariate data. \emph{Cartography and Geographic Information Systems}, 19(4), 228-236. \doi{10.1559/152304092783721231}
 }

@@ -16,8 +16,15 @@ d4h_irih(var_re_nir, red, green, eps = 0.001)
 \item{eps}{Numeric. Small epsilon to prevent division by zero (default: 0.001).}
 }
 \value{
-A SpatRaster representing structural roughness with background masked to NA.
+A SpatRaster representing structural roughness with background masked to \code{NA}.
 }
 \description{
-Measures canopy structural heterogeneity in the forest-household ecotone interface.
+Measures canopy structural heterogeneity in the forest-household ecotone interface to model vector flight pathways and peridomestic contact.
+}
+\details{
+The Index of Human Infection Risk / Roughness is calculated as:
+\deqn{\text{IRIH} = \text{Var}\left(\frac{\text{RedEdge}}{\text{NIR}}\right) \times \frac{\text{Red}}{\text{Green} + \epsilon}}
+}
+\references{
+Guerra, C. A., Snow, R. W., & Hay, S. I. (2006). Mapping the global extent of malaria in 2005. \emph{Trends in Parasitology}, 22(8), 353-358. \doi{10.1016/j.pt.2006.06.006}
 }

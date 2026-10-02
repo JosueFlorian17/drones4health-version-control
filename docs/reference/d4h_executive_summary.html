@@ -72,6 +72,17 @@
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>An object of class <code>d4h_executive_summary</code> containing a structured list of metrics, spatial coverage metadata, outlier diagnostics, and thematic stratum distributions.</p>
     </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>The executive summary computes descriptive moments (mean, standard deviation, coefficient of variation, median, interquartile range) and identifies spatial anomalies using Tukey's IQR outlier fences:
+$$\text{Lower Fence} = Q_{25} - 1.5 \times \text{IQR}$$
+$$\text{Upper Fence} = Q_{75} + 1.5 \times \text{IQR}$$
+Surface strata are categorized by biophysical domain thresholds and translated into percentage and hectare metrics.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
+    <p>Tukey, J. W. (1977). <em>Exploratory Data Analysis</em>. Addison-Wesley.</p>
+    </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

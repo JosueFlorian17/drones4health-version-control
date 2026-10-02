@@ -10,8 +10,15 @@ d4h_ctvi(ndvi_raster)
 \item{ndvi_raster}{SpatRaster or character. Input NDVI layer or path to file.}
 }
 \value{
-A SpatRaster containing CTVI values with background masked to NA.
+A SpatRaster containing CTVI values with background masked to \code{NA}.
 }
 \description{
-Calculates CTVI to normalize vegetation index distributions.
+Calculates the Corrected Transformed Vegetation Index (CTVI) to normalize skewed NDVI distributions.
+}
+\details{
+The Corrected Transformed Vegetation Index is given by:
+\deqn{\text{CTVI} = \frac{\text{NDVI} + 0.5}{\sqrt{|\text{NDVI} + 0.5|}}}
+}
+\references{
+Perry, C. R., & Lautenschlager, L. F. (1984). Functional equivalence of spectral vegetation indices. \emph{Remote Sensing of Environment}, 14(1-3), 169-182. \doi{10.1016/0034-4257(84)90013-0}
 }

@@ -1,7 +1,7 @@
 # Topographic Slope
 
-Derives terrain slope in degrees or radians from a Digital Elevation
-Model (DEM) or Digital Surface Model (DSM).
+Derives micro-terrain slope in degrees or radians from a high-resolution
+Digital Elevation Model (DEM) or Digital Surface Model (DSM).
 
 ## Usage
 
@@ -21,4 +21,18 @@ d4h_slope(dem_raster, unit = "degrees")
 
 ## Value
 
-A SpatRaster containing slope values with background masked to NA.
+A SpatRaster containing slope values with background masked to `NA`.
+
+## Details
+
+Topographic slope represents the rate of maximum elevation change:
+\$\$\beta = \arctan\left(\sqrt{\left(\frac{\partial z}{\partial
+x}\right)^2 + \left(\frac{\partial z}{\partial y}\right)^2}\right)\$\$
+Flat terrains (\\\beta \< 5^\circ\\) are critical in spatial
+epidemiology as they favor persistent micro-pooling and water
+stagnation.
+
+## References
+
+Burrough, P. A., & McDonnell, R. A. (1998). *Principles of Geographical
+Information Systems*. Oxford University Press.
