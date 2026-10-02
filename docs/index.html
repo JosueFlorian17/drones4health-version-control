@@ -13,6 +13,15 @@
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="drones4health: Ultra-High Resolution Drone Metrics for Spatial Health Analysis">
 <meta name="description" content="Extract micro-environmental and eco-epidemiological remote sensing metrics from UAV orthomosaics within a One Health framework.">
 <meta property="og:description" content="Extract micro-environmental and eco-epidemiological remote sensing metrics from UAV orthomosaics within a One Health framework.">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      processEscapes: true
+    }
+  };
+</script><script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -69,50 +78,32 @@
 <hr>
 </div>
 <div class="section level2">
-<h2 id="id_2-micro-environmental-indicators-mathematical-formulas--references">2. Micro-Environmental Indicators: Mathematical Formulas &amp; References<a class="anchor" aria-label="anchor" href="#id_2-micro-environmental-indicators-mathematical-formulas--references"></a>
+<h2 id="id_2-core-functional-modules--use-cases">2. Core Functional Modules &amp; Use Cases<a class="anchor" aria-label="anchor" href="#id_2-core-functional-modules--use-cases"></a>
 </h2>
-<p>The package computes physical, spectral, topographical, and eco-epidemiological indicators. All functions accept <code><a href="https://rspatial.github.io/terra/reference/SpatRaster-class.html" class="external-link">terra::SpatRaster</a></code> objects or direct file paths, automatically handle spatial co-registration, and mask background artifacts to <code>NA</code>.</p>
-<div class="section level3">
-<h3 id="a-spectral-vegetation--moisture-indices">A. Spectral Vegetation &amp; Moisture Indices<a class="anchor" aria-label="anchor" href="#a-spectral-vegetation--moisture-indices"></a>
-</h3>
+<p><code>drones4health</code> provides 7 modular indicator suites tailored for spatial epidemiology and field operations:</p>
 <ul>
-<li><p><strong>Normalized Difference Vegetation Index (NDVI)</strong> <em>(Rouse et al., 1974)</em>: <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">NDVI</mtext><mo>=</mo><mfrac><mrow><mtext mathvariant="normal">NIR</mtext><mo>−</mo><mtext mathvariant="normal">Red</mtext></mrow><mrow><mtext mathvariant="normal">NIR</mtext><mo>+</mo><mtext mathvariant="normal">Red</mtext></mrow></mfrac></mrow><annotation encoding="application/x-tex">\text{NDVI} = \frac{\text{NIR} - \text{Red}}{\text{NIR} + \text{Red}}</annotation></semantics></math> Quantifies photosynthetic capacity, vegetation vigor, and dense biomass cover.</p></li>
-<li><p><strong>Modified Soil-Adjusted Vegetation Index 2 (MSAVI2)</strong> <em>(Qi et al., 1994)</em>: <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">MSAVI2</mtext><mo>=</mo><mfrac><mrow><mn>2</mn><mo>⋅</mo><mtext mathvariant="normal">NIR</mtext><mo>+</mo><mn>1</mn><mo>−</mo><msqrt><mrow><mo stretchy="false" form="prefix">(</mo><mn>2</mn><mo>⋅</mo><mtext mathvariant="normal">NIR</mtext><mo>+</mo><mn>1</mn><msup><mo stretchy="false" form="postfix">)</mo><mn>2</mn></msup><mo>−</mo><mn>8</mn><mo>⋅</mo><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">NIR</mtext><mo>−</mo><mtext mathvariant="normal">Red</mtext><mo stretchy="false" form="postfix">)</mo></mrow></msqrt></mrow><mn>2</mn></mfrac></mrow><annotation encoding="application/x-tex">\text{MSAVI2} = \frac{2 \cdot \text{NIR} + 1 - \sqrt{(2 \cdot \text{NIR} + 1)^2 - 8 \cdot (\text{NIR} - \text{Red})}}{2}</annotation></semantics></math> Self-adjusting index optimized for arid, semi-arid, or sparse vegetation canopies without requiring an empirical soil adjustment parameter (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>L</mi><annotation encoding="application/x-tex">L</annotation></semantics></math>).</p></li>
-<li><p><strong>Soil-Adjusted Vegetation Index (SAVI)</strong> <em>(Huete, 1988)</em>: <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">SAVI</mtext><mo>=</mo><mfrac><mrow><mtext mathvariant="normal">NIR</mtext><mo>−</mo><mtext mathvariant="normal">Red</mtext></mrow><mrow><mtext mathvariant="normal">NIR</mtext><mo>+</mo><mtext mathvariant="normal">Red</mtext><mo>+</mo><mi>L</mi></mrow></mfrac><mo>×</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>+</mo><mi>L</mi><mo stretchy="false" form="postfix">)</mo><mspace width="1.0em"></mspace><mrow><mtext mathvariant="normal">with </mtext><mspace width="0.333em"></mspace></mrow><mi>L</mi><mo>=</mo><mn>0.5</mn></mrow><annotation encoding="application/x-tex">\text{SAVI} = \frac{\text{NIR} - \text{Red}}{\text{NIR} + \text{Red} + L} \times (1 + L) \quad \text{with } L = 0.5</annotation></semantics></math></p></li>
-<li><p><strong>Visible Atmospherically Resistant Index (VARI)</strong> <em>(Gitelson et al., 2002)</em>: <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">VARI</mtext><mo>=</mo><mfrac><mrow><mtext mathvariant="normal">Green</mtext><mo>−</mo><mtext mathvariant="normal">Red</mtext></mrow><mrow><mtext mathvariant="normal">Green</mtext><mo>+</mo><mtext mathvariant="normal">Red</mtext><mo>−</mo><mtext mathvariant="normal">Blue</mtext></mrow></mfrac></mrow><annotation encoding="application/x-tex">\text{VARI} = \frac{\text{Green} - \text{Red}}{\text{Green} + \text{Red} - \text{Blue}}</annotation></semantics></math> Estimates vegetation fraction from visible RGB channels while minimizing atmospheric scattering and illumination variance.</p></li>
-<li><p><strong>Normalized Difference Red Edge (NDRE)</strong> <em>(Barnes et al., 2000)</em>: <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">NDRE</mtext><mo>=</mo><mfrac><mrow><mtext mathvariant="normal">NIR</mtext><mo>−</mo><mtext mathvariant="normal">RedEdge</mtext></mrow><mrow><mtext mathvariant="normal">NIR</mtext><mo>+</mo><mtext mathvariant="normal">RedEdge</mtext></mrow></mfrac></mrow><annotation encoding="application/x-tex">\text{NDRE} = \frac{\text{NIR} - \text{RedEdge}}{\text{NIR} + \text{RedEdge}}</annotation></semantics></math> Measures canopy chlorophyll concentration in mature, high-density vegetative cover where standard NDVI saturates.</p></li>
-<li><p><strong>Green Normalized Difference Vegetation Index (GNDVI)</strong> <em>(Gitelson et al., 1996)</em>: <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">GNDVI</mtext><mo>=</mo><mfrac><mrow><mtext mathvariant="normal">NIR</mtext><mo>−</mo><mtext mathvariant="normal">Green</mtext></mrow><mrow><mtext mathvariant="normal">NIR</mtext><mo>+</mo><mtext mathvariant="normal">Green</mtext></mrow></mfrac></mrow><annotation encoding="application/x-tex">\text{GNDVI} = \frac{\text{NIR} - \text{Green}}{\text{NIR} + \text{Green}}</annotation></semantics></math></p></li>
-<li><p><strong>Normalized Difference Water Index (NDWI)</strong> <em>(McFeeters, 1996)</em>: <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">NDWI</mtext><mo>=</mo><mfrac><mrow><mtext mathvariant="normal">Green</mtext><mo>−</mo><mtext mathvariant="normal">NIR</mtext></mrow><mrow><mtext mathvariant="normal">Green</mtext><mo>+</mo><mtext mathvariant="normal">NIR</mtext></mrow></mfrac></mrow><annotation encoding="application/x-tex">\text{NDWI} = \frac{\text{Green} - \text{NIR}}{\text{Green} + \text{NIR}}</annotation></semantics></math> Identifies open water bodies, surface moisture, and localized pooling.</p></li>
-<li><p><strong>Enhanced Vegetation Index (EVI)</strong> <em>(Huete et al., 2002)</em>: <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">EVI</mtext><mo>=</mo><mi>G</mi><mo>×</mo><mfrac><mrow><mtext mathvariant="normal">NIR</mtext><mo>−</mo><mtext mathvariant="normal">Red</mtext></mrow><mrow><mtext mathvariant="normal">NIR</mtext><mo>+</mo><msub><mi>C</mi><mn>1</mn></msub><mo>⋅</mo><mtext mathvariant="normal">Red</mtext><mo>−</mo><msub><mi>C</mi><mn>2</mn></msub><mo>⋅</mo><mtext mathvariant="normal">Blue</mtext><mo>+</mo><mi>L</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">\text{EVI} = G \times \frac{\text{NIR} - \text{Red}}{\text{NIR} + C_1 \cdot \text{Red} - C_2 \cdot \text{Blue} + L}</annotation></semantics></math></p></li>
-<li><p><strong>Corrected Transformed Vegetation Index (CTVI)</strong> <em>(Perry &amp; Lautenschlager, 1984)</em>: <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">CTVI</mtext><mo>=</mo><mfrac><mrow><mtext mathvariant="normal">NDVI</mtext><mo>+</mo><mn>0.5</mn></mrow><msqrt><mrow><mo stretchy="false" form="prefix">|</mo><mtext mathvariant="normal">NDVI</mtext><mo>+</mo><mn>0.5</mn><mo stretchy="false" form="prefix">|</mo></mrow></msqrt></mfrac></mrow><annotation encoding="application/x-tex">\text{CTVI} = \frac{\text{NDVI} + 0.5}{\sqrt{|\text{NDVI} + 0.5|}}</annotation></semantics></math></p></li>
-<li><p><strong>Bare Soil Binary Mask</strong>: <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">BareSoilMask</mtext><mo>=</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><mn>1</mn></mtd><mtd columnalign="left" style="text-align: left"><mrow><mtext mathvariant="normal">if </mtext><mspace width="0.333em"></mspace></mrow><mtext mathvariant="normal">NDVI</mtext><mo>&lt;</mo><mi>θ</mi><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> (default: </mtext><mspace width="0.333em"></mspace></mrow><mi>θ</mi><mo>=</mo><mn>0.15</mn><mtext mathvariant="normal">)</mtext></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mn>0</mn></mtd><mtd columnalign="left" style="text-align: left"><mtext mathvariant="normal">otherwise</mtext></mtd></mtr></mtable></mrow></mrow><annotation encoding="application/x-tex">\text{BareSoilMask} = \begin{cases} 1 &amp; \text{if } \text{NDVI} &lt; \theta \text{ (default: } \theta = 0.15 \text{)} \\ 0 &amp; \text{otherwise} \end{cases}</annotation></semantics></math></p></li>
+<li>
+<strong>Spectral Vegetation &amp; Canopy Indices:</strong> Quantify photosynthetic vigor, biomass density, and canopy chlorophyll (e.g., <code><a href="reference/d4h_ndvi.html">d4h_ndvi()</a></code>, <code><a href="reference/d4h_msavi2.html">d4h_msavi2()</a></code>, <code><a href="reference/d4h_savi.html">d4h_savi()</a></code>, <code><a href="reference/d4h_ndre.html">d4h_ndre()</a></code>, <code><a href="reference/d4h_gndvi.html">d4h_gndvi()</a></code>, <code><a href="reference/d4h_vari.html">d4h_vari()</a></code>, <code><a href="reference/d4h_evi.html">d4h_evi()</a></code>). Used to map vegetative shading and canopy roosting habitats for adult mosquito vectors.</li>
+<li>
+<strong>Land Cover &amp; Substrate Masks:</strong> Classify discrete land surface substrates such as bare soil (<code><a href="reference/d4h_bare_soil.html">d4h_bare_soil()</a></code>) to delineate unpaved roads, exposed earth, and peridomestic clearing boundaries.</li>
+<li>
+<strong>Hydrological &amp; Micro-Pooling Detection:</strong> Identify open water surfaces, irrigation trenches, and standing moisture pools (<code><a href="reference/d4h_ndwi.html">d4h_ndwi()</a></code>) that provide aquatic breeding habitats.</li>
+<li>
+<strong>Micro-Topography &amp; Terrain Wetness:</strong> Model terrain slope (<code><a href="reference/d4h_slope.html">d4h_slope()</a></code>) and topographic wetness accumulation (<code><a href="reference/d4h_twi.html">d4h_twi()</a></code>) from UAV Digital Elevation Models (DEM/DSM) to pinpoint natural drainage sinks and runoff depressions.</li>
+<li>
+<strong>Eco-Epidemiological Risk Modeling:</strong> Synthesize multi-band metrics to locate solid waste micro-accumulations (<code><a href="reference/d4h_imsr.html">d4h_imsr()</a></code>), hydric stagnation risk (<code><a href="reference/d4h_irhe.html">d4h_irhe()</a></code>, <code><a href="reference/d4h_iev.html">d4h_iev()</a></code>), thermal micro-climate refuges (<code><a href="reference/d4h_irts.html">d4h_irts()</a></code>), and human-forest ecotone interfaces (<code><a href="reference/d4h_irih.html">d4h_irih()</a></code>, <code><a href="reference/d4h_ifeb.html">d4h_ifeb()</a></code>).</li>
+<li>
+<strong>Spatial Zonation &amp; Surveillance Grids:</strong> Tessellate the flight footprint into operational hexagonal grids (<code><a href="reference/d4h_hex_grid.html">d4h_hex_grid()</a></code>) and compute zonal summaries (<code><a href="reference/d4h_summarize_grid.html">d4h_summarize_grid()</a></code>) for community health teams and larviciding logistics.</li>
+<li>
+<strong>Executive Reporting &amp; Excel Export:</strong> Generate multi-moment descriptive statistics, spatial surface coverage in hectares, and Tukey outlier diagnostics with automated multi-sheet Excel workbook export (<code><a href="reference/d4h_executive_summary.html">d4h_executive_summary()</a></code>, <code><a href="reference/d4h_export_summary.html">d4h_export_summary()</a></code>).</li>
 </ul>
+<p><em>(For full mathematical formulations and derivations, see the individual function pages under the <a href="https://JosueFlorian17.github.io/drones4health-version-control/reference/index.html">Reference</a> tab).</em></p>
 <hr>
-</div>
-<div class="section level3">
-<h3 id="b-micro-topography--hydrological-indices">B. Micro-Topography &amp; Hydrological Indices<a class="anchor" aria-label="anchor" href="#b-micro-topography--hydrological-indices"></a>
-</h3>
-<ul>
-<li><p><strong>Terrain Slope (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>)</strong> <em>(Burrough &amp; McDonnell, 1998)</em>: <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>β</mi><mo>=</mo><mrow><mi mathvariant="normal">arctan</mi><mo>⁡</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><msqrt><mrow><msup><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><mi>∂</mi><mi>z</mi></mrow><mrow><mi>∂</mi><mi>x</mi></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup><mo>+</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><mi>∂</mi><mi>z</mi></mrow><mrow><mi>∂</mi><mi>y</mi></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\beta = \arctan\left(\sqrt{\left(\frac{\partial z}{\partial x}\right)^2 + \left(\frac{\partial z}{\partial y}\right)^2}\right)</annotation></semantics></math></p></li>
-<li><p><strong>Topographic Wetness Index (TWI)</strong> <em>(Beven &amp; Kirkby, 1979)</em>: <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">TWI</mtext><mo>=</mo><mrow><mi mathvariant="normal">ln</mi><mo>⁡</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mi>a</mi><mrow><mrow><mi mathvariant="normal">tan</mi><mo>⁡</mo></mrow><mi>β</mi></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\text{TWI} = \ln\left(\frac{a}{\tan \beta}\right)</annotation></semantics></math> Where <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math> represents the specific catchment area and <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math> is the local slope angle, highlighting micro-depressions prone to persistent water stagnation.</p></li>
-</ul>
-<hr>
-</div>
-<div class="section level3">
-<h3 id="c-eco-epidemiological-risk-indices-one-health">C. Eco-Epidemiological Risk Indices (One Health)<a class="anchor" aria-label="anchor" href="#c-eco-epidemiological-risk-indices-one-health"></a>
-</h3>
-<ul>
-<li><p><strong>Index of Micro-accumulation of Solid Waste (IMSR)</strong>: <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">IMSR</mtext><mo>=</mo><mtext mathvariant="normal">clamp</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><mtext mathvariant="normal">RedEdge</mtext><mo>−</mo><mtext mathvariant="normal">Red</mtext></mrow><mrow><mtext mathvariant="normal">NIR</mtext><mo>+</mo><mtext mathvariant="normal">Red</mtext><mo>+</mo><mi>ϵ</mi></mrow></mfrac><mo>,</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\text{IMSR} = \text{clamp}\left(\frac{\text{RedEdge} - \text{Red}}{\text{NIR} + \text{Red} + \epsilon}, 0, 1\right)</annotation></semantics></math> Identifies discarded artificial plastic containers, discarded tires, and domestic waste clusters that serve as <em>Aedes aegypti</em> oviposition habitats.</p></li>
-<li><p><strong>Index of High-Risk Hydric Environments (IRHE)</strong>: <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">IRHE</mtext><mo>=</mo><msub><mtext mathvariant="normal">NDWI</mtext><mtext mathvariant="normal">pos</mtext></msub><mo>×</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><msub><mtext mathvariant="normal">Slope</mtext><mtext mathvariant="normal">norm</mtext></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{IRHE} = \text{NDWI}_{\text{pos}} \times (1 - \text{Slope}_{\text{norm}})</annotation></semantics></math> Synthesizes hydric accumulation and flat micro-terrain to isolate stagnant puddles and larval breeding foci.</p></li>
-<li><p><strong>Entomological Vector Suitability Index (IEV)</strong>: <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">IEV</mtext><mo>=</mo><msub><mi>w</mi><mn>1</mn></msub><mo>⋅</mo><msub><mtext mathvariant="normal">TWI</mtext><mtext mathvariant="normal">norm</mtext></msub><mo>+</mo><msub><mi>w</mi><mn>2</mn></msub><mo>⋅</mo><msub><mtext mathvariant="normal">NDWI</mtext><mtext mathvariant="normal">norm</mtext></msub><mo>+</mo><msub><mi>w</mi><mn>3</mn></msub><mo>⋅</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><msub><mtext mathvariant="normal">Slope</mtext><mtext mathvariant="normal">norm</mtext></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{IEV} = w_1 \cdot \text{TWI}_{\text{norm}} + w_2 \cdot \text{NDWI}_{\text{norm}} + w_3 \cdot (1 - \text{Slope}_{\text{norm}})</annotation></semantics></math></p></li>
-<li><p><strong>Thermal Surface Risk Index (IRTS)</strong>: Calibrates micro-climatic surface temperature (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>S</mi><mi>T</mi></mrow><annotation encoding="application/x-tex">LST</annotation></semantics></math>) from thermal UAV sensors to identify critical thermal windows for larval development (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>22</mn><mo>∘</mo></msup><mtext mathvariant="normal">C</mtext><mo>−</mo><msup><mn>32</mn><mo>∘</mo></msup><mtext mathvariant="normal">C</mtext></mrow><annotation encoding="application/x-tex">22^\circ\text{C} - 32^\circ\text{C}</annotation></semantics></math>).</p></li>
-</ul>
-<hr>
-</div>
 </div>
 <div class="section level2">
-<h2 id="id_3-end-to-end-workflow-example">3. End-to-End Workflow Example<a class="anchor" aria-label="anchor" href="#id_3-end-to-end-workflow-example"></a>
+<h2 id="id_3-practical-workflow-from-raw-orthomosaics-to-risk-metrics">3. Practical Workflow: From Raw Orthomosaics to Risk Metrics<a class="anchor" aria-label="anchor" href="#id_3-practical-workflow-from-raw-orthomosaics-to-risk-metrics"></a>
 </h2>
+<p>All indicator functions accept <code><a href="https://rspatial.github.io/terra/reference/SpatRaster-class.html" class="external-link">terra::SpatRaster</a></code> objects or direct file paths, automatically handle spatial co-registration, and mask background NoData to <code>NA</code>:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JosueFlorian17/drones4health-version-control" class="external-link">drones4health</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/" class="external-link">terra</a></span><span class="op">)</span></span>
@@ -123,7 +114,7 @@
 <span><span class="va">path_re</span>  <span class="op">&lt;-</span> <span class="st">"data/Ohuay_RE.tif"</span></span>
 <span><span class="va">path_dem</span> <span class="op">&lt;-</span> <span class="st">"data/Ohuay_D.tif"</span></span>
 <span></span>
-<span><span class="co"># 2. Compute spectral indices and discrete masks</span></span>
+<span><span class="co"># 2. Compute vegetation indices and discrete soil substrate masks</span></span>
 <span><span class="va">r_ndvi</span>      <span class="op">&lt;-</span> <span class="fu"><a href="reference/d4h_ndvi.html">d4h_ndvi</a></span><span class="op">(</span>nir <span class="op">=</span> <span class="va">path_nir</span>, red <span class="op">=</span> <span class="va">path_r</span><span class="op">)</span></span>
 <span><span class="va">r_msavi2</span>    <span class="op">&lt;-</span> <span class="fu"><a href="reference/d4h_msavi2.html">d4h_msavi2</a></span><span class="op">(</span>nir <span class="op">=</span> <span class="va">path_nir</span>, red <span class="op">=</span> <span class="va">path_r</span><span class="op">)</span></span>
 <span><span class="va">r_bare_soil</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/d4h_bare_soil.html">d4h_bare_soil</a></span><span class="op">(</span>ndvi_raster <span class="op">=</span> <span class="va">r_ndvi</span>, threshold <span class="op">=</span> <span class="fl">0.15</span><span class="op">)</span></span>
@@ -139,7 +130,7 @@
 <div class="section level2">
 <h2 id="id_4-surveillance-zonation--hexagonal-grids">4. Surveillance Zonation &amp; Hexagonal Grids<a class="anchor" aria-label="anchor" href="#id_4-surveillance-zonation--hexagonal-grids"></a>
 </h2>
-<p>Generate field-operative spatial units (e.g., 25m or 50m diameter hexagons) for community vector control teams:</p>
+<p>Partition high-resolution flight footprints into operational units (e.g., 25m or 50m diameter hexagons) for targeted vector intervention:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Generate 50m surveillance hexagonal grid</span></span>
 <span><span class="va">grid_hex</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/d4h_hex_grid.html">d4h_hex_grid</a></span><span class="op">(</span>aoi <span class="op">=</span> <span class="va">r_ndvi</span>, cell_size <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span>
@@ -155,26 +146,26 @@
 <div class="section level2">
 <h2 id="id_5-executive-reporting--multi-sheet-excel-export">5. Executive Reporting &amp; Multi-Sheet Excel Export<a class="anchor" aria-label="anchor" href="#id_5-executive-reporting--multi-sheet-excel-export"></a>
 </h2>
-<p>Generate statistical moments, spatial extent in hectares, Tukey outlier fences (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>Q</mi><mn>25</mn></msub><mo>−</mo><mn>1.5</mn><mo>⋅</mo><mtext mathvariant="normal">IQR</mtext></mrow><annotation encoding="application/x-tex">Q_{25} - 1.5 \cdot \text{IQR}</annotation></semantics></math>, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>Q</mi><mn>75</mn></msub><mo>+</mo><mn>1.5</mn><mo>⋅</mo><mtext mathvariant="normal">IQR</mtext></mrow><annotation encoding="application/x-tex">Q_{75} + 1.5 \cdot \text{IQR}</annotation></semantics></math>), and domain-specific thematic stratum areas exported to <code>.xlsx</code>:</p>
+<p>Generate statistical moments, spatial extent in hectares, Tukey outlier fences, and domain-specific thematic stratum distributions exported directly into structured <code>.xlsx</code> workbooks:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Multi-band executive report with direct Excel workbook export</span></span>
+<code class="sourceCode R"><span><span class="co"># Multi-band executive report with direct Excel export</span></span>
 <span><span class="va">resumen_ejecutivo</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/d4h_executive_summary.html">d4h_executive_summary</a></span><span class="op">(</span></span>
 <span>  raster_in <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">r_ndvi</span>, <span class="va">r_msavi2</span>, <span class="va">r_imsr</span><span class="op">)</span>,</span>
 <span>  out_xlsx  <span class="op">=</span> <span class="st">"salidas/Resumen_Ejecutivo_Drones.xlsx"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Print executive console output</span></span>
+<span><span class="co"># Print executive summary to console</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">resumen_ejecutivo</span><span class="op">)</span></span></code></pre></div>
 <hr>
 </div>
 <div class="section level2">
 <h2 id="id_6-visualization--interactive-mapping">6. Visualization &amp; Interactive Mapping<a class="anchor" aria-label="anchor" href="#id_6-visualization--interactive-mapping"></a>
 </h2>
-<p><code>drones4health</code> provides both static publication-ready cartography via <code>ggplot2</code> and an interactive Leaflet side-by-side swipe comparison widget (<code>d4h_mapview_swipe</code>).</p>
+<p><code>drones4health</code> provides both static publication-ready cartography via <code>ggplot2</code> and interactive Leaflet side-by-side swipe comparison viewers (<code>d4h_mapview_swipe</code>).</p>
 <div class="section level3">
-<h3 id="a-interactive-side-by-side-swipe-comparison">A. Interactive Side-by-Side Swipe Comparison<a class="anchor" aria-label="anchor" href="#a-interactive-side-by-side-swipe-comparison"></a>
+<h3 id="a-interactive-side-by-side-swipe-viewer">A. Interactive Side-by-Side Swipe Viewer<a class="anchor" aria-label="anchor" href="#a-interactive-side-by-side-swipe-viewer"></a>
 </h3>
-<p>Compare continuous indices, binary masks, and hexagonal grids with a single slider bar and dynamic contrast stretching:</p>
+<p>Compare continuous indices, discrete binary masks, and hexagonal grids with a single slider bar and dynamic contrast stretching:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Highlight bare soil pixels (value 1) as teal over MSAVI2 in magma palette</span></span>
 <span><span class="va">r_solo_suelo</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/ifelse.html" class="external-link">ifel</a></span><span class="op">(</span><span class="va">r_bare_soil</span> <span class="op">==</span> <span class="fl">1</span>, <span class="fl">1</span>, <span class="cn">NA</span><span class="op">)</span></span>
@@ -216,33 +207,21 @@
 </div>
 </div>
 <div class="section level2">
-<h2 id="id_7-scientific-references--bibliography">7. Scientific References &amp; Bibliography<a class="anchor" aria-label="anchor" href="#id_7-scientific-references--bibliography"></a>
+<h2 id="id_7-references">7. References<a class="anchor" aria-label="anchor" href="#id_7-references"></a>
 </h2>
 <ol style="list-style-type: decimal">
 <li>
-<strong>Barnes, E. M., Clarke, T. R., Richards, S. E., Colaizzi, P. D., Sloan, J., Moran, M. S., … &amp; Pinter, P. J.</strong> (2000). Coincident detection of crop water stress, nitrogen status and canopy density using ground-based multispectral data. <em>Proceedings of the 5th International Conference on Precision Agriculture</em>, 16, 1-15.</li>
-<li>
 <strong>Beven, K. J., &amp; Kirkby, M. J.</strong> (1979). A physically based, variable contributing area model of basin hydrology. <em>Hydrological Sciences Bulletin</em>, 24(1), 43-69.</li>
 <li>
-<strong>Burrough, P. A., &amp; McDonnell, R. A.</strong> (1998). <em>Principles of Geographical Information Systems</em>. Oxford University Press.</li>
-<li>
-<strong>Gitelson, A. A., Kaufman, Y. J., Stark, R., &amp; Rundquist, D.</strong> (2002). Novel algorithms for remote estimation of vegetation fraction. <em>Remote Sensing of Environment</em>, 80(1), 76-87.</li>
-<li>
-<strong>Gitelson, A. A., Merzlyak, M. N., &amp; Lichtenthaler, H. K.</strong> (1996). Detection of red edge position and chlorophyll content by reflectance spectra. <em>Journal of Plant Physiology</em>, 148(3-4), 494-508.</li>
+<strong>Fornace, K. M., et al.</strong> (2014). Mapping infectious disease landscapes: unmanned aerial vehicles and epidemiology. <em>Trends in Parasitology</em>, 30(11), 514-519.</li>
 <li>
 <strong>Huete, A. R.</strong> (1988). A soil-adjusted vegetation index (SAVI). <em>Remote Sensing of Environment</em>, 25(3), 295-309.</li>
 <li>
-<strong>Huete, A., Didan, K., Miura, T., Rodriguez, E. P., Gao, X., &amp; Ferreira, L. G.</strong> (2002). Overview of the radiometric and biophysical performance of the MODIS vegetation indices. <em>Remote Sensing of Environment</em>, 83(1-2), 195-213.</li>
+<strong>Qi, J., et al.</strong> (1994). A modified soil adjusted vegetation index. <em>Remote Sensing of Environment</em>, 48(2), 119-126.</li>
 <li>
-<strong>McFeeters, S. K.</strong> (1996). The use of the Normalized Difference Water Index (NDWI) in the delineation of open water features. <em>International Journal of Remote Sensing</em>, 17(7), 1425-1432.</li>
+<strong>Rouse, J. W., et al.</strong> (1974). Monitoring vegetation systems in the Great Plains with ERTS. <em>NASA Special Publication</em>, 351, 309-317.</li>
 <li>
-<strong>Perry, C. R., &amp; Lautenschlager, L. F.</strong> (1984). Functional equivalence of spectral vegetation indices. <em>Remote Sensing of Environment</em>, 14(1-3), 169-182.</li>
-<li>
-<strong>Qi, J., Chehbouni, A., Huete, A. R., Kerr, Y. H., &amp; Sorooshian, S.</strong> (1994). A modified soil adjusted vegetation index. <em>Remote Sensing of Environment</em>, 48(2), 119-126.</li>
-<li>
-<strong>Rouse, J. W., Haas, R. H., Schell, J. A., &amp; Deering, D. W.</strong> (1974). Monitoring vegetation systems in the Great Plains with ERTS. <em>NASA Special Publication</em>, 351, 309-317.</li>
-<li>
-<strong>World Health Organization.</strong> (2020). <em>Operational framework for building climate resilient health systems</em>. World Health Organization.</li>
+<strong>World Health Organization.</strong> (2020). <em>Operational framework for building climate resilient health systems</em>. WHO.</li>
 </ol>
 </div>
 </div>

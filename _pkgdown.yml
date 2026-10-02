@@ -2,6 +2,18 @@ url: https://JosueFlorian17.github.io/drones4health-version-control/
 template:
   bootstrap: 5
   light-switch: true
+  includes:
+    in_header: |
+      <script>
+        MathJax = {
+          tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$'], ['\\[', '\\]']],
+            processEscapes: true
+          }
+        };
+      </script>
+      <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
 home:
   title: "drones4health: Ultra-High Resolution Drone Metrics for Spatial Health Analysis"
