@@ -8,9 +8,11 @@ d4h_segment_buildings(
   rgb_raster,
   ndvi_raster = NULL,
   min_area_m2 = 12,
-  max_area_m2 = 500,
-  brightness_min = 155,
-  ndvi_max = 0.18
+  max_area_m2 = 600,
+  brightness_min = 135,
+  ndvi_max = 0.25,
+  method = c("spectral", "sam"),
+  sam_checkpoint = NULL
 )
 }
 \arguments{
@@ -25,12 +27,16 @@ d4h_segment_buildings(
 \item{brightness_min}{Numeric. Minimum mean RGB brightness threshold \code{[0, 255]} (default: 155.0).}
 
 \item{ndvi_max}{Numeric. Maximum NDVI threshold to exclude tree canopies over roofs (default: 0.18).}
+
+\item{method}{Character. Segmentation method: \code{"spectral"} (default, fast native R) or \code{"sam"} (Meta Segment Anything Model).}
+
+\item{sam_checkpoint}{Character path (optional). Model weights path when \code{method = "sam"}.}
 }
 \value{
 An \code{sf} POLYGON object with columns: \code{building_id}, \code{area_m2}, \code{centroid_x}, \code{centroid_y}, and spatial geometry.
 }
 \description{
-Identifies, delineates, and vectorizes residential houses, roofs, and man-made structures from ultra-high resolution RGB orthomosaics and vegetation masks.
+Identifies, delineates, and vectorizes residential houses, roofs, and man-made structures from ultra-high resolution RGB orthomosaics using spectral-geometric OBIA or Segment Anything (SAM).
 }
 \details{
 Buildings are extracted by combining high surface brightness / spectral contrast in visible RGB bands with non-vegetated constraints (\eqn{\text{NDVI} < \theta_{\text{ndvi}}}):
@@ -39,4 +45,6 @@ Vectorized candidates are filtered by residential building footprints (\eqn{10\t
 }
 \references{
 Blaschke, T. (2010). Object based image analysis for remote sensing. \emph{ISPRS Journal of Photogrammetry and Remote Sensing}, 65(1), 2-16. \doi{10.1016/j.isprsjprs.2009.06.004}
+
+Kirillov, A., et al. (2023). Segment anything. \emph{arXiv preprint arXiv:2304.02643}.
 }

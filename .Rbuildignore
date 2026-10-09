@@ -1,2 +1,6 @@
 ^land4healthdemo2\.Rproj$
 ^\.Rproj\.user$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^\.github$

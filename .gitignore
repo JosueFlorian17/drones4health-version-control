@@ -3,3 +3,9 @@
 .RData
 .Ruserdata
 Rplots.pdf
+*.pth
+*.pt
+models/
+weights/
+
+docs
