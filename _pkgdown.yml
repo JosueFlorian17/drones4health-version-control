@@ -67,6 +67,14 @@ reference:
       - d4h_ifeb
       - d4h_iead
 
+  - title: "Feature Segmentation & Spatial Proximity Risk"
+    desc: "Automated object segmentation of water bodies and residential building footprints from ultra-high resolution RGB imagery, with Euclidean distance risk modeling."
+    contents:
+      - d4h_segment_water
+      - d4h_segment_buildings
+      - d4h_distance_to_risk
+      - d4h_raster_distance
+
   - title: "Spatial Grids & Zonation"
     desc: "Operational surveillance grids (hexagons/squares) and zonal summary statistics extraction."
     contents:

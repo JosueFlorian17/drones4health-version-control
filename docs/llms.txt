@@ -310,6 +310,21 @@ solid waste micro-accumulation, and hydric breeding suitability.
 - [`d4h_iead()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_iead.md)
   : Clearing Stagnation Index (IEAD)
 
+## Feature Segmentation & Spatial Proximity Risk
+
+Automated object segmentation of water bodies and residential building
+footprints from ultra-high resolution RGB imagery, with Euclidean
+distance risk modeling.
+
+- [`d4h_segment_water()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_segment_water.md)
+  : Segment Water Bodies and Surface Moisture Pools
+- [`d4h_segment_buildings()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_segment_buildings.md)
+  : Segment House Roofs and Building Footprints
+- [`d4h_distance_to_risk()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_distance_to_risk.md)
+  : Calculate Distance and Vulnerability Risk to Water Sources
+- [`d4h_raster_distance()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_raster_distance.md)
+  : Continuous Euclidean Distance Raster from Risk Sources
+
 ## Spatial Grids & Zonation
 
 Operational surveillance grids (hexagons/squares) and zonal summary

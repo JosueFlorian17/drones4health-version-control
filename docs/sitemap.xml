@@ -6,6 +6,7 @@
 <url><loc>https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_bare_soil.html</loc></url>
 <url><loc>https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_clean_band.html</loc></url>
 <url><loc>https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_ctvi.html</loc></url>
+<url><loc>https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_distance_to_risk.html</loc></url>
 <url><loc>https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_dvi.html</loc></url>
 <url><loc>https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_evi.html</loc></url>
 <url><loc>https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_executive_summary.html</loc></url>
@@ -29,8 +30,11 @@
 <url><loc>https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_normalize_reflectance.html</loc></url>
 <url><loc>https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_plot.html</loc></url>
 <url><loc>https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_process_mosaic.html</loc></url>
+<url><loc>https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_raster_distance.html</loc></url>
 <url><loc>https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_raster_general.html</loc></url>
 <url><loc>https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_savi.html</loc></url>
+<url><loc>https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_segment_buildings.html</loc></url>
+<url><loc>https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_segment_water.html</loc></url>
 <url><loc>https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_slope.html</loc></url>
 <url><loc>https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_summarize_general.html</loc></url>
 <url><loc>https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_summarize_global.html</loc></url>
