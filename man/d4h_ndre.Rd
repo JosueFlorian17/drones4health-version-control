@@ -22,6 +22,21 @@ The Normalized Difference Red Edge Index is formulated as:
 \deqn{\text{NDRE} = \frac{\text{NIR} - \text{RedEdge}}{\text{NIR} + \text{RedEdge}}}
 Useful in dense vegetation where standard NDVI experiences saturation.
 }
+\examples{
+\donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  nir_file <- system.file("extdata", "nir.tif", package = "drones4health")
+  re_file  <- system.file("extdata", "rededge.tif", package = "drones4health")
+
+  # Run NDRE calculation
+  r_ndre <- d4h_ndre(nir = nir_file, red_edge = re_file)
+  head(r_ndre)
+}
+}
+}
 \references{
 Barnes, E. M., Clarke, T. R., Richards, S. E., Colaizzi, P. D., Sloan, J., Moran, M. S., ... & Pinter, P. J. (2000). Coincident detection of crop water stress, nitrogen status and canopy density using ground-based multispectral data. \emph{Proceedings of the 5th International Conference on Precision Agriculture}, 16, 1-15.
 }

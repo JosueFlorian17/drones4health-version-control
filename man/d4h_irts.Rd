@@ -28,6 +28,27 @@ The Thermal Refuge and Shade Index evaluates the thermal gradient between focal 
 \deqn{\text{IRTS} = \frac{\text{NDRE} \times (\text{LST}_{\text{surrounding}} - \text{LST}_{\text{local}})}{\text{NIR} + \epsilon}}
 High positive IRTS values highlight cool micro-climatic refuges buffered by dense vegetative cover.
 }
+\examples{
+\donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  ndre_file <- system.file("extdata", "ndre.tif", package = "drones4health")
+  lst_file  <- system.file("extdata", "lst.tif", package = "drones4health")
+  nir_file  <- system.file("extdata", "nir.tif", package = "drones4health")
+
+  # Local vs surrounding focal LST
+  r_lst_local <- terra::rast(lst_file)
+  r_lst_surr  <- terra::focal(r_lst_local, w = 9, fun = "mean", na.rm = TRUE)
+
+  # Run IRTS thermal refuge calculation
+  r_irts <- d4h_irts(ndre = ndre_file, lst_local = r_lst_local,
+                     lst_surrounding = r_lst_surr, nir = nir_file)
+  head(r_irts)
+}
+}
+}
 \references{
 Murdock, C. C., Sternberg, E. D., & Thomas, M. B. (2016). Microclimate determines the infection potential of \emph{Aedes aegypti} for dengue virus. \emph{PLOS Neglected Tropical Diseases}, 10(12), e0005118. \doi{10.1371/journal.pntd.0005118}
 }

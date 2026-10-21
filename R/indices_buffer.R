@@ -36,6 +36,31 @@
 #'   \item \code{grid}: An \code{sf} / \code{SpatVector} zonal grid summary within the buffer zone.
 #'   \item \code{plot}: A \code{ggplot} object visualizing the buffer zone, raster indicator, and house points (if \code{plot = TRUE}).
 #' }
+#' @examples
+#' \donttest{
+#' if (interactive()) {
+#'   library(drones4health)
+#'   library(terra)
+#'   library(sf)
+#'
+#'   # Define paths to bands and house locations
+#'   nir_path   <- system.file("extdata", "nir.tif", package = "drones4health")
+#'   red_path   <- system.file("extdata", "red.tif", package = "drones4health")
+#'   houses_csv <- system.file("extdata", "houses.csv", package = "drones4health")
+#'
+#'   # Run focal buffer analysis around houses (150m buffer)
+#'   res_buffer <- d4h_indicator_buffer(
+#'     indicator = "NDVI",
+#'     houses    = houses_csv,
+#'     radius    = 3,
+#'     cell_size = 50,
+#'     nir       = nir_path,
+#'     red       = red_path,
+#'     palette   = "viridis"
+#'   )
+#'   head(res_buffer$grid)
+#' }
+#' }
 #' @export
 d4h_indicator_buffer <- function(indicator = "NDVI",
                                  houses,

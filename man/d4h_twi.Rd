@@ -23,6 +23,20 @@ The Topographic Wetness Index is defined as:
 where \eqn{a} is the specific contributing drainage area (catchment area per unit contour length), \eqn{\beta} is the local slope in radians, and \eqn{\epsilon} is a small numerical stabilization parameter.
 Higher TWI values indicate low-lying areas and micro-depressions with high susceptibility to surface water accumulation and vector larval breeding.
 }
+\examples{
+\donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  dem_file <- system.file("extdata", "dem.tif", package = "drones4health")
+
+  # Run TWI calculation
+  r_twi <- d4h_twi(dem_raster = dem_file)
+  head(r_twi)
+}
+}
+}
 \references{
 Beven, K. J., & Kirkby, M. J. (1979). A physically based, variable contributing area model of basin hydrology. \emph{Hydrological Sciences Bulletin}, 24(1), 43-69. \doi{10.1080/02626667909491834}
 

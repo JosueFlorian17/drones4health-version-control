@@ -22,6 +22,20 @@ Topographic slope represents the rate of maximum elevation change:
 \deqn{\beta = \arctan\left(\sqrt{\left(\frac{\partial z}{\partial x}\right)^2 + \left(\frac{\partial z}{\partial y}\right)^2}\right)}
 Flat terrains (\eqn{\beta < 5^\circ}) are critical in spatial epidemiology as they favor persistent micro-pooling and water stagnation.
 }
+\examples{
+\donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  dem_file <- system.file("extdata", "dem.tif", package = "drones4health")
+
+  # Run Slope calculation in degrees
+  r_slope <- d4h_slope(dem_raster = dem_file, unit = "degrees")
+  head(r_slope)
+}
+}
+}
 \references{
 Burrough, P. A., & McDonnell, R. A. (1998). \emph{Principles of Geographical Information Systems}. Oxford University Press.
 }

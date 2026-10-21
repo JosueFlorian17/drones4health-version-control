@@ -92,3 +92,29 @@ In ultra-high resolution drone mapping (100M+ pixels), calculating continuous in
 \deqn{\text{Buffer Distance} = R \times \text{cell\_size}}
 It crops the raw band inputs strictly to the bounding box of intersecting buffer zones, masks non-focal areas, computes the specified spectral/terrain/epidemiological index, extracts grid summaries, and produces an publication-ready ggplot visualization with house points overlaid.
 }
+\examples{
+\donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+  library(sf)
+
+  # Define paths to bands and house locations
+  nir_path   <- system.file("extdata", "nir.tif", package = "drones4health")
+  red_path   <- system.file("extdata", "red.tif", package = "drones4health")
+  houses_csv <- system.file("extdata", "houses.csv", package = "drones4health")
+
+  # Run focal buffer analysis around houses (150m buffer)
+  res_buffer <- d4h_indicator_buffer(
+    indicator = "NDVI",
+    houses    = houses_csv,
+    radius    = 3,
+    cell_size = 50,
+    nir       = nir_path,
+    red       = red_path,
+    palette   = "viridis"
+  )
+  head(res_buffer$grid)
+}
+}
+}

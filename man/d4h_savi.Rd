@@ -24,6 +24,21 @@ The Soil-Adjusted Vegetation Index is defined as:
 \deqn{\text{SAVI} = \frac{\text{NIR} - \text{Red}}{\text{NIR} + \text{Red} + L} \times (1 + L)}
 where \eqn{L} is a canopy background adjustment factor typically set to \eqn{L = 0.5} for intermediate vegetation densities.
 }
+\examples{
+\donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  nir_file <- system.file("extdata", "nir.tif", package = "drones4health")
+  red_file <- system.file("extdata", "red.tif", package = "drones4health")
+
+  # Run SAVI calculation with soil adjustment factor L = 0.5
+  r_savi <- d4h_savi(nir = nir_file, red = red_file, l_factor = 0.5)
+  head(r_savi)
+}
+}
+}
 \references{
 Huete, A. R. (1988). A soil-adjusted vegetation index (SAVI). \emph{Remote Sensing of Environment}, 25(3), 295-309. \doi{10.1016/0034-4257(88)90106-X}
 }

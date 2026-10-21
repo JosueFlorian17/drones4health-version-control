@@ -32,6 +32,22 @@ The Enhanced Vegetation Index is computed as:
 \deqn{\text{EVI} = G \times \frac{\text{NIR} - \text{Red}}{\text{NIR} + C_1 \cdot \text{Red} - C_2 \cdot \text{Blue} + L}}
 where \eqn{G = 2.5} is the gain factor, \eqn{C_1 = 6.0} and \eqn{C_2 = 7.5} are aerosol resistance coefficients, and \eqn{L = 1.0} is the canopy background factor.
 }
+\examples{
+\donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  nir_file   <- system.file("extdata", "nir.tif", package = "drones4health")
+  red_file   <- system.file("extdata", "red.tif", package = "drones4health")
+  blue_file  <- system.file("extdata", "blue.tif", package = "drones4health")
+
+  # Run EVI calculation
+  r_evi <- d4h_evi(nir = nir_file, red = red_file, blue = blue_file)
+  head(r_evi)
+}
+}
+}
 \references{
 Huete, A., Didan, K., Miura, T., Rodriguez, E. P., Gao, X., & Ferreira, L. G. (2002). Overview of the radiometric and biophysical performance of the MODIS vegetation indices. \emph{Remote Sensing of Environment}, 83(1-2), 195-213. \doi{10.1016/S0034-4257(02)00096-2}
 }

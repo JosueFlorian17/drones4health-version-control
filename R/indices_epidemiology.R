@@ -14,6 +14,21 @@
 #' World Health Organization. (2020). \emph{Comprehensive guidelines for prevention and control of dengue and dengue haemorrhagic fever}. WHO Regional Office for South-East Asia.
 #'
 #' Fornace, K. M., Drakeley, C. J., William, T., Espino, F., & Cox, J. (2014). Mapping infectious disease landscapes: unmanned aerial vehicles and epidemiology. \emph{Trends in Parasitology}, 30(11), 514-519. \doi{10.1016/j.pt.2014.09.001}
+#' @examples
+#' \donttest{
+#' if (interactive()) {
+#'   library(drones4health)
+#'   library(terra)
+#'
+#'   re_file  <- system.file("extdata", "rededge.tif", package = "drones4health")
+#'   red_file <- system.file("extdata", "red.tif", package = "drones4health")
+#'   nir_file <- system.file("extdata", "nir.tif", package = "drones4health")
+#'
+#'   # Run IMSR calculation for solid waste / plastics
+#'   r_imsr <- d4h_imsr(red_edge = re_file, red = red_file, nir = nir_file)
+#'   head(r_imsr)
+#' }
+#' }
 #' @export
 d4h_imsr <- function(red_edge, red, nir, veg_threshold = 0.2, eps = 0.001) {
   # 1. Alinear enmascarando ceros estrictos de origen
@@ -55,6 +70,26 @@ d4h_imsr <- function(red_edge, red, nir, veg_threshold = 0.2, eps = 0.001) {
 #' @return A SpatRaster representing thermal refuge intensity with background masked to \code{NA}.
 #' @references
 #' Murdock, C. C., Sternberg, E. D., & Thomas, M. B. (2016). Microclimate determines the infection potential of \emph{Aedes aegypti} for dengue virus. \emph{PLOS Neglected Tropical Diseases}, 10(12), e0005118. \doi{10.1371/journal.pntd.0005118}
+#' @examples
+#' \donttest{
+#' if (interactive()) {
+#'   library(drones4health)
+#'   library(terra)
+#'
+#'   ndre_file <- system.file("extdata", "ndre.tif", package = "drones4health")
+#'   lst_file  <- system.file("extdata", "lst.tif", package = "drones4health")
+#'   nir_file  <- system.file("extdata", "nir.tif", package = "drones4health")
+#'
+#'   # Local vs surrounding focal LST
+#'   r_lst_local <- terra::rast(lst_file)
+#'   r_lst_surr  <- terra::focal(r_lst_local, w = 9, fun = "mean", na.rm = TRUE)
+#'
+#'   # Run IRTS thermal refuge calculation
+#'   r_irts <- d4h_irts(ndre = ndre_file, lst_local = r_lst_local,
+#'                      lst_surrounding = r_lst_surr, nir = nir_file)
+#'   head(r_irts)
+#' }
+#' }
 #' @export
 d4h_irts <- function(ndre, lst_local, lst_surrounding, nir, eps = 0.001) {
   aligned <- .match_multi(ndre, lst_local, lst_surrounding, nir, mask_zeros = FALSE)
@@ -81,6 +116,24 @@ d4h_irts <- function(ndre, lst_local, lst_surrounding, nir, eps = 0.001) {
 #' @return A SpatRaster containing IEV stagnation risk values with background masked to \code{NA}.
 #' @references
 #' Hardy, A., Makame, M., Cross, D., Majambere, S., & Msellem, M. (2017). Using low-cost drones to map malaria vector habitats. \emph{Parasites & Vectors}, 10(1), 29. \doi{10.1186/s13071-017-1973-3}
+#' @examples
+#' \donttest{
+#' if (interactive()) {
+#'   library(drones4health)
+#'   library(terra)
+#'
+#'   green_file <- system.file("extdata", "green.tif", package = "drones4health")
+#'   nir_file   <- system.file("extdata", "nir.tif", package = "drones4health")
+#'   dem_file   <- system.file("extdata", "dem.tif", package = "drones4health")
+#'
+#'   r_ndwi  <- d4h_ndwi(green = green_file, nir = nir_file)
+#'   r_slope <- d4h_slope(dem_raster = dem_file, unit = "degrees")
+#'
+#'   # Run IEV vulnerability stagnation calculation
+#'   r_iev <- d4h_iev(delta_ndwi = r_ndwi, slope_dsm = r_slope)
+#'   head(r_iev)
+#' }
+#' }
 #' @export
 d4h_iev <- function(delta_ndwi, slope_dsm, eps = 0.001) {
   pair <- .match_pair(delta_ndwi, slope_dsm, mask_zeros = FALSE)
@@ -105,6 +158,23 @@ d4h_iev <- function(delta_ndwi, slope_dsm, eps = 0.001) {
 #' @return A SpatRaster stratifying larval breeding site quality with background masked to \code{NA}.
 #' @references
 #' Mordecai, E. A., Cohen, J. M., Evans, M. V., Gudapati, P., Johnson, L. R., Lippi, C. A., ... & Rohr, J. R. (2017). Detecting the impact of temperature on transmission of Zika, dengue, and chikungunya using mechanistic models. \emph{PLOS Neglected Tropical Diseases}, 11(4), e0005568. \doi{10.1371/journal.pntd.0005568}
+#' @examples
+#' \donttest{
+#' if (interactive()) {
+#'   library(drones4health)
+#'   library(terra)
+#'
+#'   nir_file   <- system.file("extdata", "nir.tif", package = "drones4health")
+#'   green_file <- system.file("extdata", "green.tif", package = "drones4health")
+#'   lst_file   <- system.file("extdata", "lst.tif", package = "drones4health")
+#'
+#'   r_gndvi <- d4h_gndvi(nir = nir_file, green = green_file)
+#'
+#'   # Run IEC calculation with T_opt = 25 C
+#'   r_iec <- d4h_iec(gndvi_water = r_gndvi, lst = lst_file, t_opt = 25)
+#'   head(r_iec)
+#' }
+#' }
 #' @export
 d4h_iec <- function(gndvi_water, lst, t_opt = 25) {
   pair <- .match_pair(gndvi_water, lst, mask_zeros = FALSE)
@@ -127,6 +197,22 @@ d4h_iec <- function(gndvi_water, lst, t_opt = 25) {
 #' @return A SpatRaster highlighting stagnation risk in clearings with background masked to \code{NA}.
 #' @references
 #' Castro, M. C., Kanamori, S., Kannady, K., Mkude, S., Killeen, G. F., & Fillinger, U. (2010). The importance of drains for the emergence of anopheline mosquitoes in urban Dar es Salaam, Tanzania. \emph{BMC Public Health}, 10, 344.
+#' @examples
+#' \donttest{
+#' if (interactive()) {
+#'   library(drones4health)
+#'   library(terra)
+#'
+#'   grad_file <- system.file("extdata", "grad_ndvi.tif", package = "drones4health")
+#'   depr_file <- system.file("extdata", "depressions.tif", package = "drones4health")
+#'   re_file   <- system.file("extdata", "rededge.tif", package = "drones4health")
+#'
+#'   # Run IEAD clearing stagnation calculation
+#'   r_iead <- d4h_iead(grad_delta_ndvi = grad_file, depressions_dsm = depr_file,
+#'                      red_edge = re_file)
+#'   head(r_iead)
+#' }
+#' }
 #' @export
 d4h_iead <- function(grad_delta_ndvi, depressions_dsm, red_edge) {
   aligned <- .match_multi(grad_delta_ndvi, depressions_dsm, red_edge, mask_zeros = FALSE)
@@ -151,6 +237,21 @@ d4h_iead <- function(grad_delta_ndvi, depressions_dsm, red_edge) {
 #' @return A SpatRaster representing water retention potential with background masked to \code{NA}.
 #' @references
 #' McFeeters, S. K. (1996). The use of the Normalized Difference Water Index (NDWI) in the delineation of open water features. \emph{International Journal of Remote Sensing}, 17(7), 1425-1432.
+#' @examples
+#' \donttest{
+#' if (interactive()) {
+#'   library(drones4health)
+#'   library(terra)
+#'
+#'   green_file <- system.file("extdata", "green.tif", package = "drones4health")
+#'   nir_file   <- system.file("extdata", "nir.tif", package = "drones4health")
+#'   lst_file   <- system.file("extdata", "lst.tif", package = "drones4health")
+#'
+#'   # Run IRHE water retention index calculation
+#'   r_irhe <- d4h_irhe(green = green_file, nir = nir_file, lst = lst_file)
+#'   head(r_irhe)
+#' }
+#' }
 #' @export
 d4h_irhe <- function(green, nir, lst, eps = 0.001) {
   aligned <- .match_multi(green, nir, lst, mask_zeros = TRUE)
@@ -180,6 +281,23 @@ d4h_irhe <- function(green, nir, lst, eps = 0.001) {
 #' @return A SpatRaster quantifying edge effects with background masked to \code{NA}.
 #' @references
 #' Laurance, W. F., et al. (2011). The impact of forest fragmentation on disease ecology. \emph{Biological Conservation}, 144(1), 56-68.
+#' @examples
+#' \donttest{
+#' if (interactive()) {
+#'   library(drones4health)
+#'   library(terra)
+#'
+#'   re_file  <- system.file("extdata", "rededge.tif", package = "drones4health")
+#'   red_file <- system.file("extdata", "red.tif", package = "drones4health")
+#'   nir_file <- system.file("extdata", "nir.tif", package = "drones4health")
+#'
+#'   r_grad_re <- terra::terrain(terra::rast(re_file), v = "slope")
+#'
+#'   # Run IFEB fragmentation and edge effect calculation
+#'   r_ifeb <- d4h_ifeb(grad_red_edge = r_grad_re, red = red_file, nir = nir_file)
+#'   head(r_ifeb)
+#' }
+#' }
 #' @export
 d4h_ifeb <- function(grad_red_edge, red, nir, eps = 0.001) {
   aligned <- .match_multi(grad_red_edge, red, nir, mask_zeros = TRUE)
@@ -205,6 +323,25 @@ d4h_ifeb <- function(grad_red_edge, red, nir, eps = 0.001) {
 #' @return A SpatRaster representing structural roughness with background masked to \code{NA}.
 #' @references
 #' Guerra, C. A., Snow, R. W., & Hay, S. I. (2006). Mapping the global extent of malaria in 2005. \emph{Trends in Parasitology}, 22(8), 353-358. \doi{10.1016/j.pt.2006.06.006}
+#' @examples
+#' \donttest{
+#' if (interactive()) {
+#'   library(drones4health)
+#'   library(terra)
+#'
+#'   re_file    <- system.file("extdata", "rededge.tif", package = "drones4health")
+#'   nir_file   <- system.file("extdata", "nir.tif", package = "drones4health")
+#'   red_file   <- system.file("extdata", "red.tif", package = "drones4health")
+#'   green_file <- system.file("extdata", "green.tif", package = "drones4health")
+#'
+#'   r_ratio <- terra::rast(re_file) / (terra::rast(nir_file) + 0.001)
+#'   r_var   <- terra::focal(r_ratio, w = 5, fun = "var", na.rm = TRUE)
+#'
+#'   # Run IRIH human interface roughness calculation
+#'   r_irih <- d4h_irih(var_re_nir = r_var, red = red_file, green = green_file)
+#'   head(r_irih)
+#' }
+#' }
 #' @export
 d4h_irih <- function(var_re_nir, red, green, eps = 0.001) {
   aligned <- .match_multi(var_re_nir, red, green, mask_zeros = TRUE)

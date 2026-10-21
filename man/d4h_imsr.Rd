@@ -29,6 +29,22 @@ The Index of Micro-accumulation of Solid Waste (IMSR) evaluates spectral deviati
 \deqn{\text{IMSR} = |\text{NDRE}_{\text{approx}} - \theta_{\text{veg}}| \times \text{NIR}_{\text{norm}}}
 where \eqn{\theta_{\text{veg}}} is a threshold separating natural vegetation from synthetic polymer surfaces. Output values are clamped between 0 and 1.
 }
+\examples{
+\donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  re_file  <- system.file("extdata", "rededge.tif", package = "drones4health")
+  red_file <- system.file("extdata", "red.tif", package = "drones4health")
+  nir_file <- system.file("extdata", "nir.tif", package = "drones4health")
+
+  # Run IMSR calculation for solid waste / plastics
+  r_imsr <- d4h_imsr(red_edge = re_file, red = red_file, nir = nir_file)
+  head(r_imsr)
+}
+}
+}
 \references{
 World Health Organization. (2020). \emph{Comprehensive guidelines for prevention and control of dengue and dengue haemorrhagic fever}. WHO Regional Office for South-East Asia.
 

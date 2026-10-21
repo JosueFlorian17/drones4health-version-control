@@ -22,6 +22,21 @@ The Normalized Difference Water Index is calculated as:
 \deqn{\text{NDWI} = \frac{\text{Green} - \text{NIR}}{\text{Green} + \text{NIR}}}
 Positive values (\eqn{\text{NDWI} > 0}) typically demarcate water surfaces, while negative values represent terrestrial vegetation and dry bare soil.
 }
+\examples{
+\donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  green_file <- system.file("extdata", "green.tif", package = "drones4health")
+  nir_file   <- system.file("extdata", "nir.tif", package = "drones4health")
+
+  # Run NDWI calculation
+  r_ndwi <- d4h_ndwi(green = green_file, nir = nir_file)
+  head(r_ndwi)
+}
+}
+}
 \references{
 McFeeters, S. K. (1996). The use of the Normalized Difference Water Index (NDWI) in the delineation of open water features. \emph{International Journal of Remote Sensing}, 17(7), 1425-1432. \doi{10.1080/01431169608948714}
 }

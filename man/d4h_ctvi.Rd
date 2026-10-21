@@ -19,6 +19,23 @@ Calculates the Corrected Transformed Vegetation Index (CTVI) to normalize skewed
 The Corrected Transformed Vegetation Index is given by:
 \deqn{\text{CTVI} = \frac{\text{NDVI} + 0.5}{\sqrt{|\text{NDVI} + 0.5|}}}
 }
+\examples{
+\donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  # Define NDVI raster
+  nir_file <- system.file("extdata", "nir.tif", package = "drones4health")
+  red_file <- system.file("extdata", "red.tif", package = "drones4health")
+  r_ndvi   <- d4h_ndvi(nir = nir_file, red = red_file)
+
+  # Run CTVI calculation
+  r_ctvi <- d4h_ctvi(ndvi_raster = r_ndvi)
+  head(r_ctvi)
+}
+}
+}
 \references{
 Perry, C. R., & Lautenschlager, L. F. (1984). Functional equivalence of spectral vegetation indices. \emph{Remote Sensing of Environment}, 14(1-3), 169-182. \doi{10.1016/0034-4257(84)90013-0}
 }

@@ -22,6 +22,21 @@ The Modified Soil-Adjusted Vegetation Index 2 utilizes an inductive equation bas
 \deqn{\text{MSAVI2} = \frac{2 \cdot \text{NIR} + 1 - \sqrt{(2 \cdot \text{NIR} + 1)^2 - 8 \cdot (\text{NIR} - \text{Red})}}{2}}
 It dynamically adjusts for soil brightness variations across complex terrain.
 }
+\examples{
+\donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  nir_file <- system.file("extdata", "nir.tif", package = "drones4health")
+  red_file <- system.file("extdata", "red.tif", package = "drones4health")
+
+  # Run MSAVI2 calculation
+  r_msavi2 <- d4h_msavi2(nir = nir_file, red = red_file)
+  head(r_msavi2)
+}
+}
+}
 \references{
 Qi, J., Chehbouni, A., Huete, A. R., Kerr, Y. H., & Sorooshian, S. (1994). A modified soil adjusted vegetation index. \emph{Remote Sensing of Environment}, 48(2), 119-126. \doi{10.1016/0034-4257(94)90134-1}
 }

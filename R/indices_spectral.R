@@ -10,6 +10,21 @@
 #' Rouse, J. W., Haas, R. H., Schell, J. A., & Deering, D. W. (1974). Monitoring vegetation systems in the Great Plains with ERTS. \emph{NASA Special Publication}, 351, 309-317.
 #'
 #' Tucker, C. J. (1979). Red and photographic infrared linear combinations for monitoring vegetation. \emph{Remote Sensing of Environment}, 8(2), 127-150. \doi{10.1016/0034-4257(79)90013-0}
+#' @examples
+#' \donttest{
+#' if (interactive()) {
+#'   library(drones4health)
+#'   library(terra)
+#'
+#'   # Define paths to UAV Near-Infrared and Red bands
+#'   nir_file <- system.file("extdata", "nir.tif", package = "drones4health")
+#'   red_file <- system.file("extdata", "red.tif", package = "drones4health")
+#'
+#'   # Run NDVI calculation
+#'   r_ndvi <- d4h_ndvi(nir = nir_file, red = red_file)
+#'   head(r_ndvi)
+#' }
+#' }
 #' @export
 d4h_ndvi <- function(nir, red) {
   pair <- .match_pair(nir, red, mask_zeros = TRUE)
@@ -34,6 +49,20 @@ d4h_ndvi <- function(nir, red) {
 #' @return A SpatRaster containing DVI values with background masked to \code{NA}.
 #' @references
 #' Tucker, C. J. (1979). Red and photographic infrared linear combinations for monitoring vegetation. \emph{Remote Sensing of Environment}, 8(2), 127-150.
+#' @examples
+#' \donttest{
+#' if (interactive()) {
+#'   library(drones4health)
+#'   library(terra)
+#'
+#'   nir_file <- system.file("extdata", "nir.tif", package = "drones4health")
+#'   red_file <- system.file("extdata", "red.tif", package = "drones4health")
+#'
+#'   # Run DVI calculation
+#'   r_dvi <- d4h_dvi(nir = nir_file, red = red_file)
+#'   head(r_dvi)
+#' }
+#' }
 #' @export
 d4h_dvi <- function(nir, red) {
   pair <- .match_pair(nir, red, mask_zeros = TRUE)
@@ -58,6 +87,20 @@ d4h_dvi <- function(nir, red) {
 #' @return A SpatRaster containing SAVI values in \code{[-1, 1]} with background masked to \code{NA}.
 #' @references
 #' Huete, A. R. (1988). A soil-adjusted vegetation index (SAVI). \emph{Remote Sensing of Environment}, 25(3), 295-309. \doi{10.1016/0034-4257(88)90106-X}
+#' @examples
+#' \donttest{
+#' if (interactive()) {
+#'   library(drones4health)
+#'   library(terra)
+#'
+#'   nir_file <- system.file("extdata", "nir.tif", package = "drones4health")
+#'   red_file <- system.file("extdata", "red.tif", package = "drones4health")
+#'
+#'   # Run SAVI calculation with soil adjustment factor L = 0.5
+#'   r_savi <- d4h_savi(nir = nir_file, red = red_file, l_factor = 0.5)
+#'   head(r_savi)
+#' }
+#' }
 #' @export
 d4h_savi <- function(nir, red, l_factor = 0.5) {
   pair <- .match_pair(nir, red, mask_zeros = TRUE)
@@ -82,6 +125,20 @@ d4h_savi <- function(nir, red, l_factor = 0.5) {
 #' @return A SpatRaster containing MSAVI2 values in \code{[-1, 1]} with background masked to \code{NA}.
 #' @references
 #' Qi, J., Chehbouni, A., Huete, A. R., Kerr, Y. H., & Sorooshian, S. (1994). A modified soil adjusted vegetation index. \emph{Remote Sensing of Environment}, 48(2), 119-126. \doi{10.1016/0034-4257(94)90134-1}
+#' @examples
+#' \donttest{
+#' if (interactive()) {
+#'   library(drones4health)
+#'   library(terra)
+#'
+#'   nir_file <- system.file("extdata", "nir.tif", package = "drones4health")
+#'   red_file <- system.file("extdata", "red.tif", package = "drones4health")
+#'
+#'   # Run MSAVI2 calculation
+#'   r_msavi2 <- d4h_msavi2(nir = nir_file, red = red_file)
+#'   head(r_msavi2)
+#' }
+#' }
 #' @export
 d4h_msavi2 <- function(nir, red) {
   pair <- .match_pair(nir, red, mask_zeros = TRUE)
@@ -118,6 +175,21 @@ d4h_msavi2 <- function(nir, red) {
 #' @return A SpatRaster containing VARI values in \code{[-1, 1]} with background masked to \code{NA}.
 #' @references
 #' Gitelson, A. A., Kaufman, Y. J., Stark, R., & Rundquist, D. (2002). Novel algorithms for remote estimation of vegetation fraction. \emph{Remote Sensing of Environment}, 80(1), 76-87. \doi{10.1016/S0034-4257(01)00289-9}
+#' @examples
+#' \donttest{
+#' if (interactive()) {
+#'   library(drones4health)
+#'   library(terra)
+#'
+#'   green_file <- system.file("extdata", "green.tif", package = "drones4health")
+#'   red_file   <- system.file("extdata", "red.tif", package = "drones4health")
+#'   blue_file  <- system.file("extdata", "blue.tif", package = "drones4health")
+#'
+#'   # Run VARI calculation from RGB channels
+#'   r_vari <- d4h_vari(green = green_file, red = red_file, blue = blue_file)
+#'   head(r_vari)
+#' }
+#' }
 #' @export
 d4h_vari <- function(green, red, blue, eps = 0.001) {
   aligned <- .match_multi(green, red, blue, mask_zeros = TRUE)
@@ -149,6 +221,21 @@ d4h_vari <- function(green, red, blue, eps = 0.001) {
 #' @return A SpatRaster containing EVI values with background masked to \code{NA}.
 #' @references
 #' Huete, A., Didan, K., Miura, T., Rodriguez, E. P., Gao, X., & Ferreira, L. G. (2002). Overview of the radiometric and biophysical performance of the MODIS vegetation indices. \emph{Remote Sensing of Environment}, 83(1-2), 195-213. \doi{10.1016/S0034-4257(02)00096-2}
+#' @examples
+#' \donttest{
+#' if (interactive()) {
+#'   library(drones4health)
+#'   library(terra)
+#'
+#'   nir_file   <- system.file("extdata", "nir.tif", package = "drones4health")
+#'   red_file   <- system.file("extdata", "red.tif", package = "drones4health")
+#'   blue_file  <- system.file("extdata", "blue.tif", package = "drones4health")
+#'
+#'   # Run EVI calculation
+#'   r_evi <- d4h_evi(nir = nir_file, red = red_file, blue = blue_file)
+#'   head(r_evi)
+#' }
+#' }
 #' @export
 d4h_evi <- function(nir, red, blue, g_factor = 2.5, c1 = 6, c2 = 7.5, l_factor = 1) {
   aligned <- .match_multi(nir, red, blue, mask_zeros = TRUE)
@@ -173,6 +260,20 @@ d4h_evi <- function(nir, red, blue, g_factor = 2.5, c1 = 6, c2 = 7.5, l_factor =
 #' @return A SpatRaster containing NDWI values in \code{[-1, 1]} with background masked to \code{NA}.
 #' @references
 #' McFeeters, S. K. (1996). The use of the Normalized Difference Water Index (NDWI) in the delineation of open water features. \emph{International Journal of Remote Sensing}, 17(7), 1425-1432. \doi{10.1080/01431169608948714}
+#' @examples
+#' \donttest{
+#' if (interactive()) {
+#'   library(drones4health)
+#'   library(terra)
+#'
+#'   green_file <- system.file("extdata", "green.tif", package = "drones4health")
+#'   nir_file   <- system.file("extdata", "nir.tif", package = "drones4health")
+#'
+#'   # Run NDWI calculation
+#'   r_ndwi <- d4h_ndwi(green = green_file, nir = nir_file)
+#'   head(r_ndwi)
+#' }
+#' }
 #' @export
 d4h_ndwi <- function(green, nir) {
   pair <- .match_pair(green, nir, mask_zeros = TRUE)
@@ -197,6 +298,20 @@ d4h_ndwi <- function(green, nir) {
 #' @return A SpatRaster containing NDRE values in \code{[-1, 1]} with background masked to \code{NA}.
 #' @references
 #' Barnes, E. M., Clarke, T. R., Richards, S. E., Colaizzi, P. D., Sloan, J., Moran, M. S., ... & Pinter, P. J. (2000). Coincident detection of crop water stress, nitrogen status and canopy density using ground-based multispectral data. \emph{Proceedings of the 5th International Conference on Precision Agriculture}, 16, 1-15.
+#' @examples
+#' \donttest{
+#' if (interactive()) {
+#'   library(drones4health)
+#'   library(terra)
+#'
+#'   nir_file <- system.file("extdata", "nir.tif", package = "drones4health")
+#'   re_file  <- system.file("extdata", "rededge.tif", package = "drones4health")
+#'
+#'   # Run NDRE calculation
+#'   r_ndre <- d4h_ndre(nir = nir_file, red_edge = re_file)
+#'   head(r_ndre)
+#' }
+#' }
 #' @export
 d4h_ndre <- function(nir, red_edge) {
   pair <- .match_pair(nir, red_edge, mask_zeros = TRUE)
@@ -220,6 +335,20 @@ d4h_ndre <- function(nir, red_edge) {
 #' @return A SpatRaster containing GNDVI values in \code{[-1, 1]} with background masked to \code{NA}.
 #' @references
 #' Gitelson, A. A., Merzlyak, M. N., & Lichtenthaler, H. K. (1996). Detection of red edge position and chlorophyll content by reflectance spectra. \emph{Journal of Plant Physiology}, 148(3-4), 494-508. \doi{10.1016/S0176-1617(96)80285-9}
+#' @examples
+#' \donttest{
+#' if (interactive()) {
+#'   library(drones4health)
+#'   library(terra)
+#'
+#'   nir_file   <- system.file("extdata", "nir.tif", package = "drones4health")
+#'   green_file <- system.file("extdata", "green.tif", package = "drones4health")
+#'
+#'   # Run GNDVI calculation
+#'   r_gndvi <- d4h_gndvi(nir = nir_file, green = green_file)
+#'   head(r_gndvi)
+#' }
+#' }
 #' @export
 d4h_gndvi <- function(nir, green) {
   pair <- .match_pair(nir, green, mask_zeros = TRUE)
@@ -242,6 +371,22 @@ d4h_gndvi <- function(nir, green) {
 #' @return A SpatRaster containing CTVI values with background masked to \code{NA}.
 #' @references
 #' Perry, C. R., & Lautenschlager, L. F. (1984). Functional equivalence of spectral vegetation indices. \emph{Remote Sensing of Environment}, 14(1-3), 169-182. \doi{10.1016/0034-4257(84)90013-0}
+#' @examples
+#' \donttest{
+#' if (interactive()) {
+#'   library(drones4health)
+#'   library(terra)
+#'
+#'   # Define NDVI raster
+#'   nir_file <- system.file("extdata", "nir.tif", package = "drones4health")
+#'   red_file <- system.file("extdata", "red.tif", package = "drones4health")
+#'   r_ndvi   <- d4h_ndvi(nir = nir_file, red = red_file)
+#'
+#'   # Run CTVI calculation
+#'   r_ctvi <- d4h_ctvi(ndvi_raster = r_ndvi)
+#'   head(r_ctvi)
+#' }
+#' }
 #' @export
 d4h_ctvi <- function(ndvi_raster) {
   r <- .ensure_raster(ndvi_raster, mask_zeros = FALSE)
@@ -262,6 +407,21 @@ d4h_ctvi <- function(ndvi_raster) {
 #' @return A binary SpatRaster (1 = bare soil, 0 = vegetation/water) with background masked to \code{NA}.
 #' @references
 #' Montandon, L. M., & Small, E. E. (2008). The impact of soil reflectance on the quantification of green vegetation fraction in arid and semi-arid environments. \emph{Remote Sensing of Environment}, 112(2), 635-645. \doi{10.1016/j.rse.2007.05.016}
+#' @examples
+#' \donttest{
+#' if (interactive()) {
+#'   library(drones4health)
+#'   library(terra)
+#'
+#'   nir_file <- system.file("extdata", "nir.tif", package = "drones4health")
+#'   red_file <- system.file("extdata", "red.tif", package = "drones4health")
+#'   r_ndvi   <- d4h_ndvi(nir = nir_file, red = red_file)
+#'
+#'   # Run Bare Soil mask classification
+#'   r_soil <- d4h_bare_soil(ndvi_raster = r_ndvi, threshold = 0.15)
+#'   head(r_soil)
+#' }
+#' }
 #' @export
 d4h_bare_soil <- function(ndvi_raster, threshold = 0.15) {
   r <- .ensure_raster(ndvi_raster, mask_zeros = FALSE)

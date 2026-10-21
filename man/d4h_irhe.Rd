@@ -25,6 +25,22 @@ Highlights persistent, cold surface water bodies with low evaporation rates pron
 The High-Risk Hydric Environment Index is computed as:
 \deqn{\text{IRHE} = \text{NDWI} \times \frac{1}{\text{LST} + \epsilon}}
 }
+\examples{
+\donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  green_file <- system.file("extdata", "green.tif", package = "drones4health")
+  nir_file   <- system.file("extdata", "nir.tif", package = "drones4health")
+  lst_file   <- system.file("extdata", "lst.tif", package = "drones4health")
+
+  # Run IRHE water retention index calculation
+  r_irhe <- d4h_irhe(green = green_file, nir = nir_file, lst = lst_file)
+  head(r_irhe)
+}
+}
+}
 \references{
 McFeeters, S. K. (1996). The use of the Normalized Difference Water Index (NDWI) in the delineation of open water features. \emph{International Journal of Remote Sensing}, 17(7), 1425-1432.
 }

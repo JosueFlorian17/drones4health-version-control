@@ -22,6 +22,22 @@ The Normalized Difference Vegetation Index is computed according to the formula:
 \deqn{\text{NDVI} = \frac{\text{NIR} - \text{Red}}{\text{NIR} + \text{Red}}}
 Pixel values are clamped to \code{[-1, 1]} with background non-data values masked to \code{NA}.
 }
+\examples{
+\donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  # Define paths to UAV Near-Infrared and Red bands
+  nir_file <- system.file("extdata", "nir.tif", package = "drones4health")
+  red_file <- system.file("extdata", "red.tif", package = "drones4health")
+
+  # Run NDVI calculation
+  r_ndvi <- d4h_ndvi(nir = nir_file, red = red_file)
+  head(r_ndvi)
+}
+}
+}
 \references{
 Rouse, J. W., Haas, R. H., Schell, J. A., & Deering, D. W. (1974). Monitoring vegetation systems in the Great Plains with ERTS. \emph{NASA Special Publication}, 351, 309-317.
 

@@ -8,6 +8,19 @@
 #' @return A SpatRaster containing slope values with background masked to \code{NA}.
 #' @references
 #' Burrough, P. A., & McDonnell, R. A. (1998). \emph{Principles of Geographical Information Systems}. Oxford University Press.
+#' @examples
+#' \donttest{
+#' if (interactive()) {
+#'   library(drones4health)
+#'   library(terra)
+#'
+#'   dem_file <- system.file("extdata", "dem.tif", package = "drones4health")
+#'
+#'   # Run Slope calculation in degrees
+#'   r_slope <- d4h_slope(dem_raster = dem_file, unit = "degrees")
+#'   head(r_slope)
+#' }
+#' }
 #' @export
 d4h_slope <- function(dem_raster, unit = "degrees") {
   dem <- .ensure_raster(dem_raster, mask_zeros = FALSE)
@@ -32,6 +45,19 @@ d4h_slope <- function(dem_raster, unit = "degrees") {
 #' Beven, K. J., & Kirkby, M. J. (1979). A physically based, variable contributing area model of basin hydrology. \emph{Hydrological Sciences Bulletin}, 24(1), 43-69. \doi{10.1080/02626667909491834}
 #'
 #' Sorensen, R., Zinko, U., & Seibert, J. (2006). On the calculation of the topographic wetness index: evaluation of different methods based on field observations. \emph{Hydrology and Earth System Sciences}, 10(1), 101-112. \doi{10.5194/hess-10-101-2006}
+#' @examples
+#' \donttest{
+#' if (interactive()) {
+#'   library(drones4health)
+#'   library(terra)
+#'
+#'   dem_file <- system.file("extdata", "dem.tif", package = "drones4health")
+#'
+#'   # Run TWI calculation
+#'   r_twi <- d4h_twi(dem_raster = dem_file)
+#'   head(r_twi)
+#' }
+#' }
 #' @export
 d4h_twi <- function(dem_raster, eps = 0.001) {
   dem <- .ensure_raster(dem_raster, mask_zeros = FALSE)
