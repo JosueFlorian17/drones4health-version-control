@@ -7,15 +7,36 @@
 \usage{
 d4h_executive_summary(
   raster_in,
+  by = c("general", "grid"),
+  grid = NULL,
+  cell_size = 50,
+  square = TRUE,
   out_xlsx = NULL,
   sample_size = 1e+06,
   digits = 3
 )
 
-d4h_report(raster_in, out_xlsx = NULL, sample_size = 1e+06, digits = 3)
+d4h_report(
+  raster_in,
+  by = c("general", "grid"),
+  grid = NULL,
+  cell_size = 50,
+  square = TRUE,
+  out_xlsx = NULL,
+  sample_size = 1e+06,
+  digits = 3
+)
 }
 \arguments{
 \item{raster_in}{SpatRaster, list of SpatRaster layers, or character file path.}
+
+\item{by}{Character. Summary aggregation scope: \code{"general"} (default, overall scene report) or \code{"grid"} (zonal summary per grid cell, with one row per cell).}
+
+\item{grid}{Optional SpatVector, sf, or character path to existing grid polygon boundaries when \code{by = "grid"}. If NULL, automatically generated using \code{cell_size} and \code{square}.}
+
+\item{cell_size}{Numeric. Grid cell size / diameter in meters when generating a new grid for \code{by = "grid"} (default: 50).}
+
+\item{square}{Logical. If TRUE, square grid; if FALSE, hexagonal grid (default: TRUE).}
 
 \item{out_xlsx}{Character (optional). File path to export a structured multi-sheet Excel workbook (.xlsx). Default: NULL.}
 
@@ -24,16 +45,17 @@ d4h_report(raster_in, out_xlsx = NULL, sample_size = 1e+06, digits = 3)
 \item{digits}{Integer. Number of decimal places to format numerical metrics (default: 3).}
 }
 \value{
-An object of class \code{d4h_executive_summary} containing a structured list of metrics, spatial coverage metadata, outlier diagnostics, and thematic stratum distributions.
+An object of class \code{d4h_executive_summary} (for \code{by = "general"}) or \code{d4h_grid_summary} / \code{data.frame} (for \code{by = "grid"}) containing structured metrics, spatial coverage metadata, outlier diagnostics, and thematic stratum distributions.
 }
 \description{
-Generates a comprehensive executive report for a given raster layer or multi-band mosaic. It extracts key statistical moments, spatial extent and resolution metrics, Tukey outlier diagnostics, domain-specific bio-physical/epidemiological stratum interpretations, and optionally exports a formatted multi-sheet Excel spreadsheet.
+Generates a comprehensive executive report for a given raster layer or multi-band mosaic. It extracts key statistical moments, spatial extent and resolution metrics, Tukey outlier diagnostics, domain-specific bio-physical/epidemiological stratum interpretations, either globally (\code{by = "general"}) or per territorial grid cell (\code{by = "grid"}), and optionally exports a formatted multi-sheet Excel spreadsheet.
 }
 \details{
 The executive summary computes descriptive moments (mean, standard deviation, coefficient of variation, median, interquartile range) and identifies spatial anomalies using Tukey's IQR outlier fences:
 \deqn{\text{Lower Fence} = Q_{25} - 1.5 \times \text{IQR}}
 \deqn{\text{Upper Fence} = Q_{75} + 1.5 \times \text{IQR}}
 Surface strata are categorized by biophysical domain thresholds and translated into percentage and hectare metrics.
+When \code{by = "grid"}, each row represents an operational surveillance grid cell with full descriptive moments, Tukey outlier rates, and stratum area percentages.
 }
 \references{
 Tukey, J. W. (1977). \emph{Exploratory Data Analysis}. Addison-Wesley.

@@ -1,18 +1,25 @@
 #' @title Executive Summary of Micro-Environmental and Epidemiological Indicators
-#' @description Generates a comprehensive executive report for a given raster layer or multi-band mosaic. It extracts key statistical moments, spatial extent and resolution metrics, Tukey outlier diagnostics, domain-specific bio-physical/epidemiological stratum interpretations, and optionally exports a formatted multi-sheet Excel spreadsheet.
+#' @description Generates a comprehensive executive report for a given raster layer or multi-band mosaic. It extracts key statistical moments, spatial extent and resolution metrics, Tukey outlier diagnostics, domain-specific bio-physical/epidemiological stratum interpretations, either globally (\code{by = "general"}) or per territorial grid cell (\code{by = "grid"}), and optionally exports a formatted multi-sheet Excel spreadsheet.
 #' @details The executive summary computes descriptive moments (mean, standard deviation, coefficient of variation, median, interquartile range) and identifies spatial anomalies using Tukey's IQR outlier fences:
 #' \deqn{\text{Lower Fence} = Q_{25} - 1.5 \times \text{IQR}}
 #' \deqn{\text{Upper Fence} = Q_{75} + 1.5 \times \text{IQR}}
 #' Surface strata are categorized by biophysical domain thresholds and translated into percentage and hectare metrics.
+#' When \code{by = "grid"}, each row represents an operational surveillance grid cell with full descriptive moments, Tukey outlier rates, and stratum area percentages.
 #' @param raster_in SpatRaster, list of SpatRaster layers, or character file path.
+#' @param by Character. Summary aggregation scope: \code{"general"} (default, overall scene report) or \code{"grid"} (zonal summary per grid cell, with one row per cell).
+#' @param grid Optional SpatVector, sf, or character path to existing grid polygon boundaries when \code{by = "grid"}. If NULL, automatically generated using \code{cell_size} and \code{square}.
+#' @param cell_size Numeric. Grid cell size / diameter in meters when generating a new grid for \code{by = "grid"} (default: 50).
+#' @param square Logical. If TRUE, square grid; if FALSE, hexagonal grid (default: TRUE).
 #' @param out_xlsx Character (optional). File path to export a structured multi-sheet Excel workbook (.xlsx). Default: NULL.
 #' @param sample_size Integer. Maximum number of sampled pixels for quantile and outlier analysis on large rasters (default: 1000000).
 #' @param digits Integer. Number of decimal places to format numerical metrics (default: 3).
-#' @return An object of class \code{d4h_executive_summary} containing a structured list of metrics, spatial coverage metadata, outlier diagnostics, and thematic stratum distributions.
+#' @return An object of class \code{d4h_executive_summary} (for \code{by = "general"}) or \code{d4h_grid_summary} / \code{data.frame} (for \code{by = "grid"}) containing structured metrics, spatial coverage metadata, outlier diagnostics, and thematic stratum distributions.
 #' @references
 #' Tukey, J. W. (1977). \emph{Exploratory Data Analysis}. Addison-Wesley.
 #' @export
-d4h_executive_summary <- function(raster_in, out_xlsx = NULL, sample_size = 1000000, digits = 3) {
+d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = NULL, cell_size = 50, square = TRUE, out_xlsx = NULL, sample_size = 1000000, digits = 3) {
+  by <- match.arg(by)
+
   r <- if (is.character(raster_in) && length(raster_in) == 1L) {
     if (!file.exists(raster_in)) stop(paste("File not found:", raster_in), call. = FALSE)
     terra::rast(raster_in)
@@ -31,6 +38,158 @@ d4h_executive_summary <- function(raster_in, out_xlsx = NULL, sample_size = 1000
     names(r) <- layer_names
   }
 
+  # ============================================================================
+  # MODO B: RESUMEN POR GRILLA (UNA FILA POR CELDA)
+  # ============================================================================
+  if (by == "grid") {
+    # 1. Resolver o generar la grilla vectorial
+    grid_vect <- if (!is.null(grid)) {
+      if (is.character(grid) && length(grid) == 1L) {
+        if (!file.exists(grid)) stop(paste("Grid file not found:", grid), call. = FALSE)
+        terra::vect(grid)
+      } else if (inherits(grid, "sf")) {
+        terra::vect(grid)
+      } else if (inherits(grid, "SpatVector")) {
+        grid
+      } else {
+        stop("'grid' must be a SpatVector, sf object, or valid file path.", call. = FALSE)
+      }
+    } else {
+      # Crear grilla operativa con d4h_hex_grid o st_make_grid
+      boundary_sf <- sf::st_as_sf(terra::as.polygons(terra::ext(r), crs = terra::crs(r)))
+      g_sf <- sf::st_make_grid(boundary_sf, cellsize = cell_size, square = square)
+      prefix <- if (square) "G%04d" else "H%04d"
+      g_sf <- sf::st_sf(
+        grid_id = sprintf(prefix, seq_along(g_sf)),
+        geometry = g_sf
+      )
+      terra::vect(g_sf)
+    }
+
+    # Asignar ID si la grilla no lo tiene
+    if (!"grid_id" %in% names(grid_vect)) {
+      grid_vect$grid_id <- sprintf("G%04d", seq_len(nrow(grid_vect)))
+    }
+
+    # Extraer valores por celda
+    vals_by_cell <- terra::extract(r, grid_vect)
+    cell_idx <- vals_by_cell[, 1]
+
+    # Calcular metricas por celda
+    grid_rows <- vector("list", nrow(grid_vect))
+    grid_ids <- grid_vect$grid_id
+
+    for (k in seq_len(nrow(grid_vect))) {
+      row_match <- which(cell_idx == k)
+      sub_vals <- vals_by_cell[row_match, -1, drop = FALSE]
+
+      cell_data <- data.frame(
+        grid_id = grid_ids[k],
+        stringsAsFactors = FALSE
+      )
+
+      # Si hay geometria, extraer centroides X/Y
+      pts_c <- suppressWarnings(terra::crds(terra::centroids(grid_vect[k, ])))
+      if (nrow(pts_c) > 0) {
+        cell_data$centroid_x <- round(pts_c[1, 1], 2)
+        cell_data$centroid_y <- round(pts_c[1, 2], 2)
+      }
+
+      # Procesar cada capa
+      has_valid_data <- FALSE
+      for (lyr_idx in seq_len(n_layers)) {
+        v_name <- layer_names[lyr_idx]
+        raw_vals <- sub_vals[[v_name]]
+        v_clean <- raw_vals[!is.na(raw_vals) & is.finite(raw_vals) & raw_vals != 0]
+
+        n_v <- length(v_clean)
+        cell_data[[paste0(v_name, "_pixeles")]] <- n_v
+
+        if (n_v > 0) {
+          has_valid_data <- TRUE
+          m_val  <- mean(v_clean)
+          sd_val <- stats::sd(v_clean)
+          if (is.na(sd_val)) sd_val <- 0
+          cv_val <- if (m_val != 0) (sd_val / abs(m_val)) * 100 else NA_real_
+
+          q_c <- stats::quantile(v_clean, probs = c(0.25, 0.50, 0.75), na.rm = TRUE)
+          q25 <- unname(q_c["25%"])
+          med <- unname(q_c["50%"])
+          q75 <- unname(q_c["75%"])
+          iqr <- q75 - q25
+
+          # Outliers Tukey
+          l_fence <- q25 - (1.5 * iqr)
+          u_fence <- q75 + (1.5 * iqr)
+          out_tot <- sum(v_clean < l_fence | v_clean > u_fence)
+          out_pct <- (out_tot / n_v) * 100
+
+          cell_data[[paste0(v_name, "_media")]]        <- round(m_val, digits)
+          cell_data[[paste0(v_name, "_sd")]]           <- round(sd_val, digits)
+          cell_data[[paste0(v_name, "_cv_pct")]]       <- round(cv_val, 1)
+          cell_data[[paste0(v_name, "_min")]]          <- round(min(v_clean), digits)
+          cell_data[[paste0(v_name, "_max")]]          <- round(max(v_clean), digits)
+          cell_data[[paste0(v_name, "_mediana")]]      <- round(med, digits)
+          cell_data[[paste0(v_name, "_iqr")]]          <- round(iqr, digits)
+          cell_data[[paste0(v_name, "_outliers_pct")]] <- round(out_pct, 1)
+
+          # Estratificación simplificada clave
+          v_up <- toupper(v_name)
+          if (grepl("NDVI|SAVI|GNDVI", v_up)) {
+            cell_data[[paste0(v_name, "_pct_agua_degradado")]] <- round(mean(v_clean < 0) * 100, 1)
+            cell_data[[paste0(v_name, "_pct_suelo_desnudo")]]   <- round(mean(v_clean >= 0 & v_clean < 0.2) * 100, 1)
+            cell_data[[paste0(v_name, "_pct_vegetacion_densa")]] <- round(mean(v_clean >= 0.5) * 100, 1)
+          } else if (grepl("NDWI|IRHE", v_up)) {
+            cell_data[[paste0(v_name, "_pct_agua_saturado")]] <- round(mean(v_clean > 0) * 100, 1)
+          } else if (grepl("IMSR", v_up)) {
+            cell_data[[paste0(v_name, "_pct_alto_riesgo_plasticos")]] <- round(mean(v_clean >= 0.35) * 100, 1)
+          } else if (grepl("TWI|IEV", v_up)) {
+            cell_data[[paste0(v_name, "_pct_zona_critica_estancamiento")]] <- round(mean(v_clean > 8) * 100, 1)
+          }
+        } else {
+          cell_data[[paste0(v_name, "_media")]]        <- NA_real_
+          cell_data[[paste0(v_name, "_sd")]]           <- NA_real_
+          cell_data[[paste0(v_name, "_cv_pct")]]       <- NA_real_
+          cell_data[[paste0(v_name, "_min")]]          <- NA_real_
+          cell_data[[paste0(v_name, "_max")]]          <- NA_real_
+          cell_data[[paste0(v_name, "_mediana")]]      <- NA_real_
+          cell_data[[paste0(v_name, "_iqr")]]          <- NA_real_
+          cell_data[[paste0(v_name, "_outliers_pct")]] <- NA_real_
+        }
+      }
+
+      if (has_valid_data) {
+        grid_rows[[k]] <- cell_data
+      }
+    }
+
+    df_grid_final <- do.call(rbind, grid_rows[!vapply(grid_rows, is.null, logical(1))])
+    rownames(df_grid_final) <- NULL
+    class(df_grid_final) <- c("d4h_grid_summary", "data.frame")
+
+    # Exportar a Excel si se solicita
+    if (!is.null(out_xlsx)) {
+      dir_out <- dirname(out_xlsx)
+      if (!dir.exists(dir_out) && dir_out != "" && dir_out != ".") {
+        dir.create(dir_out, recursive = TRUE)
+      }
+      sheets_grid <- list(Resumen_Por_Grilla = df_grid_final)
+      if (requireNamespace("writexl", quietly = TRUE)) {
+        writexl::write_xlsx(sheets_grid, path = out_xlsx)
+      } else if (requireNamespace("openxlsx", quietly = TRUE)) {
+        openxlsx::write.xlsx(sheets_grid, file = out_xlsx)
+      } else {
+        csv_fallback <- sub("\\.xlsx$", ".csv", out_xlsx)
+        utils::write.csv(df_grid_final, file = csv_fallback, row.names = FALSE)
+      }
+    }
+
+    return(df_grid_final)
+  }
+
+  # ============================================================================
+  # MODO A: RESUMEN GENERAL (INFORME ESCENARIO GLOBAL)
+  # ============================================================================
   summaries <- lapply(seq_len(n_layers), function(i) {
     lyr <- r[[i]]
     var_name <- layer_names[i]

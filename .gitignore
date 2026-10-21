@@ -7,5 +7,14 @@ Rplots.pdf
 *.pt
 models/
 weights/
+img/
+*.tif
+*.tiff
+*.gpkg
+*.xlsx
+*.csv
+*.png
 
 docs
+
+other-package-reference/

@@ -7,6 +7,11 @@
 d4h_plot(
   x,
   grid = NULL,
+  houses = NULL,
+  houses_filter_extent = FALSE,
+  house_color = "red",
+  house_size = 2,
+  rgb_bands = NULL,
   palette = "viridis",
   limits = NULL,
   title = NULL,
@@ -18,13 +23,17 @@ d4h_plot(
 
 \item{grid}{Optional SpatVector, sf, or character path to overlay grid boundaries.}
 
+\item{houses}{Optional sf, data.frame, SpatVector, or character path to CSV containing house coordinates. Automatically plotted as red points (or customizable color/size).}
+
+\item{houses_filter_extent}{Logical. If TRUE, filters houses to only those intersecting the raster extent / footprint. If FALSE (default), shows all houses including surrounding ones.}
+
+\item{house_color}{Character. Color for house points (default: "red").}
+
+\item{house_size}{Numeric. Size for house points (default: 2.0).}
+
+\item{rgb_bands}{Numeric vector of length 3 (e.g. c(1, 2, 3)). If x is a multi-band raster and rgb_bands is specified, renders in true/false RGB.}
+
 \item{palette}{Character. Color palette name ("viridis", "magma", "terrain") or custom color vector (default: "viridis").}
-
-\item{limits}{Numeric vector c(min, max) to fix the color scale limits (default: NULL).}
-
-\item{title}{Character. Plot title (default: NULL).}
-
-\item{max_pixels}{Integer. Maximum number of pixels to display before regular aggregation (default: 500000).}
 }
 \value{
 A ggplot object.

@@ -1,4 +1,19 @@
 url: https://josueflorian17.github.io/drones4health-version-control/
+description: "Ultra-High Resolution Drone Metrics for Spatial Health Analysis and Vector-Borne Disease Surveillance 🛸🔬. Micro-environmental remote sensing from UAV orthomosaics within a One Health framework 🦟🏥."
+
+home:
+  title: "drones4health: Ultra-High Resolution Drone Metrics for Spatial Health"
+
+authors:
+  Josue Florian:
+    href: https://github.com/JosueFlorian17
+
+repo:
+  url:
+    home: https://github.com/JosueFlorian17/drones4health-version-control
+    source: https://github.com/JosueFlorian17/drones4health-version-control/tree/main
+    issues: https://github.com/JosueFlorian17/drones4health-version-control/issues
+
 template:
   bootstrap: 5
   light-switch: true
@@ -15,23 +30,34 @@ template:
       </script>
       <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
-home:
-  title: "drones4health: Ultra-High Resolution Drone Metrics for Spatial Health Analysis"
-  description: "Extract micro-environmental and eco-epidemiological remote sensing metrics from UAV orthomosaics within a One Health framework."
-
 navbar:
-  title: "drones4health"
-  left:
-    - text: "Get Started"
-      href: index.html
-    - text: "Reference"
-      href: reference/index.html
-    - text: "Changelog"
-      href: news/index.html
-  right:
-    - icon: fa-github fa-lg
-      href: https://github.com/JosueFlorian17/drones4health-version-control
-      aria-label: GitHub Repository
+  bg: custom
+  structure:
+    left: [intro, reference, tutorials, articles, news]
+    right: [search, github, lightswitch]
+
+  components:
+    intro:
+      text: Get Started
+      href: articles/drones4health-quickstart.html
+
+    tutorials:
+      text: Regional Case Studies
+      menu:
+        - text: "1. Malaria & Micro-Hydrology — Peruvian Amazon"
+          href: articles/case1_peru_amazon_malaria.html
+        - text: "2. Urban Dengue & Solid Waste — Brazil & Favelas"
+          href: articles/case2_brazil_urban_dengue.html
+        - text: "3. Transboundary & Wet Pacific — Colombia & Ecuador"
+          href: articles/case3_colombia_ecuador_choco.html
+
+    articles:
+      text: Guides & Workflows
+      menu:
+        - text: "Quickstart & Workflow Pipeline"
+          href: articles/drones4health-quickstart.html
+        - text: "Interactive Swipe & Visual Analytics"
+          href: articles/interactive-swipe-analytics.html
 
 reference:
   - title: "Spectral Vegetation Indices & Land Cover Masks"
@@ -86,9 +112,10 @@ reference:
       - d4h_global_summary
 
   - title: "Interactive Mapping & Cartography"
-    desc: "Interactive swipe comparison viewers with dynamic contrast tuning and static publication-quality ggplot2 cartography."
+    desc: "Interactive swipe comparison viewers with dynamic contrast tuning, buffer-targeted focal index rendering with house overlays, and static publication-quality ggplot2 cartography."
     contents:
       - d4h_mapview_swipe
+      - d4h_indicator_buffer
       - d4h_plot
 
   - title: "Executive Reporting & Excel Export"
