@@ -1,4 +1,4 @@
-# Case Study 1: Malaria & Micro-Hydrology — Peruvian Amazon
+# Case Study 1: Malaria & Micro-Hydrology - Peruvian Amazon
 
 ## 1. Epidemiological Context & Landscape Ecology
 

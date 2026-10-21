@@ -1,10 +1,10 @@
-# Case Study 2: Urban Dengue & Solid Waste — Brazil & Favelas
+# Case Study 2: Urban Dengue & Solid Waste - Brazil & Favelas
 
 ## 1. Epidemiological Context: Arboviruses in Dense Urban Fabrics
 
 Metropolitan centers across **Brazil** (São Paulo, Rio de Janeiro,
 Salvador, Belo Horizonte) suffer from hyper-endemic cycles of dengue
-(*DENV 1–4*), chikungunya, and Zika transmitted by *Aedes aegypti* and
+(*DENV 1-4*), chikungunya, and Zika transmitted by *Aedes aegypti* and
 *Aedes albopictus*.
 
 In unplanned favelas and dense periurban neighborhoods: - Discontinuous

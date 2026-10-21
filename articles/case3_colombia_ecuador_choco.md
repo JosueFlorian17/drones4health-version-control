@@ -1,4 +1,4 @@
-# Case Study 3: Transboundary & Wet Pacific — Colombia & Ecuador
+# Case Study 3: Transboundary & Wet Pacific - Colombia & Ecuador
 
 ## 1. Epidemiological Context: The Hyper-Humid Chocó & Transboundary Basins
 
