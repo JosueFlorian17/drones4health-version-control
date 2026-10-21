@@ -1,8 +1,8 @@
 ---
-title: "Case Study 1: Malaria & Micro-Hydrology — Peruvian Amazon"
+title: "Case Study 1: Malaria & Micro-Hydrology - Peruvian Amazon"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Case Study 1: Malaria & Micro-Hydrology — Peruvian Amazon}
+  %\VignetteIndexEntry{Case Study 1: Malaria & Micro-Hydrology - Peruvian Amazon}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

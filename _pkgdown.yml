@@ -35,11 +35,11 @@ navbar:
     tutorials:
       text: Regional Case Studies
       menu:
-        - text: "1. Malaria & Micro-Hydrology — Peruvian Amazon"
+        - text: "1. Malaria & Micro-Hydrology - Peruvian Amazon"
           href: articles/case1_peru_amazon_malaria.html
-        - text: "2. Urban Dengue & Solid Waste — Brazil & Favelas"
+        - text: "2. Urban Dengue & Solid Waste - Brazil & Favelas"
           href: articles/case2_brazil_urban_dengue.html
-        - text: "3. Transboundary & Wet Pacific — Colombia & Ecuador"
+        - text: "3. Transboundary & Wet Pacific - Colombia & Ecuador"
           href: articles/case3_colombia_ecuador_choco.html
 
     articles:

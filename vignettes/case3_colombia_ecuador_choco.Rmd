@@ -1,8 +1,8 @@
 ---
-title: "Case Study 3: Transboundary & Wet Pacific — Colombia & Ecuador"
+title: "Case Study 3: Transboundary & Wet Pacific - Colombia & Ecuador"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Case Study 3: Transboundary & Wet Pacific — Colombia & Ecuador}
+  %\VignetteIndexEntry{Case Study 3: Transboundary & Wet Pacific - Colombia & Ecuador}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

@@ -1,8 +1,8 @@
 ---
-title: "Case Study 2: Urban Dengue & Solid Waste — Brazil & Favelas"
+title: "Case Study 2: Urban Dengue & Solid Waste - Brazil & Favelas"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Case Study 2: Urban Dengue & Solid Waste — Brazil & Favelas}
+  %\VignetteIndexEntry{Case Study 2: Urban Dengue & Solid Waste - Brazil & Favelas}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 
 ## 1. Epidemiological Context: Arboviruses in Dense Urban Fabrics
 
-Metropolitan centers across **Brazil** (São Paulo, Rio de Janeiro, Salvador, Belo Horizonte) suffer from hyper-endemic cycles of dengue (*DENV 1–4*), chikungunya, and Zika transmitted by *Aedes aegypti* and *Aedes albopictus*.
+Metropolitan centers across **Brazil** (São Paulo, Rio de Janeiro, Salvador, Belo Horizonte) suffer from hyper-endemic cycles of dengue (*DENV 1-4*), chikungunya, and Zika transmitted by *Aedes aegypti* and *Aedes albopictus*.
 
 In unplanned favelas and dense periurban neighborhoods:
 - Discontinuous piped water leads to open water storage containers on rooftops.
