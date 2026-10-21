@@ -47,3 +47,22 @@ Gitelson, A. A., Kaufman, Y. J., Stark, R., & Rundquist, D. (2002).
 Novel algorithms for remote estimation of vegetation fraction. *Remote
 Sensing of Environment*, 80(1), 76-87.
 [doi:10.1016/S0034-4257(01)00289-9](https://doi.org/10.1016/S0034-4257%2801%2900289-9)
+
+## Examples
+
+``` r
+# \donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  green_file <- system.file("extdata", "green.tif", package = "drones4health")
+  red_file   <- system.file("extdata", "red.tif", package = "drones4health")
+  blue_file  <- system.file("extdata", "blue.tif", package = "drones4health")
+
+  # Run VARI calculation from RGB channels
+  r_vari <- d4h_vari(green = green_file, red = red_file, blue = blue_file)
+  head(r_vari)
+}
+# }
+```

@@ -1,30 +1,6 @@
 # Quickstart: UAV Micro-Environmental Pipeline for Spatial Health
 
-## 1. Overview
-
-**`drones4health`** provides automated workflows to turn raw drone
-orthomosaics (RGB, Multispectral, Thermal, and DEM) into actionable
-micro-environmental epidemiological metrics.
-
-           [UAV Multispectral / DEM Bands]
-                          │
-            ┌─────────────┴─────────────┐
-            ▼                           ▼
-    [Spectral Indices: NDVI/NDWI]  [Micro-Topography: Slope/TWI]
-            │                           │
-            └─────────────┬─────────────┘
-                          ▼
-           [Segmentation & Object Detection]
-           (Water Bodies & Residential Roofs)
-                          │
-                          ▼
-             [Focal Buffers & Risk Modeling]
-             (Euclidean Distance & Grids)
-                          │
-                          ▼
-         [Executive Summaries & Multi-Sheet Excel]
-
-## 2. Installation
+## 1. Installation
 
 Install the package directly from GitHub:
 
@@ -51,7 +27,7 @@ library(sf)
 library(ggplot2)
 ```
 
-## 3. Basic Workflow: Spectral Indices & Water Detection
+## 2. Basic Workflow: Spectral Indices & Water Detection
 
 ``` r
 
@@ -75,7 +51,7 @@ water_bodies <- d4h_segment_water(
 )
 ```
 
-## 4. Focal Household Buffers & Distance-to-Risk
+## 3. Focal Household Buffers & Distance-to-Risk
 
 Evaluate micro-environmental exposure strictly inside a buffer around
 community households:
@@ -105,7 +81,7 @@ risk_houses <- d4h_distance_to_risk(
 table(risk_houses$risk_level)
 ```
 
-## 5. Executive Reporting
+## 4. Executive Reporting
 
 Extract comprehensive multi-moment descriptive statistics and export to
 Excel:

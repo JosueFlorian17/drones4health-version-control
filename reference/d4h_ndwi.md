@@ -38,3 +38,21 @@ McFeeters, S. K. (1996). The use of the Normalized Difference Water
 Index (NDWI) in the delineation of open water features. *International
 Journal of Remote Sensing*, 17(7), 1425-1432.
 [doi:10.1080/01431169608948714](https://doi.org/10.1080/01431169608948714)
+
+## Examples
+
+``` r
+# \donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  green_file <- system.file("extdata", "green.tif", package = "drones4health")
+  nir_file   <- system.file("extdata", "nir.tif", package = "drones4health")
+
+  # Run NDWI calculation
+  r_ndwi <- d4h_ndwi(green = green_file, nir = nir_file)
+  head(r_ndwi)
+}
+# }
+```

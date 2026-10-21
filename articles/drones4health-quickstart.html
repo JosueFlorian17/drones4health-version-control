@@ -89,51 +89,26 @@
     
     
 <div class="section level2">
-<h2 id="overview">1. Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
-</h2>
-<p><strong><code>drones4health</code></strong> provides automated
-workflows to turn raw drone orthomosaics (RGB, Multispectral, Thermal,
-and DEM) into actionable micro-environmental epidemiological
-metrics.</p>
-<pre><code>       [UAV Multispectral / DEM Bands]
-                      │
-        ┌─────────────┴─────────────┐
-        ▼                           ▼
-[Spectral Indices: NDVI/NDWI]  [Micro-Topography: Slope/TWI]
-        │                           │
-        └─────────────┬─────────────┘
-                      ▼
-       [Segmentation &amp; Object Detection]
-       (Water Bodies &amp; Residential Roofs)
-                      │
-                      ▼
-         [Focal Buffers &amp; Risk Modeling]
-         (Euclidean Distance &amp; Grids)
-                      │
-                      ▼
-     [Executive Summaries &amp; Multi-Sheet Excel]</code></pre>
-</div>
-<div class="section level2">
-<h2 id="installation">2. Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+<h2 id="installation">1. Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <p>Install the package directly from GitHub:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
 <span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"JosueFlorian17/drones4health-version-control"</span><span class="op">)</span></span></code></pre></div>
 <p>Or using <code>remotes</code>:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"JosueFlorian17/drones4health-version-control"</span><span class="op">)</span></span></code></pre></div>
 <p>Load libraries:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JosueFlorian17/drones4health-version-control" class="external-link">drones4health</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/" class="external-link">terra</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="basic-workflow-spectral-indices-water-detection">3. Basic Workflow: Spectral Indices &amp; Water Detection<a class="anchor" aria-label="anchor" href="#basic-workflow-spectral-indices-water-detection"></a>
+<h2 id="basic-workflow-spectral-indices-water-detection">2. Basic Workflow: Spectral Indices &amp; Water Detection<a class="anchor" aria-label="anchor" href="#basic-workflow-spectral-indices-water-detection"></a>
 </h2>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define file paths to UAV bands</span></span>
 <span><span class="va">nir_path</span> <span class="op">&lt;-</span> <span class="st">"data/Ohuay_NIR.tif"</span></span>
 <span><span class="va">red_path</span> <span class="op">&lt;-</span> <span class="st">"data/Ohuay_R.tif"</span></span>
@@ -154,11 +129,11 @@ metrics.</p>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="focal-household-buffers-distance-to-risk">4. Focal Household Buffers &amp; Distance-to-Risk<a class="anchor" aria-label="anchor" href="#focal-household-buffers-distance-to-risk"></a>
+<h2 id="focal-household-buffers-distance-to-risk">3. Focal Household Buffers &amp; Distance-to-Risk<a class="anchor" aria-label="anchor" href="#focal-household-buffers-distance-to-risk"></a>
 </h2>
 <p>Evaluate micro-environmental exposure strictly inside a buffer around
 community households:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Compute focal NDVI inside a 150m buffer (3 grid units of 50m) around houses</span></span>
 <span><span class="va">res_buffer</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_indicator_buffer.html">d4h_indicator_buffer</a></span><span class="op">(</span></span>
 <span>  indicator   <span class="op">=</span> <span class="st">"NDVI"</span>,</span>
@@ -182,11 +157,11 @@ community households:</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">risk_houses</span><span class="op">$</span><span class="va">risk_level</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="executive-reporting">5. Executive Reporting<a class="anchor" aria-label="anchor" href="#executive-reporting"></a>
+<h2 id="executive-reporting">4. Executive Reporting<a class="anchor" aria-label="anchor" href="#executive-reporting"></a>
 </h2>
 <p>Extract comprehensive multi-moment descriptive statistics and export
 to Excel:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Console executive summary</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="../reference/d4h_executive_summary.html">d4h_executive_summary</a></span><span class="op">(</span><span class="va">res_buffer</span><span class="op">$</span><span class="va">raster</span>, by <span class="op">=</span> <span class="st">"general"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>

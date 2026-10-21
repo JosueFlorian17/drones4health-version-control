@@ -36,3 +36,21 @@ Gitelson, A. A., Merzlyak, M. N., & Lichtenthaler, H. K. (1996).
 Detection of red edge position and chlorophyll content by reflectance
 spectra. *Journal of Plant Physiology*, 148(3-4), 494-508.
 [doi:10.1016/S0176-1617(96)80285-9](https://doi.org/10.1016/S0176-1617%2896%2980285-9)
+
+## Examples
+
+``` r
+# \donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  nir_file   <- system.file("extdata", "nir.tif", package = "drones4health")
+  green_file <- system.file("extdata", "green.tif", package = "drones4health")
+
+  # Run GNDVI calculation
+  r_gndvi <- d4h_gndvi(nir = nir_file, green = green_file)
+  head(r_gndvi)
+}
+# }
+```

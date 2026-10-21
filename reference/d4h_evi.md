@@ -58,3 +58,22 @@ L. G. (2002). Overview of the radiometric and biophysical performance of
 the MODIS vegetation indices. *Remote Sensing of Environment*, 83(1-2),
 195-213.
 [doi:10.1016/S0034-4257(02)00096-2](https://doi.org/10.1016/S0034-4257%2802%2900096-2)
+
+## Examples
+
+``` r
+# \donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  nir_file   <- system.file("extdata", "nir.tif", package = "drones4health")
+  red_file   <- system.file("extdata", "red.tif", package = "drones4health")
+  blue_file  <- system.file("extdata", "blue.tif", package = "drones4health")
+
+  # Run EVI calculation
+  r_evi <- d4h_evi(nir = nir_file, red = red_file, blue = blue_file)
+  head(r_evi)
+}
+# }
+```

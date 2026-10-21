@@ -45,3 +45,25 @@ Hardy, A., Makame, M., Cross, D., Majambere, S., & Msellem, M. (2017).
 Using low-cost drones to map malaria vector habitats. *Parasites &
 Vectors*, 10(1), 29.
 [doi:10.1186/s13071-017-1973-3](https://doi.org/10.1186/s13071-017-1973-3)
+
+## Examples
+
+``` r
+# \donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  green_file <- system.file("extdata", "green.tif", package = "drones4health")
+  nir_file   <- system.file("extdata", "nir.tif", package = "drones4health")
+  dem_file   <- system.file("extdata", "dem.tif", package = "drones4health")
+
+  r_ndwi  <- d4h_ndwi(green = green_file, nir = nir_file)
+  r_slope <- d4h_slope(dem_raster = dem_file, unit = "degrees")
+
+  # Run IEV vulnerability stagnation calculation
+  r_iev <- d4h_iev(delta_ndwi = r_ndwi, slope_dsm = r_slope)
+  head(r_iev)
+}
+# }
+```

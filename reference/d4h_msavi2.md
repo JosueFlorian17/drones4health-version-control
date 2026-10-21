@@ -39,3 +39,21 @@ Qi, J., Chehbouni, A., Huete, A. R., Kerr, Y. H., & Sorooshian, S.
 (1994). A modified soil adjusted vegetation index. *Remote Sensing of
 Environment*, 48(2), 119-126.
 [doi:10.1016/0034-4257(94)90134-1](https://doi.org/10.1016/0034-4257%2894%2990134-1)
+
+## Examples
+
+``` r
+# \donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  nir_file <- system.file("extdata", "nir.tif", package = "drones4health")
+  red_file <- system.file("extdata", "red.tif", package = "drones4health")
+
+  # Run MSAVI2 calculation
+  r_msavi2 <- d4h_msavi2(nir = nir_file, red = red_file)
+  head(r_msavi2)
+}
+# }
+```
