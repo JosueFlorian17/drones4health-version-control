@@ -2,12 +2,13 @@
 
 ## Authors
 
-- **Josue Florian**. Author, maintainer.
+- **[Josue Florian](https://github.com/JosueFlorian17)**. Author,
+  maintainer.
 
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/JosueFlorian17/drones4health-version-control/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/JosueFlorian17/drones4health-version-control/tree/main/DESCRIPTION)
 
 Florian J (2026). *drones4health: Ultra-High Resolution Drone Metrics
 for Spatial Health Analysis*. R package version 0.1.0,

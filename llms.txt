@@ -344,11 +344,14 @@ statistics extraction.
 
 ## Interactive Mapping & Cartography
 
-Interactive swipe comparison viewers with dynamic contrast tuning and
-static publication-quality ggplot2 cartography.
+Interactive swipe comparison viewers with dynamic contrast tuning,
+buffer-targeted focal index rendering with house overlays, and static
+publication-quality ggplot2 cartography.
 
 - [`d4h_mapview_swipe()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_mapview_swipe.md)
   : Interactive Side-by-Side Raster Swipe Viewer
+- [`d4h_indicator_buffer()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_indicator_buffer.md)
+  : Targeted Focal Indicator Analysis and Plotting around House Buffers
 - [`d4h_plot()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_plot.md)
   : Cartographic Visualization with ggplot2
 
@@ -380,3 +383,17 @@ Temperature, raster cleaning, and batch mosaic workflows.
 - [`d4h_list_metrics()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_list_metrics.md)
   : List Available Micro-Environmental and Epidemiological Metrics
 
+# Articles
+
+### All vignettes
+
+- [Case Study 1: Malaria & Micro-Hydrology — Peruvian
+  Amazon](https://josueflorian17.github.io/drones4health-version-control/articles/case1_peru_amazon_malaria.md):
+- [Case Study 2: Urban Dengue & Solid Waste — Brazil &
+  Favelas](https://josueflorian17.github.io/drones4health-version-control/articles/case2_brazil_urban_dengue.md):
+- [Case Study 3: Transboundary & Wet Pacific — Colombia &
+  Ecuador](https://josueflorian17.github.io/drones4health-version-control/articles/case3_colombia_ecuador_choco.md):
+- [Quickstart: UAV Micro-Environmental Pipeline for Spatial
+  Health](https://josueflorian17.github.io/drones4health-version-control/articles/drones4health-quickstart.md):
+- [Interactive Swipe & Visual
+  Analytics](https://josueflorian17.github.io/drones4health-version-control/articles/interactive-swipe-analytics.md):

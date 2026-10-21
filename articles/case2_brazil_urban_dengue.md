@@ -1,0 +1,79 @@
+# Case Study 2: Urban Dengue & Solid Waste — Brazil & Favelas
+
+## 1. Epidemiological Context: Arboviruses in Dense Urban Fabrics
+
+Metropolitan centers across **Brazil** (São Paulo, Rio de Janeiro,
+Salvador, Belo Horizonte) suffer from hyper-endemic cycles of dengue
+(*DENV 1–4*), chikungunya, and Zika transmitted by *Aedes aegypti* and
+*Aedes albopictus*.
+
+In unplanned favelas and dense periurban neighborhoods: - Discontinuous
+piped water leads to open water storage containers on rooftops. -
+Micro-accumulations of artificial solid waste (tires, plastic buckets,
+discarded unroofed containers) trap rainwater. - High thermal heat
+island effects force adult mosquitoes to concentrate in shaded,
+vegetated domestic backyards.
+
+## 2. Targeted Indicator Suite
+
+| Indicator | Implementation | Entomological Significance |
+|:---|:---|:---|
+| **IMSR** | [`d4h_imsr()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_imsr.md) | Index of Solid Waste Micro-accumulation: highlights spectral signatures of plastics, metal debris, and uncollected waste in patios and rooftops. |
+| **IRTS** | [`d4h_irts()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_irts.md) | Thermal Micro-Refuge Index: merges canopy shade and thermal data (LST) to pinpoint cool microclimates where adult *Aedes* rest during midday heat. |
+| **Building Segmentation** | [`d4h_segment_buildings()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_segment_buildings.md) | Automatically isolates complex informal building footprints from orthomosaics. |
+| **Spatial Hexagonal Grids** | [`d4h_hex_grid()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_hex_grid.md) | Partitions the urban territory into operational blocks ($`25 - 50\text{ m}`$) for community health brigades. |
+
+## 3. End-to-End Execution Workflow
+
+``` r
+
+library(drones4health)
+library(terra)
+library(sf)
+library(ggplot2)
+
+# File paths to UAV orthomosaics
+path_re  <- "data/brazil_urban/Ohuay_RE.tif"   # RedEdge band
+path_r   <- "data/brazil_urban/Ohuay_R.tif"    # Red band
+path_nir <- "data/brazil_urban/Ohuay_NIR.tif"  # NIR band
+path_rgb <- "data/brazil_urban/Ohuay_D.tif"    # RGB / Orthomosaic
+
+# Step 1: Detect Artificial Solid Waste Micro-Accumulation (IMSR)
+# IMSR = (RedEdge - Red) / (RedEdge + NIR)
+r_imsr <- d4h_imsr(red_edge = path_re, red = path_r, nir = path_nir)
+
+# Step 2: Delineate residential structures
+casas_urbanas <- d4h_segment_buildings(
+  raster_in      = path_rgb,
+  method         = "threshold",
+  threshold      = 140,
+  min_area_m2    = 10.0,
+  fill_holes     = TRUE
+)
+
+# Step 3: Tessellate into 30m Hexagonal Surveillance Grids
+hex_cells <- d4h_hex_grid(
+  study_area = casas_urbanas,
+  cell_size  = 30
+)
+
+# Step 4: Aggregate waste accumulation risk per neighborhood block
+grid_summary <- d4h_summarize_grid(
+  grid   = hex_cells,
+  raster = r_imsr,
+  stats  = c("mean", "median", "q90", "sd")
+)
+
+# Step 5: Generate Executive Report for Municipal Public Health Officers
+print(d4h_executive_summary(r_imsr, by = "general"))
+```
+
+## 4. Municipal Action Strategies
+
+- **Drone-Guided Garbage Collection:** Municipal sanitation teams
+  prioritize blocks exceeding the 90th percentile of IMSR to eliminate
+  artificial oviposition sites before the rainy season.
+- **Micro-Targeted Education:** Community health agents (*Agentes
+  Comunitários de Saúde*) visit specific rooftop clusters identified by
+  drone without wasting time on door-to-door visual sweeps of entire
+  neighborhoods.

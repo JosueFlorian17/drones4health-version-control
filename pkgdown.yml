@@ -1,8 +1,13 @@
 pandoc: 3.8.3
 pkgdown: 2.2.1
 pkgdown_sha: ~
-articles: {}
-last_built: 2026-10-09T17:33Z
+articles:
+  case1_peru_amazon_malaria: case1_peru_amazon_malaria.html
+  case2_brazil_urban_dengue: case2_brazil_urban_dengue.html
+  case3_colombia_ecuador_choco: case3_colombia_ecuador_choco.html
+  drones4health-quickstart: drones4health-quickstart.html
+  interactive-swipe-analytics: interactive-swipe-analytics.html
+last_built: 2026-10-21T12:30Z
 urls:
   reference: https://josueflorian17.github.io/drones4health-version-control/reference
   article: https://josueflorian17.github.io/drones4health-version-control/articles

@@ -1,6 +1,12 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://josueflorian17.github.io/drones4health-version-control/404.html</loc></url>
 <url><loc>https://josueflorian17.github.io/drones4health-version-control/LICENSE-text.html</loc></url>
+<url><loc>https://josueflorian17.github.io/drones4health-version-control/articles/case1_peru_amazon_malaria.html</loc></url>
+<url><loc>https://josueflorian17.github.io/drones4health-version-control/articles/case2_brazil_urban_dengue.html</loc></url>
+<url><loc>https://josueflorian17.github.io/drones4health-version-control/articles/case3_colombia_ecuador_choco.html</loc></url>
+<url><loc>https://josueflorian17.github.io/drones4health-version-control/articles/drones4health-quickstart.html</loc></url>
+<url><loc>https://josueflorian17.github.io/drones4health-version-control/articles/index.html</loc></url>
+<url><loc>https://josueflorian17.github.io/drones4health-version-control/articles/interactive-swipe-analytics.html</loc></url>
 <url><loc>https://josueflorian17.github.io/drones4health-version-control/authors.html</loc></url>
 <url><loc>https://josueflorian17.github.io/drones4health-version-control/index.html</loc></url>
 <url><loc>https://josueflorian17.github.io/drones4health-version-control/reference/d4h_bare_soil.html</loc></url>
@@ -18,6 +24,7 @@
 <url><loc>https://josueflorian17.github.io/drones4health-version-control/reference/d4h_iev.html</loc></url>
 <url><loc>https://josueflorian17.github.io/drones4health-version-control/reference/d4h_ifeb.html</loc></url>
 <url><loc>https://josueflorian17.github.io/drones4health-version-control/reference/d4h_imsr.html</loc></url>
+<url><loc>https://josueflorian17.github.io/drones4health-version-control/reference/d4h_indicator_buffer.html</loc></url>
 <url><loc>https://josueflorian17.github.io/drones4health-version-control/reference/d4h_irhe.html</loc></url>
 <url><loc>https://josueflorian17.github.io/drones4health-version-control/reference/d4h_irih.html</loc></url>
 <url><loc>https://josueflorian17.github.io/drones4health-version-control/reference/d4h_irts.html</loc></url>

@@ -95,11 +95,14 @@ statistics extraction.
 
 ## Interactive Mapping & Cartography
 
-Interactive swipe comparison viewers with dynamic contrast tuning and
-static publication-quality ggplot2 cartography.
+Interactive swipe comparison viewers with dynamic contrast tuning,
+buffer-targeted focal index rendering with house overlays, and static
+publication-quality ggplot2 cartography.
 
 - [`d4h_mapview_swipe()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_mapview_swipe.md)
   : Interactive Side-by-Side Raster Swipe Viewer
+- [`d4h_indicator_buffer()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_indicator_buffer.md)
+  : Targeted Focal Indicator Analysis and Plotting around House Buffers
 - [`d4h_plot()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_plot.md)
   : Cartographic Visualization with ggplot2
 
