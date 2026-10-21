@@ -21,10 +21,26 @@ In precision spatial epidemiology and micro-environmental surveillance, field re
 
 `drones4health` provides **`d4h_mapview_swipe()`**, an interactive side-by-side swipe slider powered by Leaflet and Mapview swipe mechanics.
 
-<div class="text-center my-4">
-  <img src="../man/figures/swipe_ndvi_vs_bare_soil.png" class="img-fluid rounded shadow-sm border" alt="Interactive Side-by-Side Swipe Comparison: NDVI vs Bare Soil Mask" width="95%">
-  <p class="text-muted mt-2"><em>Figure 1: Dual-layer comparison showing photosynthetic vegetative vigor (NDVI) on the left and exposed substrate / unpaved paths (Bare Soil Mask, NDVI &lt; 0.15) on the right.</em></p>
+### Interactive Slider Demo (Drag to Swipe):
+
+<div class="d4h-swipe-container my-4">
+  <!-- Base image (Right layer: Bare Soil Mask) -->
+  <img src="../man/figures/swipe_layer_bare_soil.png" class="d4h-swipe-base" alt="Bare Soil Mask Layer">
+  
+  <!-- Overlay image (Left layer: NDVI) -->
+  <div class="d4h-swipe-overlay" style="width: 50%;">
+    <img src="../man/figures/swipe_layer_ndvi.png" alt="NDVI Layer">
+  </div>
+  
+  <!-- Slider Handle and Range Control -->
+  <div class="d4h-swipe-handle" style="left: 50%;"></div>
+  <input type="range" min="0" max="100" value="50" class="d4h-swipe-range" aria-label="Swipe comparison slider">
+  
+  <!-- Labels -->
+  <span class="d4h-swipe-label-left">NDVI (Vegetation)</span>
+  <span class="d4h-swipe-label-right">Bare Soil (&lt; 0.15)</span>
 </div>
+<p class="text-center text-muted small mt-n2 mb-4"><em>👆 Drag the central circular divider left or right to inspect the transition between vegetative cover and bare ground pathways.</em></p>
 
 ---
 

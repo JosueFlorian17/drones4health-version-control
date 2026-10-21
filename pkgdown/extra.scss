@@ -91,3 +91,113 @@ $badge-h: 46px;
     }
   }
 }
+
+// Interactive Image Comparison Slider Widget
+.d4h-swipe-container {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  margin: 1.5rem auto;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+  user-select: none;
+  border: 1px solid rgba(0,0,0,0.1);
+
+  .d4h-swipe-base {
+    display: block;
+    width: 100%;
+    height: auto;
+    pointer-events: none;
+  }
+
+  .d4h-swipe-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+    border-right: 3px solid #ffffff;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.3);
+
+    img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: auto;
+      max-width: none;
+      pointer-events: none;
+    }
+  }
+
+  .d4h-swipe-handle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    background: #ffffff;
+    border: 3px solid #244654;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 10;
+
+    &::before {
+      content: '\2194';
+      font-size: 18px;
+      font-weight: bold;
+      color: #244654;
+    }
+  }
+
+  .d4h-swipe-range {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    margin: 0;
+    padding: 0;
+    cursor: ew-resize;
+    z-index: 20;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .d4h-swipe-label-left {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    background: rgba(0,0,0,0.65);
+    color: #ffffff;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  .d4h-swipe-label-right {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    background: rgba(0,0,0,0.65);
+    color: #ffffff;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    pointer-events: none;
+    z-index: 5;
+  }
+}

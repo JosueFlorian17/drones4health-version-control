@@ -20,6 +20,41 @@ template:
   includes:
     in_header: |
       <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          function initSwipers() {
+            var sliders = document.querySelectorAll('.d4h-swipe-range');
+            sliders.forEach(function(slider) {
+              var container = slider.closest('.d4h-swipe-container');
+              if (!container) return;
+              var overlay = container.querySelector('.d4h-swipe-overlay');
+              var overlayImg = overlay ? overlay.querySelector('img') : null;
+              var handle = container.querySelector('.d4h-swipe-handle');
+              var baseImg = container.querySelector('.d4h-swipe-base');
+
+              function updateSlider() {
+                var val = slider.value;
+                if (overlay) overlay.style.width = val + '%';
+                if (handle) handle.style.left = val + '%';
+                if (overlayImg && baseImg) {
+                  overlayImg.style.width = baseImg.offsetWidth + 'px';
+                  overlayImg.style.height = baseImg.offsetHeight + 'px';
+                }
+              }
+
+              slider.addEventListener('input', updateSlider);
+              slider.addEventListener('change', updateSlider);
+              window.addEventListener('resize', updateSlider);
+              if (baseImg && baseImg.complete) {
+                updateSlider();
+              } else if (baseImg) {
+                baseImg.addEventListener('load', updateSlider);
+              }
+            });
+          }
+          initSwipers();
+        });
+      </script>
 
 navbar:
   bg: custom
