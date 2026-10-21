@@ -14,6 +14,7 @@ img/
 *.xlsx
 *.csv
 *.png
+!man/figures/*.png
 
 docs
 

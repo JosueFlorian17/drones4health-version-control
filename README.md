@@ -123,18 +123,18 @@ print(resumen_ejecutivo)
 Compare continuous indices, discrete binary masks, and hexagonal grids with a single slider bar and dynamic contrast stretching:
 
 ```r
-# Highlight bare soil pixels (value 1) as teal over MSAVI2 in magma palette
-r_solo_suelo <- terra::ifel(r_bare_soil == 1, 1, NA)
-names(r_solo_suelo) <- "Bare_Soil"
+# Calculate NDVI and Bare Soil mask from multispectral UAV bands
+r_ndvi <- d4h_ndvi(nir = "data/Ohuay_NIR.tif", red = "data/Ohuay_R.tif")
+r_soil <- d4h_bare_soil(ndvi_raster = r_ndvi, threshold = 0.15)
 
+# Render interactive swipe slider
 visor_swipe <- d4h_mapview_swipe(
-  x        = r_solo_suelo,
-  y        = r_msavi2,
+  x        = r_ndvi,                    # Left layer: continuous NDVI
+  y        = r_soil,                    # Right layer: discrete Bare Soil mask
   grid     = NULL,                      # Optional: pass grid_hex to overlay polygons
-  basemap  = FALSE,                     # FALSE = neutral / TRUE = satellite imagery
-  col_x    = "#2a9d8f",                 # Teal discrete color for bare soil
-  col_y    = "magma",                   # Magma continuous palette for MSAVI2
-  limits_y = c(0, 0.8)                  # Dynamic contrast range
+  basemap  = TRUE,                      # TRUE = satellite imagery / FALSE = neutral
+  col_x    = "viridis",                 # Viridis palette for NDVI
+  col_y    = c("#f5f5f5", "#8d5b4c")   # Custom colors for bare soil substrate
 )
 
 visor_swipe
@@ -143,9 +143,9 @@ visor_swipe
 #### Visual Outputs:
 
 <p align="center">
-  <img src="man/figures/swipe_bare_soil_msavi2.png" width="85%" alt="Interactive Swipe Viewer - Bare Soil vs MSAVI2" />
+  <img src="man/figures/swipe_ndvi_vs_bare_soil.png" width="90%" alt="Interactive Swipe Viewer - NDVI vs Bare Soil Mask" />
   <br>
-  <em>Figure 1: Interactive side-by-side swipe comparison between Discrete Bare Soil Mask (teal, left) and MSAVI2 (magma, right) with categorical and continuous legends.</em>
+  <em>Figure 1: Dual-layer side-by-side swipe comparison showing photosynthetic vegetative vigor (NDVI) on the left and exposed bare soil substrates / pathways (Bare Soil Mask) on the right.</em>
 </p>
 
 <p align="center">
