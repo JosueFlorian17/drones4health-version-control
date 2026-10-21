@@ -89,50 +89,106 @@
     
     
 <div class="section level2">
-<h2 id="interactive-dual-layer-comparison">1. Interactive Dual-Layer Comparison<a class="anchor" aria-label="anchor" href="#interactive-dual-layer-comparison"></a>
+<h2 id="overview-dual-layer-comparison">1. Overview &amp; Dual-Layer Comparison<a class="anchor" aria-label="anchor" href="#overview-dual-layer-comparison"></a>
 </h2>
-<p>In precision spatial epidemiology, field researchers and
-epidemiologists often need to contrast a physical landscape feature
-(such as an RGB orthomosaic or digital surface model) against a derived
-risk metric (such as NDVI, MSAVI2, or TWI) to validate classification
-boundaries in real time.</p>
-<p><code>drones4health</code> provides <code><a href="../reference/d4h_mapview_swipe.html">d4h_mapview_swipe()</a></code>,
-powered by Leaflet and Mapview swipe mechanics, enabling side-by-side or
-split-screen exploration in interactive R Markdown and web
-dashboards.</p>
+<p>In precision spatial epidemiology and micro-environmental
+surveillance, field researchers and public health brigades need to
+contrast physical landscape features (such as high-resolution UAV
+orthomosaics or raw spectral layers) against derived eco-epidemiological
+indices (e.g., NDVI vs. Bare Soil, TWI vs. Water, or Orthomosaic
+vs. IMSR).</p>
+<p><code>drones4health</code> provides
+<strong><code><a href="../reference/d4h_mapview_swipe.html">d4h_mapview_swipe()</a></code></strong>, an interactive
+side-by-side swipe slider powered by Leaflet and Mapview swipe
+mechanics.</p>
+<div class="text-center my-4">
+<img src="../reference/figures/swipe_ndvi_vs_bare_soil.png" class="img-fluid rounded shadow-sm border" alt="Interactive Side-by-Side Swipe Comparison: NDVI vs Bare Soil Mask" width="95%"><p class="text-muted mt-2">
+<em>Figure 1: Dual-layer comparison showing photosynthetic vegetative
+vigor (NDVI) on the left and exposed substrate / unpaved paths (Bare
+Soil Mask, NDVI &lt; 0.15) on the right.</em>
+</p>
+</div>
+<hr>
 </div>
 <div class="section level2">
-<h2 id="dynamic-contrast-stretching">2. Dynamic Contrast Stretching<a class="anchor" aria-label="anchor" href="#dynamic-contrast-stretching"></a>
+<h2 id="interactive-in-browser-swipe-slider">2. Interactive In-Browser Swipe Slider<a class="anchor" aria-label="anchor" href="#interactive-in-browser-swipe-slider"></a>
 </h2>
-<p>Sensor values can occasionally exhibit extreme outliers (e.g., highly
-reflective metal roofs or deep shaded water).
-<code><a href="../reference/d4h_mapview_swipe.html">d4h_mapview_swipe()</a></code> integrates quantile-based contrast
-stretching:</p>
+<p>You can render an interactive swipe comparison in your RStudio
+Viewer, Shiny dashboard, or R Markdown document:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JosueFlorian17/drones4health-version-control" class="external-link">drones4health</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/" class="external-link">terra</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Load raster layers</span></span>
-<span><span class="va">r_dem</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="st">"data/Ohuay_D.tif"</span><span class="op">)</span></span>
-<span><span class="va">r_ndvi</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="st">"data/Ohuay_NDVI.tif"</span><span class="op">)</span></span>
+<span><span class="co"># 1. Paths to UAV multispectral bands</span></span>
+<span><span class="va">nir_path</span> <span class="op">&lt;-</span> <span class="st">"data/Ohuay_NIR.tif"</span></span>
+<span><span class="va">red_path</span> <span class="op">&lt;-</span> <span class="st">"data/Ohuay_R.tif"</span></span>
 <span></span>
-<span><span class="co"># Side-by-side interactive swipe comparison</span></span>
+<span><span class="co"># 2. Compute NDVI and Bare Soil mask</span></span>
+<span><span class="va">r_ndvi</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_ndvi.html">d4h_ndvi</a></span><span class="op">(</span>nir <span class="op">=</span> <span class="va">nir_path</span>, red <span class="op">=</span> <span class="va">red_path</span><span class="op">)</span></span>
+<span><span class="va">r_soil</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_bare_soil.html">d4h_bare_soil</a></span><span class="op">(</span>ndvi_raster <span class="op">=</span> <span class="va">r_ndvi</span>, threshold <span class="op">=</span> <span class="fl">0.15</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 3. Interactive swipe slider (Left: NDVI, Right: Bare Soil Mask)</span></span>
 <span><span class="fu"><a href="../reference/d4h_mapview_swipe.html">d4h_mapview_swipe</a></span><span class="op">(</span></span>
-<span>  x               <span class="op">=</span> <span class="va">r_dem</span>,</span>
-<span>  y               <span class="op">=</span> <span class="va">r_ndvi</span>,</span>
-<span>  quantile_cutoff <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.02</span>, <span class="fl">0.98</span><span class="op">)</span>,</span>
-<span>  col.regions     <span class="op">=</span> <span class="st">"viridis"</span></span>
+<span>  x       <span class="op">=</span> <span class="va">r_ndvi</span>,</span>
+<span>  y       <span class="op">=</span> <span class="va">r_soil</span>,</span>
+<span>  col_x   <span class="op">=</span> <span class="st">"viridis"</span>,</span>
+<span>  col_y   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#f5f5f5"</span>, <span class="st">"#8d5b4c"</span><span class="op">)</span>,</span>
+<span>  basemap <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
+<div class="row my-4">
+<div class="col-md-6 text-center">
+<pre><code>&lt;img src="../man/figures/swipe_layer_ndvi.png" class="img-fluid rounded border" alt="NDVI Layer" width="90%"&gt;
+&lt;p class="small text-muted mt-1"&gt;&lt;strong&gt;Left Layer:&lt;/strong&gt; NDVI (Vegetation Vigor &amp;amp; Canopy Roosting)&lt;/p&gt;</code></pre>
+</div>
+<div class="col-md-6 text-center">
+<pre><code>&lt;img src="../man/figures/swipe_layer_bare_soil.png" class="img-fluid rounded border" alt="Bare Soil Mask" width="90%"&gt;
+&lt;p class="small text-muted mt-1"&gt;&lt;strong&gt;Right Layer:&lt;/strong&gt; Bare Soil Mask (&amp;lt; 0.15, Exposed Substrate)&lt;/p&gt;</code></pre>
+</div>
+</div>
+<hr>
 </div>
 <div class="section level2">
-<h2 id="highlighting-micro-ecosystem-transitions">3. Highlighting Micro-Ecosystem Transitions<a class="anchor" aria-label="anchor" href="#highlighting-micro-ecosystem-transitions"></a>
+<h2 id="superimposing-surveillance-grids">3. Superimposing Surveillance Grids<a class="anchor" aria-label="anchor" href="#superimposing-surveillance-grids"></a>
 </h2>
-<p>The interactive swipe allows users to slide between layers to
-confirm: - The exact delineation of bare soil footprints versus dense
-vegetation. - Micro-drainage channels visible in high-resolution
-elevation models versus water stagnation indices. - Roof material
-transitions (galvanized zinc versus palm thatch) and their proximity to
-standing water.</p>
+<p>You can also overlay operational surveillance grids (e.g. 50-meter
+hexagonal grids) directly over the swiping layers:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Generate 50m operational hexagonal grid</span></span>
+<span><span class="va">grid_hex</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_hex_grid.html">d4h_hex_grid</a></span><span class="op">(</span>aoi <span class="op">=</span> <span class="va">r_ndvi</span>, cell_size <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Swipe with grid overlay for field brigades</span></span>
+<span><span class="fu"><a href="../reference/d4h_mapview_swipe.html">d4h_mapview_swipe</a></span><span class="op">(</span></span>
+<span>  x       <span class="op">=</span> <span class="va">r_ndvi</span>,</span>
+<span>  y       <span class="op">=</span> <span class="va">r_soil</span>,</span>
+<span>  grid    <span class="op">=</span> <span class="va">grid_hex</span>,</span>
+<span>  col_x   <span class="op">=</span> <span class="st">"viridis"</span>,</span>
+<span>  col_y   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#f5f5f5"</span>, <span class="st">"#8d5b4c"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<div class="text-center my-4">
+<img src="../reference/figures/swipe_hex_grid.png" class="img-fluid rounded shadow-sm border" alt="Swipe Viewer with Hexagonal Surveillance Grid" width="85%"><p class="text-muted mt-2">
+<em>Figure 2: Interactive slider comparison with an operational 50m
+hexagonal grid overlay for vector control logistics.</em>
+</p>
+</div>
+<hr>
+</div>
+<div class="section level2">
+<h2 id="epidemiological-utility">4. Epidemiological Utility<a class="anchor" aria-label="anchor" href="#epidemiological-utility"></a>
+</h2>
+<ul>
+<li>
+<strong>Substrate Validation:</strong> Disentangle bare ground,
+unpaved pedestrian pathways, and cleared peri-domestic clearings from
+natural vegetation without ground-truth ambiguity.</li>
+<li>
+<strong>Larviciding Planning:</strong> Locate small ditches, water
+pooling areas, and artificial structures across complex rural and
+peri-urban landscapes.</li>
+<li>
+<strong>Quality Control:</strong> Visually confirm that binary
+thresholds (e.g., NDVI &lt; 0.15 for bare soil) accurately conform to
+real landscape features.</li>
+</ul>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
