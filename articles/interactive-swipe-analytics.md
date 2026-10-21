@@ -13,12 +13,16 @@ vs. Bare Soil, TWI vs. Water, or Orthomosaic vs. IMSR).
 an interactive side-by-side swipe slider powered by Leaflet and Mapview
 swipe mechanics.
 
-![Interactive Side-by-Side Swipe Comparison: NDVI vs Bare Soil
-Mask](../reference/figures/swipe_ndvi_vs_bare_soil.png)
+### Interactive Slider Demo (Drag to Swipe):
 
-*Figure 1: Dual-layer comparison showing photosynthetic vegetative vigor
-(NDVI) on the left and exposed substrate / unpaved paths (Bare Soil
-Mask, NDVI \< 0.15) on the right.*
+![Bare Soil Mask Layer](../reference/figures/swipe_layer_bare_soil.png)
+
+    <img src="../man/figures/swipe_layer_ndvi.png" alt="NDVI Layer">
+
+NDVI (Vegetation) Bare Soil (\< 0.15)
+
+*👆 Drag the central circular divider left or right to inspect the
+transition between vegetative cover and bare ground pathways.*
 
 ------------------------------------------------------------------------
 
