@@ -196,26 +196,26 @@ print(resumen_buffers)
 
 ``` text
 ==============================================================================
-             DRONES4HEALTH - INFORME RESUMEN EJECUTIVO
+             DRONES4HEALTH - EXECUTIVE SUMMARY REPORT
 ==============================================================================
 
- INDICADOR: FOCAL_BUFFER_NDVI
+ INDICATOR: FOCAL_BUFFER_NDVI
 ------------------------------------------------------------------------------
- 1. COBERTURA Y RESOLUCION ESPACIAL:
-    - Resolucion de pixel : 99.21 cm
-    - Area focal cubierta : 55.765 ha (557,650 m2) en buffers peridomesticos
-    - Total de viviendas  : 55 unidades habitacionales evaluadas
+ 1. SPATIAL COVERAGE AND RESOLUTION:
+    - Pixel Resolution    : 99.21 cm
+    - Focal Buffer Area   : 55.765 ha (557,650 m2) across peridomestic buffers
+    - Total Households    : 55 residential units evaluated
 
- 2. ESTRATIFICACION DE PROXIMIDAD A CUERPOS DE AGUA:
-    - Critical (<50m)     :  1 casa  ( 1.8 %) - Prioridad sanitaria inmediata
-    - High (50-100m)      :  3 casas ( 5.5 %) - Vigilancia entomologica activa
-    - Moderate (100-200m) : 24 casas (43.6 %) - Monitoreo periodico
-    - Low (>200m)         : 27 casas (49.1 %) - Perimetro basal de seguridad
+ 2. DISTANCE-TO-WATER PROXIMITY STRATIFICATION:
+    - Critical (<50m)     :  1 house  ( 1.8 %) - Immediate vector control priority
+    - High (50-100m)      :  3 houses ( 5.5 %) - Active entomological surveillance
+    - Moderate (100-200m) : 24 houses (43.6 %) - Periodic routine monitoring
+    - Low (>200m)         : 27 houses (49.1 %) - Baseline buffer zone
 
- 3. METRICAS DE VEGETACION FOCAL (NDVI DENTRO DE BUFFERS):
-    - Promedio (Media)    : 0.282 (+/- 0.221 SD)
-    - Rango util          : [-0.485, 0.946]
-    - Mediana (Q50)       : 0.245
+ 3. FOCAL VEGETATION CANOPY METRICS (NDVI INSIDE BUFFERS):
+    - Arithmetic Mean     : 0.282 (+/- 0.221 SD)
+    - Valid Range         : [-0.485, 0.946]
+    - Median (Q50)        : 0.245
 ==============================================================================
 ```
 

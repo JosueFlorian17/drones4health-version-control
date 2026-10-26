@@ -127,34 +127,34 @@ print(resumen_grillas)
 
 ``` text
 ==============================================================================
-             DRONES4HEALTH - INFORME RESUMEN EJECUTIVO
+             DRONES4HEALTH - EXECUTIVE SUMMARY REPORT
 ==============================================================================
 
- INDICADOR: NDVI
+ INDICATOR: NDVI
 ------------------------------------------------------------------------------
- 1. COBERTURA Y RESOLUCION ESPACIAL:
-    - Resolucion de pixel : 99.21 cm
-    - Area util cubierta  : 64.628 ha (646,276 m2)
-    - Pixeles evaluados   : 656,624 (36.5% de la escena util)
+ 1. SPATIAL COVERAGE AND RESOLUTION:
+    - Pixel Resolution    : 99.21 cm
+    - Surveyed Area       : 64.628 ha (646,276 m2)
+    - Evaluated Pixels    : 656,624 (36.5% valid footprint coverage)
 
- 2. ESTADISTICAS DESCRIPTIVAS GLOBALES:
-    - Promedio (Media)    : 0.238 (+/- 0.255 SD)
-    - Coef. de Variacion  : 106.9 %
-    - Rango total [Min,Max]: [-0.954, 0.99] (Amplitud: 1.944)
-    - Mediana (Q50)       : 0.182
-    - Rango Intercuartil  : [0.052, 0.399] (IQR: 0.347)
-    - Intervalo 90% central: [-0.083, 0.716] (P5 - P95)
+ 2. GLOBAL DESCRIPTIVE STATISTICAL MOMENTS:
+    - Arithmetic Mean     : 0.238 (+/- 0.255 SD)
+    - Coeff. of Variation : 106.9 %
+    - Overall Range [Min,Max]: [-0.954, 0.99] (Span: 1.944)
+    - Median (Q50)        : 0.182
+    - Interquartile Range : [0.052, 0.399] (IQR: 0.347)
+    - Central 90% Span    : [-0.083, 0.716] (P05 - P95)
 
- 3. DIAGNOSTICO DE VALORES ATIPICOS (OUTLIERS):
-    - Limites Tukey (IQR) : Inferior < -0.469 | Superior > 0.92
-    - Atipicos detectados : 5,388 pixeles (0.82% del total)
-    - Diagnostico         : Distribucion homogenea (valores extremos < 1%)
+ 3. SPATIAL OUTLIER DIAGNOSTICS (TUKEY IQR):
+    - Tukey IQR Fences    : Lower < -0.469 | Upper > 0.92
+    - Outliers Detected   : 5,388 pixels (0.82% of valid pixels)
+    - Spatial Diagnostics : Homogeneous distribution (extreme values < 1%)
 
- 4. ESTRATIFICACION TEMATICA Y SUPERFICIES:
-    - Agua / Suelo muy degradado (< 0.0)         :  14.7 % (  9.53 ha)
-    - Suelo desnudo / Escasa vegetacion [0.0, 0.2):  38.2 % ( 24.67 ha)
-    - Vegetacion moderada / Transicion [0.2, 0.5) :  29.4 % ( 18.99 ha)
-    - Vegetacion densa / Alto vigor [>= 0.5)     :  17.7 % ( 11.44 ha)
+ 4. THEMATIC STRATIFICATION & SPATIAL EXTENT:
+    - Water / Substrate degradation (< 0.0)     :  14.7 % (  9.53 ha)
+    - Bare soil / Sparse canopy [0.0, 0.2)      :  38.2 % ( 24.67 ha)
+    - Moderate vegetation / Transition [0.2, 0.5):  29.4 % ( 18.99 ha)
+    - Dense vegetation / High vigor [>= 0.5)    :  17.7 % ( 11.44 ha)
 
 ==============================================================================
 ```

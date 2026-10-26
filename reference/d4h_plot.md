@@ -2,12 +2,17 @@
 
 Unified visualization function for drone rasters, grids, vector
 features, and comparative dual-layer analysis. When comparing two layers
-(`x` and `y`): if `interactive = TRUE`, renders an interactive
-side-by-side swipe slider widget (via Leaflet and Leaflet.extras2); if
-`interactive = FALSE` (default), renders a publication-ready static
-side-by-side comparative panel (via `ggplot2` and `cowplot`). For a
-single layer, `interactive = TRUE` renders an interactive `mapview` web
-map, while `interactive = FALSE` produces a static `ggplot2` map.
+(`x` and `y`):
+
+- If `interactive = TRUE`, renders an interactive side-by-side swipe
+  slider widget (powered by `mapview` and `leaflet.extras2`).
+
+- If `interactive = FALSE` (default), outputs a publication-ready static
+  comparative panel via `ggplot2` and `cowplot`.
+
+For a single layer: `interactive = TRUE` produces an interactive
+`mapview` web map, while `interactive = FALSE` produces a static
+`ggplot2` map.
 
 ## Usage
 
@@ -27,7 +32,9 @@ d4h_plot(
   limits = NULL,
   limits_y = NULL,
   title = NULL,
-  max_pixels = 5e+05
+  max_pixels = 5e+05,
+  zcol = NULL,
+  ortho = NULL
 )
 ```
 
@@ -40,14 +47,14 @@ d4h_plot(
 
 - y:
 
-  Optional SpatRaster or character path. Right layer for comparative
-  visualization (e.g. comparing NDVI vs NDWI, or Pre vs Post
-  intervention).
+  Optional SpatRaster, SpatVector, sf, or character path. Right layer
+  for comparative visualization (e.g., comparing NDVI vs NDWI, or Pre vs
+  Post intervention).
 
 - interactive:
 
   Logical. If `FALSE` (default), outputs a static `ggplot2` plot (or
-  side-by-side comparison if `y` is supplied). If `TRUE`, outputs an
+  dual-panel comparison if `y` is provided). If `TRUE`, outputs an
   interactive swipe slider (when `y` is provided) or interactive
   `mapview` web map (when single layer).
 
@@ -106,10 +113,21 @@ d4h_plot(
   Numeric. Maximum number of pixels to render before spatial aggregation
   (default: 500000).
 
+- zcol:
+
+  Character. Optional column name to color/fill spatial vector features
+  (e.g., `"proximity_level"`, `"risk_level"`, or `"dist_water_m"`).
+
+- ortho:
+
+  SpatRaster or character path. Optional high-resolution RGB orthomosaic
+  to render as an underlay base layer beneath grids, vectors, or point
+  features.
+
 ## Value
 
-A `ggplot` object (if `interactive = FALSE`) or a `leaflet` / `mapview`
-interactive widget (if `interactive = TRUE`).
+A `ggplot` object (if `interactive = FALSE`) or an interactive `mapview`
+/ `leaflet` slider widget (if `interactive = TRUE`).
 
 ## Examples
 
@@ -122,7 +140,7 @@ if (interactive()) {
   ndvi_file <- system.file("extdata", "ndvi.tif", package = "drones4health")
   ndre_file <- system.file("extdata", "ndre.tif", package = "drones4health")
 
-  # 1. Comparative dual-indicator: interactive slider
+  # 1. Comparative dual-indicator: interactive mapview swipe slider
   d4h_plot(x = ndvi_file, y = ndre_file, interactive = TRUE)
 
   # 2. Comparative dual-indicator: static publication panel

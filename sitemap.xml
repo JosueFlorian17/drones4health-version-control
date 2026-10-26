@@ -1,10 +1,7 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://josueflorian17.github.io/drones4health-version-control/404.html</loc></url>
 <url><loc>https://josueflorian17.github.io/drones4health-version-control/articles/case1_metrics_calculation.html</loc></url>
-<url><loc>https://josueflorian17.github.io/drones4health-version-control/articles/case1_peru_amazon_malaria.html</loc></url>
-<url><loc>https://josueflorian17.github.io/drones4health-version-control/articles/case2_brazil_urban_dengue.html</loc></url>
 <url><loc>https://josueflorian17.github.io/drones4health-version-control/articles/case2_grids_zonal_statistics.html</loc></url>
-<url><loc>https://josueflorian17.github.io/drones4health-version-control/articles/case3_colombia_ecuador_choco.html</loc></url>
 <url><loc>https://josueflorian17.github.io/drones4health-version-control/articles/case3_water_segmentation_grid_analysis.html</loc></url>
 <url><loc>https://josueflorian17.github.io/drones4health-version-control/articles/case4_gps_houses_buffers_distances.html</loc></url>
 <url><loc>https://josueflorian17.github.io/drones4health-version-control/articles/drones4health-quickstart.html</loc></url>
@@ -25,6 +22,7 @@
 <url><loc>https://josueflorian17.github.io/drones4health-version-control/reference/d4h_executive_summary.html</loc></url>
 <url><loc>https://josueflorian17.github.io/drones4health-version-control/reference/d4h_export_summary.html</loc></url>
 <url><loc>https://josueflorian17.github.io/drones4health-version-control/reference/d4h_gndvi.html</loc></url>
+<url><loc>https://josueflorian17.github.io/drones4health-version-control/reference/d4h_grid_distance_to_water.html</loc></url>
 <url><loc>https://josueflorian17.github.io/drones4health-version-control/reference/d4h_hex_grid.html</loc></url>
 <url><loc>https://josueflorian17.github.io/drones4health-version-control/reference/d4h_iead.html</loc></url>
 <url><loc>https://josueflorian17.github.io/drones4health-version-control/reference/d4h_iec.html</loc></url>

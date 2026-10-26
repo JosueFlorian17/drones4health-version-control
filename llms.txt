@@ -328,11 +328,14 @@ distance to water modeling.
 
 ## Spatial Grids & Zonation
 
-Operational surveillance grids (hexagons/squares) and zonal summary
-statistics extraction.
+Operational surveillance grids (hexagons/squares), grid-level
+distance-to-water risk modeling, and zonal summary statistics
+extraction.
 
 - [`d4h_hex_grid()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_hex_grid.md)
   : Generate Hexagonal Surveillance Grid
+- [`d4h_grid_distance_to_water()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_grid_distance_to_water.md)
+  : Spatial Grid Proximity and Exposure Modeling to Water Bodies
 - [`d4h_summarize_grid()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_summarize_grid.md)
   : Summarize Raster Indicator by Spatial Grid
 - [`d4h_summarize_general()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_summarize_general.md)
@@ -411,15 +414,3 @@ Quickstart guides and interactive swipe comparison viewers.
   Health](https://josueflorian17.github.io/drones4health-version-control/articles/drones4health-quickstart.md):
 - [Interactive Swipe & Visual
   Analytics](https://josueflorian17.github.io/drones4health-version-control/articles/interactive-swipe-analytics.md):
-
-### Regional Case Studies
-
-Contextualized field studies across diverse Latin American transmission
-ecosystems.
-
-- [Case Study 1: Malaria & Micro-Hydrology - Peruvian
-  Amazon](https://josueflorian17.github.io/drones4health-version-control/articles/case1_peru_amazon_malaria.md):
-- [Case Study 2: Urban Dengue & Solid Waste - Brazil &
-  Favelas](https://josueflorian17.github.io/drones4health-version-control/articles/case2_brazil_urban_dengue.md):
-- [Case Study 3: Wet Pacific -
-  Colombia](https://josueflorian17.github.io/drones4health-version-control/articles/case3_colombia_ecuador_choco.md):
