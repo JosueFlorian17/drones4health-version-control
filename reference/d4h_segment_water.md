@@ -94,3 +94,34 @@ spectral signatures combined with low optical reflectance:
 \text{otherwise} \end{cases}\$\$ Extracted pixel clusters are converted
 to vector polygons (`sf`), with calculated surface area (\\\text{m}^2\\)
 and perimeter.
+
+## Examples
+
+``` r
+# \donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+  library(sf)
+
+  # Define paths to NDWI, RGB orthomosaic, and building exclusion layers
+  ndwi_file  <- system.file("extdata", "ndwi.tif", package = "drones4health")
+  rgb_file   <- system.file("extdata", "ortho_rgb.tif", package = "drones4health")
+  houses_sf  <- st_read(system.file("extdata", "buildings.gpkg", package = "drones4health"))
+
+  # Segment surface water bodies with brightness filtering and building exclusion
+  water_sf <- d4h_segment_water(
+    raster_in            = ndwi_file,
+    rgb_raster           = rgb_file,
+    threshold            = 0.0,
+    is_ndwi              = TRUE,
+    max_water_brightness = 95.0,
+    min_area_m2          = 2.0,
+    max_area_m2          = 50000.0,
+    method               = "spectral",
+    exclude_buildings    = houses_sf
+  )
+  print(water_sf)
+}
+# }
+```

@@ -14,7 +14,8 @@ d4h_distance_to_risk(
   decay_lambda = 100,
   buffer_breaks = c(50, 100, 200),
   risk_labels = c("Critico (<50m)", "Alto (50-100m)", "Moderado (100-200m)",
-    "Bajo (>200m)")
+    "Bajo (>200m)"),
+  proximity_labels = NULL
 )
 ```
 
@@ -43,11 +44,16 @@ d4h_distance_to_risk(
   Character vector. Names for each stratified risk tier (default:
   `c("Critico (<50m)", "Alto (50-100m)", "Moderado (100-200m)", "Bajo (>200m)")`).
 
+- proximity_labels:
+
+  Character vector (optional). Custom names for each stratified
+  proximity tier (alternative to `risk_labels`).
+
 ## Value
 
 An `sf` object matching `buildings` with appended columns:
-`dist_water_m`, `nearest_water_id`, `risk_score` in `[0, 1]`, and
-`risk_level`.
+`dist_water_m`, `nearest_water_id`, `proximity_score` in `[0, 1]`, and
+`proximity_level`.
 
 ## Details
 
@@ -67,3 +73,28 @@ climate resilient health systems*. World Health Organization.
 Guerra, C. A., Snow, R. W., & Hay, S. I. (2006). Mapping the global
 extent of malaria in 2005. *Trends in Parasitology*, 22(8), 353-358.
 [doi:10.1016/j.pt.2006.06.006](https://doi.org/10.1016/j.pt.2006.06.006)
+
+## Examples
+
+``` r
+# \donttest{
+if (interactive()) {
+  library(drones4health)
+  library(sf)
+
+  # Load building and water source polygons
+  houses_sf <- st_read(system.file("extdata", "buildings.gpkg", package = "drones4health"))
+  water_sf  <- st_read(system.file("extdata", "water_bodies.gpkg", package = "drones4health"))
+
+  # Calculate Euclidean distance and vector proximity scores with custom tiers
+  proximity_sf <- d4h_distance_to_water(
+    buildings        = houses_sf,
+    sources          = water_sf,
+    decay_lambda     = 100.0,
+    buffer_breaks    = c(50, 100, 200),
+    proximity_labels = c("Immediate (<50m)", "High (50-100m)", "Moderate (100-200m)", "Distal (>200m)")
+  )
+  head(proximity_sf)
+}
+# }
+```

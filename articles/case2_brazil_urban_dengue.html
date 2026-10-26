@@ -71,19 +71,25 @@
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="../articles/drones4health-quickstart.html">Get Started</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="active nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-regional-case-studies" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Regional Case Studies</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-regional-case-studies">
-<li><a class="dropdown-item" href="../articles/case1_peru_amazon_malaria.html">1. Malaria &amp; Micro-Hydrology - Peruvian Amazon</a></li>
-    <li><a class="dropdown-item" href="../articles/case2_brazil_urban_dengue.html">2. Urban Dengue &amp; Solid Waste - Brazil &amp; Favelas</a></li>
-    <li><a class="dropdown-item" href="../articles/case3_colombia_ecuador_choco.html">3. Transboundary &amp; Wet Pacific - Colombia &amp; Ecuador</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-use-cases" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Use Cases</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-use-cases">
+<li><a class="dropdown-item" href="../articles/case1_metrics_calculation.html">Case 01 - Orthomosaic Ingestion &amp; Metric Calculation</a></li>
+    <li><a class="dropdown-item" href="../articles/case2_grids_zonal_statistics.html">Case 02 - Grid Generation &amp; Zonal Statistics</a></li>
+    <li><a class="dropdown-item" href="../articles/case3_water_segmentation_grid_analysis.html">Case 03 - Water Body Segmentation &amp; Grid Analysis</a></li>
+    <li><a class="dropdown-item" href="../articles/case4_gps_houses_buffers_distances.html">Case 04 - GPS House Buffers &amp; Proximity to Water</a></li>
   </ul>
 </li>
-<li class="nav-item dropdown">
+<li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-guides-workflows" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Guides &amp; Workflows</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-guides-workflows">
 <li><a class="dropdown-item" href="../articles/drones4health-quickstart.html">Quickstart &amp; Workflow Pipeline</a></li>
     <li><a class="dropdown-item" href="../articles/interactive-swipe-analytics.html">Interactive Swipe &amp; Visual Analytics</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Regional Case Studies</h6></li>
+    <li><a class="dropdown-item" href="../articles/case1_peru_amazon_malaria.html">Malaria &amp; Micro-Hydrology - Peruvian Amazon</a></li>
+    <li><a class="dropdown-item" href="../articles/case2_brazil_urban_dengue.html">Urban Dengue &amp; Solid Waste - Brazil &amp; Favelas</a></li>
+    <li><a class="dropdown-item" href="../articles/case3_colombia_ecuador_choco.html">Wet Pacific - Colombia</a></li>
   </ul>
 </li>
       </ul>
@@ -125,9 +131,8 @@
 <div class="section level2">
 <h2 id="epidemiological-context-arboviruses-in-dense-urban-fabrics">1. Epidemiological Context: Arboviruses in Dense Urban Fabrics<a class="anchor" aria-label="anchor" href="#epidemiological-context-arboviruses-in-dense-urban-fabrics"></a>
 </h2>
-<p>Metropolitan centers across <strong>Brazil</strong> (São Paulo, Rio
-de Janeiro, Salvador, Belo Horizonte) suffer from hyper-endemic cycles
-of dengue (<em>DENV 1-4</em>), chikungunya, and Zika transmitted by
+<p>Metropolitan centers across <strong>Brazil</strong> suffer from
+hyper-endemic cycles of dengue, chikungunya, and Zika transmitted by
 <em>Aedes aegypti</em> and <em>Aedes albopictus</em>.</p>
 <p>In unplanned favelas and dense periurban neighborhoods: -
 Discontinuous piped water leads to open water storage containers on
@@ -148,7 +153,7 @@ shaded, vegetated domestic backyards.</p>
 <thead><tr class="header">
 <th align="left">Indicator</th>
 <th align="left">Implementation</th>
-<th align="left">Entomological Significance</th>
+<th align="left">Significance</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
@@ -161,8 +166,8 @@ patios and rooftops.</td>
 <tr class="even">
 <td align="left"><strong>IRTS</strong></td>
 <td align="left"><code><a href="../reference/d4h_irts.html">d4h_irts()</a></code></td>
-<td align="left">Thermal Micro-Refuge Index: merges canopy shade and
-thermal data (LST) to pinpoint cool microclimates where adult
+<td align="left">Thermal Micro-Refuge Index: merges tree and plant shade
+and thermal data (LST) to pinpoint cool microclimates where adult
 <em>Aedes</em> rest during midday heat.</td>
 </tr>
 <tr class="odd">
@@ -182,8 +187,13 @@ for community health brigades.</td>
 </table>
 </div>
 <div class="section level2">
-<h2 id="end-to-end-execution-workflow">3. End-to-End Execution Workflow<a class="anchor" aria-label="anchor" href="#end-to-end-execution-workflow"></a>
+<h2 id="workflow">3. Workflow<a class="anchor" aria-label="anchor" href="#workflow"></a>
 </h2>
+<div class="section level3">
+<h3 id="libraries-sensor-inputs">3.1 Libraries &amp; Sensor Inputs<a class="anchor" aria-label="anchor" href="#libraries-sensor-inputs"></a>
+</h3>
+<p>We initialize the analytical pipeline with high-resolution UAV
+multispectral channels (RedEdge, Red, NIR, and RGB):</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JosueFlorian17/drones4health-version-control" class="external-link">drones4health</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/" class="external-link">terra</a></span><span class="op">)</span></span>
@@ -194,51 +204,70 @@ for community health brigades.</td>
 <span><span class="va">path_re</span>  <span class="op">&lt;-</span> <span class="st">"data/brazil_urban/Ohuay_RE.tif"</span>   <span class="co"># RedEdge band</span></span>
 <span><span class="va">path_r</span>   <span class="op">&lt;-</span> <span class="st">"data/brazil_urban/Ohuay_R.tif"</span>    <span class="co"># Red band</span></span>
 <span><span class="va">path_nir</span> <span class="op">&lt;-</span> <span class="st">"data/brazil_urban/Ohuay_NIR.tif"</span>  <span class="co"># NIR band</span></span>
-<span><span class="va">path_rgb</span> <span class="op">&lt;-</span> <span class="st">"data/brazil_urban/Ohuay_D.tif"</span>    <span class="co"># RGB / Orthomosaic</span></span>
-<span></span>
-<span><span class="co"># Step 1: Detect Artificial Solid Waste Micro-Accumulation (IMSR)</span></span>
-<span><span class="co"># IMSR = (RedEdge - Red) / (RedEdge + NIR)</span></span>
-<span><span class="va">r_imsr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_imsr.html">d4h_imsr</a></span><span class="op">(</span>red_edge <span class="op">=</span> <span class="va">path_re</span>, red <span class="op">=</span> <span class="va">path_r</span>, nir <span class="op">=</span> <span class="va">path_nir</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Step 2: Delineate residential structures</span></span>
-<span><span class="va">casas_urbanas</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_segment_buildings.html">d4h_segment_buildings</a></span><span class="op">(</span></span>
-<span>  raster_in      <span class="op">=</span> <span class="va">path_rgb</span>,</span>
-<span>  method         <span class="op">=</span> <span class="st">"threshold"</span>,</span>
-<span>  threshold      <span class="op">=</span> <span class="fl">140</span>,</span>
-<span>  min_area_m2    <span class="op">=</span> <span class="fl">10.0</span>,</span>
-<span>  fill_holes     <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Step 3: Tessellate into 30m Hexagonal Surveillance Grids</span></span>
+<span><span class="va">path_rgb</span> <span class="op">&lt;-</span> <span class="st">"data/brazil_urban/Ohuay_D.tif"</span>    <span class="co"># RGB / Orthomosaic</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="artificial-solid-waste-detection-imsr">3.2 Artificial Solid Waste Detection (IMSR)<a class="anchor" aria-label="anchor" href="#artificial-solid-waste-detection-imsr"></a>
+</h3>
+<p>We map the spectral index of solid waste micro-accumulation to detect
+plastic, metal, and uncollected trash aggregates:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># IMSR = (RedEdge - Red) / (RedEdge + NIR)</span></span>
+<span><span class="va">r_imsr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_imsr.html">d4h_imsr</a></span><span class="op">(</span>red_edge <span class="op">=</span> <span class="va">path_re</span>, red <span class="op">=</span> <span class="va">path_r</span>, nir <span class="op">=</span> <span class="va">path_nir</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="informal-settlement-building-footprint-segmentation">3.3 Informal Settlement Building Footprint Segmentation<a class="anchor" aria-label="anchor" href="#informal-settlement-building-footprint-segmentation"></a>
+</h3>
+<p>We isolate complex rooftop surfaces and residential structures in
+dense informal settlements:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">urban_buildings</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_segment_buildings.html">d4h_segment_buildings</a></span><span class="op">(</span></span>
+<span>  raster_in   <span class="op">=</span> <span class="va">path_rgb</span>,</span>
+<span>  method      <span class="op">=</span> <span class="st">"threshold"</span>,</span>
+<span>  threshold   <span class="op">=</span> <span class="fl">140</span>,</span>
+<span>  min_area_m2 <span class="op">=</span> <span class="fl">10.0</span>,</span>
+<span>  fill_holes  <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="operational-hexagonal-surveillance-grids">3.4 Operational Hexagonal Surveillance Grids<a class="anchor" aria-label="anchor" href="#operational-hexagonal-surveillance-grids"></a>
+</h3>
+<p>To convert continuous pixel indices into actionable units for field
+brigades, we partition the urban territory into 30-meter operational
+hexagonal cells:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Tessellate study area into 30m hexagonal cells</span></span>
 <span><span class="va">hex_cells</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_hex_grid.html">d4h_hex_grid</a></span><span class="op">(</span></span>
-<span>  study_area <span class="op">=</span> <span class="va">casas_urbanas</span>,</span>
+<span>  study_area <span class="op">=</span> <span class="va">urban_buildings</span>,</span>
 <span>  cell_size  <span class="op">=</span> <span class="fl">30</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Step 4: Aggregate waste accumulation risk per neighborhood block</span></span>
+<span><span class="co"># Aggregate solid waste exposure metrics per block</span></span>
 <span><span class="va">grid_summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_summarize_grid.html">d4h_summarize_grid</a></span><span class="op">(</span></span>
 <span>  grid   <span class="op">=</span> <span class="va">hex_cells</span>,</span>
 <span>  raster <span class="op">=</span> <span class="va">r_imsr</span>,</span>
 <span>  stats  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean"</span>, <span class="st">"median"</span>, <span class="st">"q90"</span>, <span class="st">"sd"</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Step 5: Generate Executive Report for Municipal Public Health Officers</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="../reference/d4h_executive_summary.html">d4h_executive_summary</a></span><span class="op">(</span><span class="va">r_imsr</span>, by <span class="op">=</span> <span class="st">"general"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span></code></pre></div>
+<div class="text-center my-3">
+<img src="../reference/figures/case2_hex_grid.png" class="img-fluid rounded border shadow-sm" alt="Urban Hexagonal Surveillance Grid" width="85%"><p class="small text-muted mt-1">
+<em>Figure 3.2: Operational zoning via 30m hexagonal grids for
+prioritizing vector-control health brigades.</em>
+</p>
 </div>
-<div class="section level2">
-<h2 id="municipal-action-strategies">4. Municipal Action Strategies<a class="anchor" aria-label="anchor" href="#municipal-action-strategies"></a>
-</h2>
-<ul>
-<li>
-<strong>Drone-Guided Garbage Collection:</strong> Municipal
-sanitation teams prioritize blocks exceeding the 90th percentile of IMSR
-to eliminate artificial oviposition sites before the rainy season.</li>
-<li>
-<strong>Micro-Targeted Education:</strong> Community health agents
-(<em>Agentes Comunitários de Saúde</em>) visit specific rooftop clusters
-identified by drone without wasting time on door-to-door visual sweeps
-of entire neighborhoods.</li>
-</ul>
+</div>
+<div class="section level3">
+<h3 id="executive-exposure-summary">3.5 Executive Exposure Summary<a class="anchor" aria-label="anchor" href="#executive-exposure-summary"></a>
+</h3>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Generate executive multi-moment table for municipal decision-makers</span></span>
+<span><span class="va">urban_summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_executive_summary.html">d4h_executive_summary</a></span><span class="op">(</span><span class="va">r_imsr</span>, by <span class="op">=</span> <span class="st">"general"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">urban_summary</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; ── Executive Summary: Urban Exposure &amp; Solid Waste Metrics ──</span></span>
+<span><span class="co">#&gt; Total Urban Area Surveyed: 42.6 ha</span></span>
+<span><span class="co">#&gt; Mean IMSR Index: 0.318 (SD: 0.142)</span></span>
+<span><span class="co">#&gt; 90th Percentile Waste Accumulation: 0.584</span></span>
+<span><span class="co">#&gt; High Priority Hexagonal Blocks: 18 blocks (&gt; Q90 threshold)</span></span></code></pre>
+</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

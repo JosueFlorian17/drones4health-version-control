@@ -1,14 +1,36 @@
 # Articles
 
-### All vignettes
+### Core Use Cases
+
+Operational end-to-end workflows for ultra-high resolution drone
+analytics in vector surveillance and environmental health.
+
+- [Case 01 - Orthomosaic Ingestion & Metric
+  Calculation](https://josueflorian17.github.io/drones4health-version-control/articles/case1_metrics_calculation.md):
+- [Case 02 - Grid Generation & Zonal
+  Statistics](https://josueflorian17.github.io/drones4health-version-control/articles/case2_grids_zonal_statistics.md):
+- [Case 03 - Water Body Segmentation & Grid
+  Analysis](https://josueflorian17.github.io/drones4health-version-control/articles/case3_water_segmentation_grid_analysis.md):
+- [Case 04 - GPS House Buffers & Proximity to
+  Water](https://josueflorian17.github.io/drones4health-version-control/articles/case4_gps_houses_buffers_distances.md):
+
+### Operational Guides & Interactive Analytics
+
+Quickstart guides and interactive swipe comparison viewers.
+
+- [Quickstart: UAV Micro-Environmental Pipeline for Spatial
+  Health](https://josueflorian17.github.io/drones4health-version-control/articles/drones4health-quickstart.md):
+- [Interactive Swipe & Visual
+  Analytics](https://josueflorian17.github.io/drones4health-version-control/articles/interactive-swipe-analytics.md):
+
+### Regional Case Studies
+
+Contextualized field studies across diverse Latin American transmission
+ecosystems.
 
 - [Case Study 1: Malaria & Micro-Hydrology - Peruvian
   Amazon](https://josueflorian17.github.io/drones4health-version-control/articles/case1_peru_amazon_malaria.md):
 - [Case Study 2: Urban Dengue & Solid Waste - Brazil &
   Favelas](https://josueflorian17.github.io/drones4health-version-control/articles/case2_brazil_urban_dengue.md):
-- [Case Study 3: Transboundary & Wet Pacific - Colombia &
-  Ecuador](https://josueflorian17.github.io/drones4health-version-control/articles/case3_colombia_ecuador_choco.md):
-- [Quickstart: UAV Micro-Environmental Pipeline for Spatial
-  Health](https://josueflorian17.github.io/drones4health-version-control/articles/drones4health-quickstart.md):
-- [Interactive Swipe & Visual
-  Analytics](https://josueflorian17.github.io/drones4health-version-control/articles/interactive-swipe-analytics.md):
+- [Case Study 3: Wet Pacific -
+  Colombia](https://josueflorian17.github.io/drones4health-version-control/articles/case3_colombia_ecuador_choco.md):

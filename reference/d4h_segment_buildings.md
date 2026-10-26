@@ -84,3 +84,30 @@ Blaschke, T. (2010). Object based image analysis for remote sensing.
 
 Kirillov, A., et al. (2023). Segment anything. *arXiv preprint
 arXiv:2304.02643*.
+
+## Examples
+
+``` r
+# \donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  # Define paths to RGB orthomosaic and optional NDVI layer
+  rgb_file  <- system.file("extdata", "ortho_rgb.tif", package = "drones4health")
+  ndvi_file <- system.file("extdata", "ndvi.tif", package = "drones4health")
+
+  # Extract building footprints with optical brightness thresholds and vegetation masking
+  buildings_sf <- d4h_segment_buildings(
+    rgb_raster     = rgb_file,
+    ndvi_raster    = ndvi_file,
+    min_area_m2    = 12.0,
+    max_area_m2    = 600.0,
+    brightness_min = 135.0,
+    ndvi_max       = 0.25,
+    method         = "spectral"
+  )
+  print(buildings_sf)
+}
+# }
+```

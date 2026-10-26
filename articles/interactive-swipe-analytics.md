@@ -13,16 +13,9 @@ vs. Bare Soil, TWI vs. Water, or Orthomosaic vs. IMSR).
 an interactive side-by-side swipe slider powered by Leaflet and Mapview
 swipe mechanics.
 
-### Interactive Slider Demo (Drag to Swipe):
+### Interactive Live Slider Demo (Leaflet & Mapview Swipe):
 
-![Bare Soil Mask Layer](../reference/figures/swipe_layer_bare_soil.png)
-
-    <img src="../man/figures/swipe_layer_ndvi.png" alt="NDVI Layer">
-
-NDVI (Vegetation) Bare Soil (\< 0.15)
-
-*👆 Drag the central circular divider left or right to inspect the
-transition between vegetative cover and bare ground pathways.*
+    <iframe src="../d4h_swipe_viewer.html" width="100%" height="560px" style="border: none; border-radius: 8px;" title="Interactive Leaflet Swipe Map"></iframe>
 
 ------------------------------------------------------------------------
 

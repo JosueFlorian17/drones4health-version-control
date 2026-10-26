@@ -26,3 +26,21 @@ d4h_thermal_to_celsius(thermal_raster, gain = 0.01, offset = -273.15)
 ## Value
 
 A SpatRaster representing temperature in degrees Celsius.
+
+## Examples
+
+``` r
+# \donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  # Path to raw radiometric thermal band
+  therm_file <- system.file("extdata", "thermal_raw.tif", package = "drones4health")
+
+  # Calibrate raw thermal digital numbers to Celsius Land Surface Temperature
+  r_lst <- d4h_thermal_to_celsius(thermal_raster = therm_file, gain = 0.01, offset = -273.15)
+  print(r_lst)
+}
+# }
+```

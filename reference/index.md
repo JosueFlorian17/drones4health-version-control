@@ -39,9 +39,9 @@ Elevation Models (DEM/DSM).
 - [`d4h_twi()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_twi.md)
   : Topographic Wetness Index (TWI)
 
-## Eco-Epidemiological Risk Indices (One Health)
+## Eco-Epidemiological Spatial Indices
 
-Spatial modeling of localized vector-borne disease transmission risks,
+Spatial modeling of localized vector-borne disease transmission factors,
 solid waste micro-accumulation, and hydric breeding suitability.
 
 - [`d4h_imsr()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_imsr.md)
@@ -61,16 +61,18 @@ solid waste micro-accumulation, and hydric breeding suitability.
 - [`d4h_iead()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_iead.md)
   : Clearing Stagnation Index (IEAD)
 
-## Feature Segmentation & Spatial Proximity Risk
+## Feature Segmentation & Spatial Proximity to Water
 
 Automated object segmentation of water bodies and residential building
 footprints from ultra-high resolution RGB imagery, with Euclidean
-distance risk modeling.
+distance to water modeling.
 
 - [`d4h_segment_water()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_segment_water.md)
   : Segment Water Bodies and Surface Moisture Pools
 - [`d4h_segment_buildings()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_segment_buildings.md)
   : Segment House Roofs and Building Footprints
+- [`d4h_distance_to_water()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_distance_to_water.md)
+  : Calculate Distance and Proximity to Water Sources
 - [`d4h_distance_to_risk()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_distance_to_risk.md)
   : Calculate Distance and Vulnerability Risk to Water Sources
 - [`d4h_raster_distance()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_raster_distance.md)
@@ -104,7 +106,7 @@ publication-quality ggplot2 cartography.
 - [`d4h_indicator_buffer()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_indicator_buffer.md)
   : Targeted Focal Indicator Analysis and Plotting around House Buffers
 - [`d4h_plot()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_plot.md)
-  : Cartographic Visualization with ggplot2
+  : Unified Cartographic and Interactive Visualization
 
 ## Executive Reporting & Excel Export
 
@@ -121,8 +123,11 @@ direct multi-sheet Excel (.xlsx) workbook export.
 ## Preprocessing, Calibration & Utilities
 
 Surface reflectance scaling, thermal calibration to Celsius Land Surface
-Temperature, raster cleaning, and batch mosaic workflows.
+Temperature, raster cleaning, and multi-band stack ingestion workflows.
 
+- [`d4h_read_stack()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_read_stack.md)
+  [`d4h_load_stack()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_read_stack.md)
+  : Read and Validate Multi-Band Stack Raster
 - [`d4h_normalize_reflectance()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_normalize_reflectance.md)
   : Normalize Digital Numbers to Surface Reflectance
 - [`d4h_thermal_to_celsius()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_thermal_to_celsius.md)

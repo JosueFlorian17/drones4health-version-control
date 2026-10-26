@@ -25,3 +25,21 @@ d4h_summarize_general(raster_in, exact_boundary = TRUE)
 ## Value
 
 A SpatVector with a single polygon containing the overall mean value(s).
+
+## Examples
+
+``` r
+# \donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  # Load environmental index raster
+  twi_file <- system.file("extdata", "twi.tif", package = "drones4health")
+
+  # Extract overall mean across the flight mosaic footprint
+  gen_summary <- d4h_summarize_general(raster_in = twi_file, exact_boundary = TRUE)
+  print(gen_summary)
+}
+# }
+```

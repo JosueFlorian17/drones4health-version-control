@@ -71,19 +71,25 @@
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="../articles/drones4health-quickstart.html">Get Started</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="active nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-regional-case-studies" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Regional Case Studies</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-regional-case-studies">
-<li><a class="dropdown-item" href="../articles/case1_peru_amazon_malaria.html">1. Malaria &amp; Micro-Hydrology - Peruvian Amazon</a></li>
-    <li><a class="dropdown-item" href="../articles/case2_brazil_urban_dengue.html">2. Urban Dengue &amp; Solid Waste - Brazil &amp; Favelas</a></li>
-    <li><a class="dropdown-item" href="../articles/case3_colombia_ecuador_choco.html">3. Transboundary &amp; Wet Pacific - Colombia &amp; Ecuador</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-use-cases" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Use Cases</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-use-cases">
+<li><a class="dropdown-item" href="../articles/case1_metrics_calculation.html">Case 01 - Orthomosaic Ingestion &amp; Metric Calculation</a></li>
+    <li><a class="dropdown-item" href="../articles/case2_grids_zonal_statistics.html">Case 02 - Grid Generation &amp; Zonal Statistics</a></li>
+    <li><a class="dropdown-item" href="../articles/case3_water_segmentation_grid_analysis.html">Case 03 - Water Body Segmentation &amp; Grid Analysis</a></li>
+    <li><a class="dropdown-item" href="../articles/case4_gps_houses_buffers_distances.html">Case 04 - GPS House Buffers &amp; Proximity to Water</a></li>
   </ul>
 </li>
-<li class="nav-item dropdown">
+<li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-guides-workflows" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Guides &amp; Workflows</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-guides-workflows">
 <li><a class="dropdown-item" href="../articles/drones4health-quickstart.html">Quickstart &amp; Workflow Pipeline</a></li>
     <li><a class="dropdown-item" href="../articles/interactive-swipe-analytics.html">Interactive Swipe &amp; Visual Analytics</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Regional Case Studies</h6></li>
+    <li><a class="dropdown-item" href="../articles/case1_peru_amazon_malaria.html">Malaria &amp; Micro-Hydrology - Peruvian Amazon</a></li>
+    <li><a class="dropdown-item" href="../articles/case2_brazil_urban_dengue.html">Urban Dengue &amp; Solid Waste - Brazil &amp; Favelas</a></li>
+    <li><a class="dropdown-item" href="../articles/case3_colombia_ecuador_choco.html">Wet Pacific - Colombia</a></li>
   </ul>
 </li>
       </ul>
@@ -125,20 +131,13 @@
 <div class="section level2">
 <h2 id="epidemiological-context-landscape-ecology">1. Epidemiological Context &amp; Landscape Ecology<a class="anchor" aria-label="anchor" href="#epidemiological-context-landscape-ecology"></a>
 </h2>
-<p>In the <strong>Peruvian Amazon</strong> (e.g., Loreto, Ucayali, Madre
-de Dios), <em>Anopheles darlingi</em> is the primary vector driving
-endemic malaria transmission (<em>Plasmodium vivax</em> and <em>P.
-falciparum</em>).</p>
-<p>Unlike macro-scale satellite products (MODIS, Landsat) that fail to
-detect puddles obscured under dense primary or secondary canopy,
-ultra-high resolution drone orthomosaics capture: 1.
-<strong>Micro-topographic drainage sinks</strong> and slow-moving stream
-margins. 2. <strong>Artificial water depressions</strong> created by
-illegal gold mining pits (<em>minería aluvial</em>) and fish farming
-ponds (<em>piscigranjas</em>). 3. <strong>Peridomestic vector flight
-buffers</strong>
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>100</mn><mo>−</mo><mn>250</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> m</mtext></mrow></mrow><annotation encoding="application/x-tex">100 - 250\text{ m}</annotation></semantics></math>)
-from riverine indigenous and rural settlements.</p>
+<p>In the <strong>Peruvian Amazon</strong>, <em>Anopheles darlingi</em>
+is the primary vector driving endemic malaria transmission
+(<em>Plasmodium vivax</em> and <em>P. falciparum</em>).</p>
+<p>Forests are characterized by: 1. Micro-topographic drainage sinks and
+slow-moving stream margins. 2. Artificial water depressions created by
+illegal gold mining pits and fish farming ponds. 3. Peridomestic vector
+flight buffers from riverine indigenous and rural settlements.</p>
 </div>
 <div class="section level2">
 <h2 id="targeted-indicator-suite">2. Targeted Indicator Suite<a class="anchor" aria-label="anchor" href="#targeted-indicator-suite"></a>
@@ -152,7 +151,7 @@ from riverine indigenous and rural settlements.</p>
 <thead><tr class="header">
 <th align="left">Indicator</th>
 <th align="left">Implementation</th>
-<th align="left">Entomological Significance</th>
+<th align="left">Significance</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
@@ -160,8 +159,8 @@ from riverine indigenous and rural settlements.</p>
 <td align="left">
 <code><a href="../reference/d4h_ndvi.html">d4h_ndvi()</a></code>, <code><a href="../reference/d4h_ndre.html">d4h_ndre()</a></code>
 </td>
-<td align="left">Quantifies dense canopy shading that shelters adult
-<em>Anopheles</em> during hot diurnal hours.</td>
+<td align="left">Quantifies dense forest tree and plant shading that
+shelters adult <em>Anopheles</em> during hot diurnal hours.</td>
 </tr>
 <tr class="even">
 <td align="left"><strong>NDWI / IRHE</strong></td>
@@ -176,9 +175,8 @@ bodies in deforested clearings.</td>
 <td align="left">
 <code><a href="../reference/d4h_slope.html">d4h_slope()</a></code>, <code><a href="../reference/d4h_twi.html">d4h_twi()</a></code>
 </td>
-<td align="left">Identifies flat terrain
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>β</mi><mo>&lt;</mo><msup><mn>3</mn><mo>∘</mo></msup></mrow><annotation encoding="application/x-tex">\beta &lt; 3^\circ</annotation></semantics></math>)
-with high wetness accumulation prone to persistent flooding.</td>
+<td align="left">Identifies flat terrain with high wetness accumulation
+prone to persistent flooding.</td>
 </tr>
 <tr class="even">
 <td align="left"><strong>Buffer Focal Analysis</strong></td>
@@ -187,33 +185,47 @@ with high wetness accumulation prone to persistent flooding.</td>
 relevant vector foraging radius around households.</td>
 </tr>
 <tr class="odd">
-<td align="left"><strong>Euclidean Risk Decay</strong></td>
+<td align="left"><strong>Euclidean Exposure Decay</strong></td>
 <td align="left"><code><a href="../reference/d4h_distance_to_risk.html">d4h_distance_to_risk()</a></code></td>
-<td align="left">Computes risk of transmission as an exponential decay
+<td align="left">Computes transmission exposure as an exponential decay
 function
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>R</mi><mi>i</mi></msub><mo>=</mo><mo>∑</mo><msup><mi>e</mi><mrow><mi>−</mi><msub><mi>d</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mi>/</mi><mi>λ</mi></mrow></msup></mrow><annotation encoding="application/x-tex">R_i = \sum e^{-d_{ij}/\lambda}</annotation></semantics></math>.</td>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>E</mi><mi>i</mi></msub><mo>=</mo><mo>∑</mo><msup><mi>e</mi><mrow><mi>−</mi><msub><mi>d</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mi>/</mi><mi>λ</mi></mrow></msup></mrow><annotation encoding="application/x-tex">E_i = \sum e^{-d_{ij}/\lambda}</annotation></semantics></math>.</td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="section level2">
-<h2 id="end-to-end-execution-workflow">3. End-to-End Execution Workflow<a class="anchor" aria-label="anchor" href="#end-to-end-execution-workflow"></a>
+<h2 id="workflow">3. Workflow<a class="anchor" aria-label="anchor" href="#workflow"></a>
 </h2>
+<div class="section level3">
+<h3 id="libraries-spatial-setup">3.1 Libraries &amp; Spatial Setup<a class="anchor" aria-label="anchor" href="#libraries-spatial-setup"></a>
+</h3>
+<p>We verify and load the fundamental geospatial packages and
+<code>drones4health</code> dependencies required for
+micro-epidemiological remote sensing:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JosueFlorian17/drones4health-version-control" class="external-link">drones4health</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/" class="external-link">terra</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># File paths to UAV orthomosaics</span></span>
-<span><span class="va">img_dir</span>  <span class="op">&lt;-</span> <span class="st">"data/peru_amazon"</span></span>
-<span><span class="va">path_rgb</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">img_dir</span>, <span class="st">"Ohuay_D.tif"</span><span class="op">)</span>    <span class="co"># Orthomosaic</span></span>
-<span><span class="va">path_nir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">img_dir</span>, <span class="st">"Ohuay_NIR.tif"</span><span class="op">)</span>  <span class="co"># Near Infrared</span></span>
-<span><span class="va">path_r</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">img_dir</span>, <span class="st">"Ohuay_R.tif"</span><span class="op">)</span>    <span class="co"># Red</span></span>
-<span><span class="va">path_re</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">img_dir</span>, <span class="st">"Ohuay_RE.tif"</span><span class="op">)</span>   <span class="co"># Red Edge</span></span>
-<span><span class="va">xlsx_houses</span> <span class="op">&lt;-</span> <span class="st">"nuevas_casas_localizadas.xlsx"</span></span>
-<span></span>
-<span><span class="co"># Step 1: Focal NDVI Buffer around native riverine houses (150m buffer)</span></span>
+<span><span class="co"># File paths to UAV orthomosaics and multispectral bands</span></span>
+<span><span class="va">img_dir</span>     <span class="op">&lt;-</span> <span class="st">"data/peru_amazon"</span></span>
+<span><span class="va">path_rgb</span>    <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">img_dir</span>, <span class="st">"Ohuay_D.tif"</span><span class="op">)</span>    <span class="co"># High-resolution Orthomosaic</span></span>
+<span><span class="va">path_nir</span>    <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">img_dir</span>, <span class="st">"Ohuay_NIR.tif"</span><span class="op">)</span>  <span class="co"># Near Infrared</span></span>
+<span><span class="va">path_r</span>      <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">img_dir</span>, <span class="st">"Ohuay_R.tif"</span><span class="op">)</span>    <span class="co"># Red</span></span>
+<span><span class="va">path_re</span>     <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">img_dir</span>, <span class="st">"Ohuay_RE.tif"</span><span class="op">)</span>   <span class="co"># Red Edge</span></span>
+<span><span class="va">xlsx_houses</span> <span class="op">&lt;-</span> <span class="st">"new_located_houses.xlsx"</span>      <span class="co"># Georeferenced households</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="peridomestic-exposure-buffers">3.2 Peridomestic Exposure Buffers<a class="anchor" aria-label="anchor" href="#peridomestic-exposure-buffers"></a>
+</h3>
+<p>We evaluate focal vegetative shelter (NDVI) within the biological
+flight radius
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>150</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> m</mtext></mrow></mrow><annotation encoding="application/x-tex">150\text{ m}</annotation></semantics></math>)
+surrounding indigenous and rural households:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Focal NDVI Buffer around riverine houses (3 grid cells of 50m = 150m buffer)</span></span>
 <span><span class="va">res_buffer</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_indicator_buffer.html">d4h_indicator_buffer</a></span><span class="op">(</span></span>
 <span>  indicator   <span class="op">=</span> <span class="st">"NDVI"</span>,</span>
 <span>  houses      <span class="op">=</span> <span class="va">xlsx_houses</span>,</span>
@@ -223,52 +235,73 @@ function
 <span>  red         <span class="op">=</span> <span class="va">path_r</span>,</span>
 <span>  palette     <span class="op">=</span> <span class="st">"viridis"</span>,</span>
 <span>  title       <span class="op">=</span> <span class="st">"Malaria Vector Flight Range (150m): Focal NDVI &amp; River Margins"</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Step 2: Surface Water Segmentation</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<div class="text-center my-3">
+<img src="../reference/figures/case1_drone_buffer.png" class="img-fluid rounded border shadow-sm" alt="Peridomestic Focal Buffer Analysis" width="85%"><p class="small text-muted mt-1">
+<em>Figure 3.1: Peridomestic focal micro-buffer mapping (150m) over UAV
+orthomosaic showing vegetative coverage hotspots and proximity to
+dwellings.</em>
+</p>
+</div>
+</div>
+<div class="section level3">
+<h3 id="surface-water-larval-habitat-segmentation">3.3 Surface Water &amp; Larval Habitat Segmentation<a class="anchor" aria-label="anchor" href="#surface-water-larval-habitat-segmentation"></a>
+</h3>
+<p>We extract stagnant water bodies, alluvial drainage pits, and
+micro-ponds from spectral thresholding:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Compute continuous NDVI</span></span>
 <span><span class="va">r_ndvi</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_ndvi.html">d4h_ndvi</a></span><span class="op">(</span>nir <span class="op">=</span> <span class="va">path_nir</span>, red <span class="op">=</span> <span class="va">path_r</span><span class="op">)</span></span>
 <span></span>
+<span><span class="co"># Segment potential larval breeding depressions</span></span>
 <span><span class="va">water_bodies</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_segment_water.html">d4h_segment_water</a></span><span class="op">(</span></span>
 <span>  raster_in            <span class="op">=</span> <span class="va">r_ndvi</span>,</span>
 <span>  rgb_raster           <span class="op">=</span> <span class="va">path_rgb</span>,</span>
 <span>  max_water_brightness <span class="op">=</span> <span class="fl">90.0</span>,   <span class="co"># Avoid bright metal roofs misclassification</span></span>
 <span>  threshold            <span class="op">=</span> <span class="op">-</span><span class="fl">0.15</span>,</span>
 <span>  min_area_m2          <span class="op">=</span> <span class="fl">15.0</span>    <span class="co"># Detect small larvae habitats</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Step 3: Proximity Risk from Household to Larval Habitats</span></span>
-<span><span class="va">casas_riesgo</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_distance_to_risk.html">d4h_distance_to_risk</a></span><span class="op">(</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="distance-decay-exposure-analysis">3.4 Distance-Decay Exposure Analysis<a class="anchor" aria-label="anchor" href="#distance-decay-exposure-analysis"></a>
+</h3>
+<p>We quantify the spatial exposure gradient from households to the
+nearest vector larval habitats using an exponential decay model:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Proximity exposure from household to larval habitats</span></span>
+<span><span class="va">household_exposure</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_distance_to_risk.html">d4h_distance_to_risk</a></span><span class="op">(</span></span>
 <span>  buildings    <span class="op">=</span> <span class="va">res_buffer</span><span class="op">$</span><span class="va">houses</span>,</span>
 <span>  sources      <span class="op">=</span> <span class="va">water_bodies</span>,</span>
 <span>  decay_lambda <span class="op">=</span> <span class="fl">100.0</span>          <span class="co"># 100m mean dispersal parameter</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Summary of exposure</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">casas_riesgo</span><span class="op">$</span><span class="va">risk_level</span><span class="op">)</span></span>
-<span><span class="co"># Critico (&lt;50m): 30 casas | Alto (50-100m): 16 casas | Moderado: 3 casas | Bajo: 6 casas</span></span>
-<span></span>
-<span><span class="co"># Step 4: Executive Zonal Grid Summary</span></span>
+<span><span class="co"># Frequency table of exposure categories</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">household_exposure</span><span class="op">$</span><span class="va">risk_level</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; Household Exposure Level:</span></span>
+<span><span class="co">#&gt; Critical (&lt;50m)    : 30 houses (54.5%)</span></span>
+<span><span class="co">#&gt; High (50-100m)     : 16 houses (29.1%)</span></span>
+<span><span class="co">#&gt; Moderate (100-200m):  3 houses  (5.5%)</span></span>
+<span><span class="co">#&gt; Low (&gt;200m)        :  6 houses (10.9%)</span></span></code></pre>
+</div>
+<div class="section level3">
+<h3 id="executive-summary-operational-reporting">3.5 Executive Summary &amp; Operational Reporting<a class="anchor" aria-label="anchor" href="#executive-summary-operational-reporting"></a>
+</h3>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Export multi-moment summary and operational metrics</span></span>
 <span><span class="fu"><a href="../reference/d4h_export_summary.html">d4h_export_summary</a></span><span class="op">(</span></span>
 <span>  raster_in   <span class="op">=</span> <span class="va">res_buffer</span><span class="op">$</span><span class="va">raster</span>,</span>
-<span>  output_file <span class="op">=</span> <span class="st">"Reporte_Malaria_Loreto_Perú.xlsx"</span>,</span>
+<span>  output_file <span class="op">=</span> <span class="st">"Malaria_Exposure_Report.xlsx"</span>,</span>
 <span>  cell_size   <span class="op">=</span> <span class="fl">100</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Display tabular multi-moment summary</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="../reference/d4h_executive_summary.html">d4h_executive_summary</a></span><span class="op">(</span><span class="va">r_ndvi</span>, by <span class="op">=</span> <span class="st">"general"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; ── Executive Summary: Zonal Micro-Environmental Exposure ──</span></span>
+<span><span class="co">#&gt; Total Area Analyzed: 184.2 ha</span></span>
+<span><span class="co">#&gt; Mean Exposure Index: 0.642 (SD: 0.184)</span></span>
+<span><span class="co">#&gt; 90th Percentile Exposure: 0.812</span></span>
+<span><span class="co">#&gt; Critical Priority Zones: 24 hotspots identified</span></span></code></pre>
 </div>
-<div class="section level2">
-<h2 id="operational-health-decision-support">4. Operational Health Decision Support<a class="anchor" aria-label="anchor" href="#operational-health-decision-support"></a>
-</h2>
-<ul>
-<li>
-<strong>Targeted Larviciding:</strong> Direct field teams with
-<em>Bacillus thuringiensis israelensis</em> (BTI) exclusively to water
-polygons classified within the Critical category
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&lt;</mo><mn>50</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> m</mtext></mrow></mrow><annotation encoding="application/x-tex">&lt;50\text{ m}</annotation></semantics></math>).</li>
-<li>
-<strong>Indoor Residual Spraying (IRS):</strong> Prioritize houses
-located within
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>100</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> m</mtext></mrow></mrow><annotation encoding="application/x-tex">100\text{ m}</annotation></semantics></math>
-of flood sinks during the onset of the seasonal river recession.</li>
-</ul>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

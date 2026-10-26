@@ -58,3 +58,35 @@ d4h_process_mosaic(
 
 A list containing the SpatRaster stack of indicators and the SpatVector
 grid summary.
+
+## Examples
+
+``` r
+# \donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  # Define paths to multispectral drone bands
+  nir_path   <- system.file("extdata", "nir.tif", package = "drones4health")
+  red_path   <- system.file("extdata", "red.tif", package = "drones4health")
+  green_path <- system.file("extdata", "green.tif", package = "drones4health")
+  dem_path   <- system.file("extdata", "dem.tif", package = "drones4health")
+
+  # Execute full automated processing pipeline with output exports
+  results <- d4h_process_mosaic(
+    nir       = nir_path,
+    red       = red_path,
+    green     = green_path,
+    dem       = dem_path,
+    cell_size = 50,
+    square    = FALSE,
+    out_tif   = tempfile(fileext = ".tif"),
+    out_csv   = tempfile(fileext = ".csv")
+  )
+  # Inspect stacked indicators and hexagonal summary grid
+  print(results$indicators)
+  head(results$grid)
+}
+# }
+```

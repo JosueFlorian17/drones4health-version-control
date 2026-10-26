@@ -52,15 +52,21 @@
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/drones4health-quickstart.html">Get Started</a></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-regional-case-studies" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Regional Case Studies</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-regional-case-studies"><li><a class="dropdown-item" href="../articles/case1_peru_amazon_malaria.html">1. Malaria &amp; Micro-Hydrology - Peruvian Amazon</a></li>
-    <li><a class="dropdown-item" href="../articles/case2_brazil_urban_dengue.html">2. Urban Dengue &amp; Solid Waste - Brazil &amp; Favelas</a></li>
-    <li><a class="dropdown-item" href="../articles/case3_colombia_ecuador_choco.html">3. Transboundary &amp; Wet Pacific - Colombia &amp; Ecuador</a></li>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-use-cases" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Use Cases</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-use-cases"><li><a class="dropdown-item" href="../articles/case1_metrics_calculation.html">Case 01 - Orthomosaic Ingestion &amp; Metric Calculation</a></li>
+    <li><a class="dropdown-item" href="../articles/case2_grids_zonal_statistics.html">Case 02 - Grid Generation &amp; Zonal Statistics</a></li>
+    <li><a class="dropdown-item" href="../articles/case3_water_segmentation_grid_analysis.html">Case 03 - Water Body Segmentation &amp; Grid Analysis</a></li>
+    <li><a class="dropdown-item" href="../articles/case4_gps_houses_buffers_distances.html">Case 04 - GPS House Buffers &amp; Proximity to Water</a></li>
   </ul></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-guides-workflows" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Guides &amp; Workflows</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-guides-workflows"><li><a class="dropdown-item" href="../articles/drones4health-quickstart.html">Quickstart &amp; Workflow Pipeline</a></li>
     <li><a class="dropdown-item" href="../articles/interactive-swipe-analytics.html">Interactive Swipe &amp; Visual Analytics</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Regional Case Studies</h6></li>
+    <li><a class="dropdown-item" href="../articles/case1_peru_amazon_malaria.html">Malaria &amp; Micro-Hydrology - Peruvian Amazon</a></li>
+    <li><a class="dropdown-item" href="../articles/case2_brazil_urban_dengue.html">Urban Dengue &amp; Solid Waste - Brazil &amp; Favelas</a></li>
+    <li><a class="dropdown-item" href="../articles/case3_colombia_ecuador_choco.html">Wet Pacific - Colombia</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -110,6 +116,23 @@
     <p>A SpatVector with a single polygon containing the overall mean value(s).</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JosueFlorian17/drones4health-version-control" class="external-link">drones4health</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/" class="external-link">terra</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># Load environmental index raster</span></span></span>
+<span class="r-in"><span>  <span class="va">twi_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"twi.tif"</span>, package <span class="op">=</span> <span class="st">"drones4health"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># Extract overall mean across the flight mosaic footprint</span></span></span>
+<span class="r-in"><span>  <span class="va">gen_summary</span> <span class="op">&lt;-</span> <span class="fu">d4h_summarize_general</span><span class="op">(</span>raster_in <span class="op">=</span> <span class="va">twi_file</span>, exact_boundary <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">gen_summary</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

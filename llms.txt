@@ -2,11 +2,10 @@
 
 **`drones4health`** is an R package designed to extract, analyze, and
 synthesize ultra-high resolution (centimeter-level) remote sensing
-indicators from Unmanned Aerial Vehicle (UAV) orthomosaics within a
-**One Health** framework. It bridges micro-environmental landscape
-ecology with spatial epidemiology for precision vector control,
-environmental health surveillance, and localized pathogen transmission
-risk modeling.
+indicators from Unmanned Aerial Vehicle (UAV) orthomosaics for spatial
+epidemiology. It bridges micro-environmental landscape ecology with
+spatial epidemiology for precision vector control, environmental health
+surveillance, and localized pathogen transmission risk modeling.
 
 ------------------------------------------------------------------------
 
@@ -38,7 +37,7 @@ library(sf)
 
 ------------------------------------------------------------------------
 
-## 2. Core Functional Modules & Use Cases
+## 2. Core Functional Modules
 
 `drones4health` provides 7 modular indicator suites tailored for spatial
 epidemiology and field operations:
@@ -288,9 +287,9 @@ Elevation Models (DEM/DSM).
 - [`d4h_twi()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_twi.md)
   : Topographic Wetness Index (TWI)
 
-## Eco-Epidemiological Risk Indices (One Health)
+## Eco-Epidemiological Spatial Indices
 
-Spatial modeling of localized vector-borne disease transmission risks,
+Spatial modeling of localized vector-borne disease transmission factors,
 solid waste micro-accumulation, and hydric breeding suitability.
 
 - [`d4h_imsr()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_imsr.md)
@@ -310,16 +309,18 @@ solid waste micro-accumulation, and hydric breeding suitability.
 - [`d4h_iead()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_iead.md)
   : Clearing Stagnation Index (IEAD)
 
-## Feature Segmentation & Spatial Proximity Risk
+## Feature Segmentation & Spatial Proximity to Water
 
 Automated object segmentation of water bodies and residential building
 footprints from ultra-high resolution RGB imagery, with Euclidean
-distance risk modeling.
+distance to water modeling.
 
 - [`d4h_segment_water()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_segment_water.md)
   : Segment Water Bodies and Surface Moisture Pools
 - [`d4h_segment_buildings()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_segment_buildings.md)
   : Segment House Roofs and Building Footprints
+- [`d4h_distance_to_water()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_distance_to_water.md)
+  : Calculate Distance and Proximity to Water Sources
 - [`d4h_distance_to_risk()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_distance_to_risk.md)
   : Calculate Distance and Vulnerability Risk to Water Sources
 - [`d4h_raster_distance()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_raster_distance.md)
@@ -353,7 +354,7 @@ publication-quality ggplot2 cartography.
 - [`d4h_indicator_buffer()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_indicator_buffer.md)
   : Targeted Focal Indicator Analysis and Plotting around House Buffers
 - [`d4h_plot()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_plot.md)
-  : Cartographic Visualization with ggplot2
+  : Unified Cartographic and Interactive Visualization
 
 ## Executive Reporting & Excel Export
 
@@ -370,8 +371,11 @@ direct multi-sheet Excel (.xlsx) workbook export.
 ## Preprocessing, Calibration & Utilities
 
 Surface reflectance scaling, thermal calibration to Celsius Land Surface
-Temperature, raster cleaning, and batch mosaic workflows.
+Temperature, raster cleaning, and multi-band stack ingestion workflows.
 
+- [`d4h_read_stack()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_read_stack.md)
+  [`d4h_load_stack()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_read_stack.md)
+  : Read and Validate Multi-Band Stack Raster
 - [`d4h_normalize_reflectance()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_normalize_reflectance.md)
   : Normalize Digital Numbers to Surface Reflectance
 - [`d4h_thermal_to_celsius()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_thermal_to_celsius.md)
@@ -385,15 +389,37 @@ Temperature, raster cleaning, and batch mosaic workflows.
 
 # Articles
 
-### All vignettes
+### Core Use Cases
+
+Operational end-to-end workflows for ultra-high resolution drone
+analytics in vector surveillance and environmental health.
+
+- [Case 01 - Orthomosaic Ingestion & Metric
+  Calculation](https://josueflorian17.github.io/drones4health-version-control/articles/case1_metrics_calculation.md):
+- [Case 02 - Grid Generation & Zonal
+  Statistics](https://josueflorian17.github.io/drones4health-version-control/articles/case2_grids_zonal_statistics.md):
+- [Case 03 - Water Body Segmentation & Grid
+  Analysis](https://josueflorian17.github.io/drones4health-version-control/articles/case3_water_segmentation_grid_analysis.md):
+- [Case 04 - GPS House Buffers & Proximity to
+  Water](https://josueflorian17.github.io/drones4health-version-control/articles/case4_gps_houses_buffers_distances.md):
+
+### Operational Guides & Interactive Analytics
+
+Quickstart guides and interactive swipe comparison viewers.
+
+- [Quickstart: UAV Micro-Environmental Pipeline for Spatial
+  Health](https://josueflorian17.github.io/drones4health-version-control/articles/drones4health-quickstart.md):
+- [Interactive Swipe & Visual
+  Analytics](https://josueflorian17.github.io/drones4health-version-control/articles/interactive-swipe-analytics.md):
+
+### Regional Case Studies
+
+Contextualized field studies across diverse Latin American transmission
+ecosystems.
 
 - [Case Study 1: Malaria & Micro-Hydrology - Peruvian
   Amazon](https://josueflorian17.github.io/drones4health-version-control/articles/case1_peru_amazon_malaria.md):
 - [Case Study 2: Urban Dengue & Solid Waste - Brazil &
   Favelas](https://josueflorian17.github.io/drones4health-version-control/articles/case2_brazil_urban_dengue.md):
-- [Case Study 3: Transboundary & Wet Pacific - Colombia &
-  Ecuador](https://josueflorian17.github.io/drones4health-version-control/articles/case3_colombia_ecuador_choco.md):
-- [Quickstart: UAV Micro-Environmental Pipeline for Spatial
-  Health](https://josueflorian17.github.io/drones4health-version-control/articles/drones4health-quickstart.md):
-- [Interactive Swipe & Visual
-  Analytics](https://josueflorian17.github.io/drones4health-version-control/articles/interactive-swipe-analytics.md):
+- [Case Study 3: Wet Pacific -
+  Colombia](https://josueflorian17.github.io/drones4health-version-control/articles/case3_colombia_ecuador_choco.md):

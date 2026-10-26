@@ -2,11 +2,10 @@
 
 **`drones4health`** is an R package designed to extract, analyze, and
 synthesize ultra-high resolution (centimeter-level) remote sensing
-indicators from Unmanned Aerial Vehicle (UAV) orthomosaics within a
-**One Health** framework. It bridges micro-environmental landscape
-ecology with spatial epidemiology for precision vector control,
-environmental health surveillance, and localized pathogen transmission
-risk modeling.
+indicators from Unmanned Aerial Vehicle (UAV) orthomosaics for spatial
+epidemiology. It bridges micro-environmental landscape ecology with
+spatial epidemiology for precision vector control, environmental health
+surveillance, and localized pathogen transmission risk modeling.
 
 ------------------------------------------------------------------------
 
@@ -38,7 +37,7 @@ library(sf)
 
 ------------------------------------------------------------------------
 
-## 2. Core Functional Modules & Use Cases
+## 2. Core Functional Modules
 
 `drones4health` provides 7 modular indicator suites tailored for spatial
 epidemiology and field operations:
