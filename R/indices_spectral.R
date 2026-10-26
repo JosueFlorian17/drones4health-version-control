@@ -231,8 +231,16 @@ d4h_vari <- function(green, red, blue, eps = 0.001) {
 #'   red_file   <- system.file("extdata", "red.tif", package = "drones4health")
 #'   blue_file  <- system.file("extdata", "blue.tif", package = "drones4health")
 #'
-#'   # Run EVI calculation
-#'   r_evi <- d4h_evi(nir = nir_file, red = red_file, blue = blue_file)
+#'   # Run EVI calculation with atmospheric resistance coefficients
+#'   r_evi <- d4h_evi(
+#'     nir       = nir_file,
+#'     red       = red_file,
+#'     blue      = blue_file,
+#'     g_factor  = 2.5,
+#'     c1        = 6.0,
+#'     c2        = 7.5,
+#'     l_factor  = 1.0
+#'   )
 #'   head(r_evi)
 #' }
 #' }

@@ -73,6 +73,20 @@ NULL
 #' @param raster_layer SpatRaster or character. Input band or path to file.
 #' @param scale_factor Numeric. Divisor to scale the raster (default: 65535).
 #' @return A SpatRaster clamped between 0 and 1 with zeros masked as NA.
+#' @examples
+#' \donttest{
+#' if (interactive()) {
+#'   library(drones4health)
+#'   library(terra)
+#'
+#'   # Path to raw 16-bit digital number raster band
+#'   raw_nir <- system.file("extdata", "nir_raw16.tif", package = "drones4health")
+#'
+#'   # Normalize pixel values to 0-1 reflectance scale
+#'   r_norm <- d4h_normalize_reflectance(raster_layer = raw_nir, scale_factor = 65535)
+#'   print(r_norm)
+#' }
+#' }
 #' @export
 d4h_normalize_reflectance <- function(raster_layer, scale_factor = 65535) {
   r <- .ensure_raster(raster_layer, mask_zeros = TRUE)
@@ -88,6 +102,20 @@ d4h_normalize_reflectance <- function(raster_layer, scale_factor = 65535) {
 #' @param gain Numeric. Calibration gain multiplier (default: 0.01).
 #' @param offset Numeric. Calibration offset value (default: -273.15).
 #' @return A SpatRaster representing temperature in degrees Celsius.
+#' @examples
+#' \donttest{
+#' if (interactive()) {
+#'   library(drones4health)
+#'   library(terra)
+#'
+#'   # Path to raw radiometric thermal band
+#'   therm_file <- system.file("extdata", "thermal_raw.tif", package = "drones4health")
+#'
+#'   # Calibrate raw thermal digital numbers to Celsius Land Surface Temperature
+#'   r_lst <- d4h_thermal_to_celsius(thermal_raster = therm_file, gain = 0.01, offset = -273.15)
+#'   print(r_lst)
+#' }
+#' }
 #' @export
 d4h_thermal_to_celsius <- function(thermal_raster, gain = 0.01, offset = -273.15) {
   r <- .ensure_raster(thermal_raster, mask_zeros = FALSE)
@@ -104,6 +132,20 @@ d4h_thermal_to_celsius <- function(thermal_raster, gain = 0.01, offset = -273.15
 #' @param min_val Numeric. Minimum valid value (default: -1).
 #' @param max_val Numeric. Maximum valid value (default: 1).
 #' @return A cleaned SpatRaster.
+#' @examples
+#' \donttest{
+#' if (interactive()) {
+#'   library(drones4health)
+#'   library(terra)
+#'
+#'   # Path to uncleaned index raster
+#'   idx_file <- system.file("extdata", "ndvi.tif", package = "drones4health")
+#'
+#'   # Clean invalid artefacts and clamp to valid range [-1, 1]
+#'   r_clean <- d4h_clean_band(raster_layer = idx_file, min_val = -1, max_val = 1)
+#'   print(r_clean)
+#' }
+#' }
 #' @export
 d4h_clean_band <- function(raster_layer, min_val = -1, max_val = 1) {
   r <- .ensure_raster(raster_layer, mask_zeros = FALSE)

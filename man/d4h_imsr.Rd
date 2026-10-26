@@ -39,8 +39,14 @@ if (interactive()) {
   red_file <- system.file("extdata", "red.tif", package = "drones4health")
   nir_file <- system.file("extdata", "nir.tif", package = "drones4health")
 
-  # Run IMSR calculation for solid waste / plastics
-  r_imsr <- d4h_imsr(red_edge = re_file, red = red_file, nir = nir_file)
+  # Run IMSR calculation for solid waste / plastics with explicit thresholds
+  r_imsr <- d4h_imsr(
+    red_edge      = re_file,
+    red           = red_file,
+    nir           = nir_file,
+    veg_threshold = 0.2,
+    eps           = 0.001
+  )
   head(r_imsr)
 }
 }

@@ -36,3 +36,20 @@ stagnation.
 
 Burrough, P. A., & McDonnell, R. A. (1998). *Principles of Geographical
 Information Systems*. Oxford University Press.
+
+## Examples
+
+``` r
+# \donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  dem_file <- system.file("extdata", "dem.tif", package = "drones4health")
+
+  # Run Slope calculation in degrees
+  r_slope <- d4h_slope(dem_raster = dem_file, unit = "degrees")
+  head(r_slope)
+}
+# }
+```

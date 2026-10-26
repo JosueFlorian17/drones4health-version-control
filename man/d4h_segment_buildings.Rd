@@ -43,6 +43,30 @@ Buildings are extracted by combining high surface brightness / spectral contrast
 \deqn{\text{BuildingCandidate} = \begin{cases} 1 & \text{if } \text{RGB}_{\text{mean}} \ge \theta_{\text{bright}} \text{ and } \text{NDVI} < \theta_{\text{ndvi}} \\ 0 & \text{otherwise} \end{cases}}
 Vectorized candidates are filtered by residential building footprints (\eqn{10\text{ m}^2 \le \text{Area} \le 500\text{ m}^2}).
 }
+\examples{
+\donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  # Define paths to RGB orthomosaic and optional NDVI layer
+  rgb_file  <- system.file("extdata", "ortho_rgb.tif", package = "drones4health")
+  ndvi_file <- system.file("extdata", "ndvi.tif", package = "drones4health")
+
+  # Extract building footprints with optical brightness thresholds and vegetation masking
+  buildings_sf <- d4h_segment_buildings(
+    rgb_raster     = rgb_file,
+    ndvi_raster    = ndvi_file,
+    min_area_m2    = 12.0,
+    max_area_m2    = 600.0,
+    brightness_min = 135.0,
+    ndvi_max       = 0.25,
+    method         = "spectral"
+  )
+  print(buildings_sf)
+}
+}
+}
 \references{
 Blaschke, T. (2010). Object based image analysis for remote sensing. \emph{ISPRS Journal of Photogrammetry and Remote Sensing}, 65(1), 2-16. \doi{10.1016/j.isprsjprs.2009.06.004}
 

@@ -2,10 +2,12 @@
 % Please edit documentation in R/plot_d4h.R
 \name{d4h_plot}
 \alias{d4h_plot}
-\title{Cartographic Visualization with ggplot2}
+\title{Unified Cartographic and Interactive Visualization}
 \usage{
 d4h_plot(
   x,
+  y = NULL,
+  interactive = FALSE,
   grid = NULL,
   houses = NULL,
   houses_filter_extent = FALSE,
@@ -13,19 +15,27 @@ d4h_plot(
   house_size = 2,
   rgb_bands = NULL,
   palette = "viridis",
+  palette_y = "magma",
   limits = NULL,
+  limits_y = NULL,
   title = NULL,
-  max_pixels = 5e+05
+  max_pixels = 5e+05,
+  zcol = NULL,
+  ortho = NULL
 )
 }
 \arguments{
-\item{x}{SpatRaster, SpatVector, sf, or character path to plot.}
+\item{x}{SpatRaster, SpatVector, sf, summary data.frame, or character file path to plot (or left layer in comparative mode).}
+
+\item{y}{Optional SpatRaster, SpatVector, sf, or character path. Right layer for comparative visualization (e.g., comparing NDVI vs NDWI, or Pre vs Post intervention).}
+
+\item{interactive}{Logical. If \code{FALSE} (default), outputs a static \code{ggplot2} plot (or dual-panel comparison if \code{y} is provided). If \code{TRUE}, outputs an interactive swipe slider (when \code{y} is provided) or interactive \code{mapview} web map (when single layer).}
 
 \item{grid}{Optional SpatVector, sf, or character path to overlay grid boundaries.}
 
-\item{houses}{Optional sf, data.frame, SpatVector, or character path to CSV containing house coordinates. Automatically plotted as red points (or customizable color/size).}
+\item{houses}{Optional sf, data.frame, SpatVector, or character path to CSV/Excel containing house coordinates. Automatically plotted as points.}
 
-\item{houses_filter_extent}{Logical. If TRUE, filters houses to only those intersecting the raster extent / footprint. If FALSE (default), shows all houses including surrounding ones.}
+\item{houses_filter_extent}{Logical. If TRUE, filters houses to only those intersecting the raster extent / footprint. If FALSE (default), retains all houses.}
 
 \item{house_color}{Character. Color for house points (default: "red").}
 
@@ -33,11 +43,53 @@ d4h_plot(
 
 \item{rgb_bands}{Numeric vector of length 3 (e.g. c(1, 2, 3)). If x is a multi-band raster and rgb_bands is specified, renders in true/false RGB.}
 
-\item{palette}{Character. Color palette name ("viridis", "magma", "terrain") or custom color vector (default: "viridis").}
+\item{palette}{Character. Color palette name ("viridis", "magma", "terrain", "spectral") or custom color vector (default: "viridis"). For dual comparison, specifies palette for layer x.}
+
+\item{palette_y}{Character. Color palette for layer y in dual comparative mode (default: "magma").}
+
+\item{limits}{Numeric vector c(min, max) to fix color scale limits for layer x.}
+
+\item{limits_y}{Numeric vector c(min, max) to fix color scale limits for layer y.}
+
+\item{title}{Character. Custom plot title.}
+
+\item{max_pixels}{Numeric. Maximum number of pixels to render before spatial aggregation (default: 500000).}
+
+\item{zcol}{Character. Optional column name to color/fill spatial vector features (e.g., \code{"proximity_level"}, \code{"risk_level"}, or \code{"dist_water_m"}).}
+
+\item{ortho}{SpatRaster or character path. Optional high-resolution RGB orthomosaic to render as an underlay base layer beneath grids, vectors, or point features.}
 }
 \value{
-A ggplot object.
+A \code{ggplot} object (if \code{interactive = FALSE}) or an interactive \code{mapview} / \code{leaflet} slider widget (if \code{interactive = TRUE}).
 }
 \description{
-Plots continuous raster layers or zonal grids using aggregation and geom_raster.
+Unified visualization function for drone rasters, grids, vector features, and comparative dual-layer analysis.
+When comparing two layers (\code{x} and \code{y}):
+\itemize{
+\item If \code{interactive = TRUE}, renders an interactive side-by-side swipe slider widget (powered by \code{mapview} and \code{leaflet.extras2}).
+\item If \code{interactive = FALSE} (default), outputs a publication-ready static comparative panel via \code{ggplot2} and \code{cowplot}.
+}
+For a single layer: \code{interactive = TRUE} produces an interactive \code{mapview} web map, while \code{interactive = FALSE} produces a static \code{ggplot2} map.
+}
+\examples{
+\donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  ndvi_file <- system.file("extdata", "ndvi.tif", package = "drones4health")
+  ndre_file <- system.file("extdata", "ndre.tif", package = "drones4health")
+
+  # 1. Comparative dual-indicator: interactive mapview swipe slider
+  d4h_plot(x = ndvi_file, y = ndre_file, interactive = TRUE)
+
+  # 2. Comparative dual-indicator: static publication panel
+  p_dual <- d4h_plot(x = ndvi_file, y = ndre_file, interactive = FALSE)
+  print(p_dual)
+
+  # 3. Single indicator: static map
+  p_single <- d4h_plot(x = ndvi_file, interactive = FALSE)
+  print(p_single)
+}
+}
 }

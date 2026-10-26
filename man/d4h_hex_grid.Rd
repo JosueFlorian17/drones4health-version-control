@@ -4,12 +4,14 @@
 \alias{d4h_hex_grid}
 \title{Generate Hexagonal Surveillance Grid}
 \usage{
-d4h_hex_grid(aoi, cell_size = 50)
+d4h_hex_grid(aoi, cell_size = 50, clip_to_footprint = TRUE)
 }
 \arguments{
-\item{aoi}{SpatRaster, SpatVector, sf, or character path defining the spatial bounds.}
+\item{aoi}{SpatRaster, SpatVector, sf, or character path defining the spatial bounds or mosaic.}
 
 \item{cell_size}{Numeric. Hexagon diameter in meters (default: 50).}
+
+\item{clip_to_footprint}{Logical. If TRUE (default), restricts grid cells strictly to the valid non-NA flight footprint of the input raster or polygon boundaries.}
 }
 \value{
 A SpatVector containing the hexagonal grid polygons with unique IDs.
@@ -21,6 +23,23 @@ Creates an operative hexagonal surveillance grid with unique alphanumeric identi
 Hexagonal spatial partitions minimize perimeter-to-area ratio and provide equidistant neighborhood connectivity:
 \deqn{A_{\text{hex}} = \frac{3\sqrt{3}}{2} r^2}
 Ideal for vector control teams, larviciding deployments, and spatial health sampling.
+By default, cells are clipped strictly to the valid non-NA flight footprint of the raster or polygon boundaries (\code{clip_to_footprint = TRUE})
+to prevent artificial bounding-box grid padding outside the surveyed area.
+}
+\examples{
+\donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  # Define Area of Interest raster
+  aoi_file <- system.file("extdata", "ortho_rgb.tif", package = "drones4health")
+
+  # Create hexagonal grid cells with 50-meter diameter clipped to flight footprint
+  hex_grid <- d4h_hex_grid(aoi = aoi_file, cell_size = 50, clip_to_footprint = TRUE)
+  plot(hex_grid)
+}
+}
 }
 \references{
 Carr, D. B., Olsen, A. R., & White, D. (1992). Hexagon mosaic maps for display of univariate and bivariate data. \emph{Cartography and Geographic Information Systems}, 19(4), 228-236. \doi{10.1559/152304092783721231}

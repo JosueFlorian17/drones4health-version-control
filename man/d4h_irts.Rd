@@ -42,9 +42,14 @@ if (interactive()) {
   r_lst_local <- terra::rast(lst_file)
   r_lst_surr  <- terra::focal(r_lst_local, w = 9, fun = "mean", na.rm = TRUE)
 
-  # Run IRTS thermal refuge calculation
-  r_irts <- d4h_irts(ndre = ndre_file, lst_local = r_lst_local,
-                     lst_surrounding = r_lst_surr, nir = nir_file)
+  # Run IRTS thermal refuge calculation with stabilization parameter
+  r_irts <- d4h_irts(
+    ndre            = ndre_file,
+    lst_local       = r_lst_local,
+    lst_surrounding = r_lst_surr,
+    nir             = nir_file,
+    eps             = 0.001
+  )
   head(r_irts)
 }
 }

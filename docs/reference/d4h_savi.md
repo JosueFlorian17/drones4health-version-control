@@ -40,3 +40,21 @@ set to \\L = 0.5\\ for intermediate vegetation densities.
 Huete, A. R. (1988). A soil-adjusted vegetation index (SAVI). *Remote
 Sensing of Environment*, 25(3), 295-309.
 [doi:10.1016/0034-4257(88)90106-X](https://doi.org/10.1016/0034-4257%2888%2990106-X)
+
+## Examples
+
+``` r
+# \donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  nir_file <- system.file("extdata", "nir.tif", package = "drones4health")
+  red_file <- system.file("extdata", "red.tif", package = "drones4health")
+
+  # Run SAVI calculation with soil adjustment factor L = 0.5
+  r_savi <- d4h_savi(nir = nir_file, red = red_file, l_factor = 0.5)
+  head(r_savi)
+}
+# }
+```

@@ -24,3 +24,23 @@ A tibble data frame containing summary statistics per layer.
 \description{
 Calculates descriptive statistics (mean, standard deviation, min, max, and quantiles) across the entire extent of one or multiple SpatRaster indicator layers.
 }
+\examples{
+\donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  # Load multi-band or single-band index raster
+  ndvi_file <- system.file("extdata", "ndvi.tif", package = "drones4health")
+
+  # Calculate global summary statistics and quantiles
+  global_stats <- d4h_summarize_global(
+    raster_in = ndvi_file,
+    na.rm = TRUE,
+    quantiles = TRUE,
+    digits = 3
+  )
+  print(global_stats)
+}
+}
+}

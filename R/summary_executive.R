@@ -16,6 +16,38 @@
 #' @return An object of class \code{d4h_executive_summary} (for \code{by = "general"}) or \code{d4h_grid_summary} / \code{data.frame} (for \code{by = "grid"}) containing structured metrics, spatial coverage metadata, outlier diagnostics, and thematic stratum distributions.
 #' @references
 #' Tukey, J. W. (1977). \emph{Exploratory Data Analysis}. Addison-Wesley.
+#' @examples
+#' \donttest{
+#' if (interactive()) {
+#'   library(drones4health)
+#'   library(terra)
+#'
+#'   # Load raster indicator
+#'   ndvi_file <- system.file("extdata", "ndvi.tif", package = "drones4health")
+#'
+#'   # 1. Generate general executive report with outlier diagnostics
+#'   exec_rep <- d4h_executive_summary(
+#'     raster_in   = ndvi_file,
+#'     by          = "general",
+#'     out_xlsx    = tempfile(fileext = ".xlsx"),
+#'     sample_size = 1000000,
+#'     digits      = 3
+#'   )
+#'   print(exec_rep)
+#'
+#'   # 2. Generate zonal grid executive summary per hexagonal cell
+#'   exec_grid <- d4h_executive_summary(
+#'     raster_in   = ndvi_file,
+#'     by          = "grid",
+#'     cell_size   = 50,
+#'     square      = FALSE,
+#'     out_xlsx    = tempfile(fileext = ".xlsx"),
+#'     sample_size = 1000000,
+#'     digits      = 3
+#'   )
+#'   head(exec_grid)
+#' }
+#' }
 #' @export
 d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = NULL, cell_size = 50, square = TRUE, out_xlsx = NULL, sample_size = 1000000, digits = 3) {
   by <- match.arg(by)
@@ -245,11 +277,11 @@ d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = N
     outliers_pct <- (outliers_total / n_valid) * 100
 
     outlier_status <- if (outliers_pct < 1) {
-      "Distribucion homogenea (valores extremos < 1%)"
+      "Homogeneous distribution (extreme values < 1%)"
     } else if (outliers_pct < 5) {
-      "Variabilidad moderada (puntos atipicos localizados)"
+      "Moderate dispersion (localized spatial anomalies)"
     } else {
-      "Alta dispersion / presencia significativa de anomalias o bordes"
+      "High dispersion / significant anomaly presence or boundary effects"
     }
 
     # 4. Estratificacion tematica contextualizada por tipo de indice
@@ -257,30 +289,30 @@ d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = N
     strata <- list()
 
     if (grepl("NDVI|SAVI|GNDVI|NDRE|EVI|DVI", var_upper)) {
-      strata[["Agua / Suelo muy degradado (< 0.0)"]] <- list(pct = mean(vals < 0) * 100, ha = (mean(vals < 0) * area_ha))
-      strata[["Suelo desnudo / Escasa vegetacion [0.0, 0.2)"]] <- list(pct = mean(vals >= 0 & vals < 0.2) * 100, ha = (mean(vals >= 0 & vals < 0.2) * area_ha))
-      strata[["Vegetacion moderada / Transicion [0.2, 0.5)"]] <- list(pct = mean(vals >= 0.2 & vals < 0.5) * 100, ha = (mean(vals >= 0.2 & vals < 0.5) * area_ha))
-      strata[["Vegetacion densa / Alto vigor [>= 0.5)"]] <- list(pct = mean(vals >= 0.5) * 100, ha = (mean(vals >= 0.5) * area_ha))
+      strata[["Water / Substrate degradation (< 0.0)"]] <- list(pct = mean(vals < 0) * 100, ha = (mean(vals < 0) * area_ha))
+      strata[["Bare soil / Sparse canopy [0.0, 0.2)"]] <- list(pct = mean(vals >= 0 & vals < 0.2) * 100, ha = (mean(vals >= 0 & vals < 0.2) * area_ha))
+      strata[["Moderate vegetation / Transition [0.2, 0.5)"]] <- list(pct = mean(vals >= 0.2 & vals < 0.5) * 100, ha = (mean(vals >= 0.2 & vals < 0.5) * area_ha))
+      strata[["Dense vegetation / High vigor [>= 0.5)"]] <- list(pct = mean(vals >= 0.5) * 100, ha = (mean(vals >= 0.5) * area_ha))
     } else if (grepl("NDWI|IRHE", var_upper)) {
-      strata[["Cuerpos de agua / Suelo saturado (> 0.0)"]] <- list(pct = mean(vals > 0) * 100, ha = (mean(vals > 0) * area_ha))
-      strata[["Superficie no saturada (<= 0.0)"]] <- list(pct = mean(vals <= 0) * 100, ha = (mean(vals <= 0) * area_ha))
+      strata[["Water bodies / Saturated soil (> 0.0)"]] <- list(pct = mean(vals > 0) * 100, ha = (mean(vals > 0) * area_ha))
+      strata[["Unsaturated terrestrial surface (<= 0.0)"]] <- list(pct = mean(vals <= 0) * 100, ha = (mean(vals <= 0) * area_ha))
     } else if (grepl("IMSR", var_upper)) {
-      strata[["Entorno natural / Sin riesgo (< 0.15)"]] <- list(pct = mean(vals < 0.15) * 100, ha = (mean(vals < 0.15) * area_ha))
-      strata[["Riesgo moderado / Residuos dispersos [0.15, 0.35)"]] <- list(pct = mean(vals >= 0.15 & vals < 0.35) * 100, ha = (mean(vals >= 0.15 & vals < 0.35) * area_ha))
-      strata[["Alto riesgo / Contenedores y plasticos (>= 0.35)"]] <- list(pct = mean(vals >= 0.35) * 100, ha = (mean(vals >= 0.35) * area_ha))
+      strata[["Natural environment / Baseline (< 0.15)"]] <- list(pct = mean(vals < 0.15) * 100, ha = (mean(vals < 0.15) * area_ha))
+      strata[["Moderate accumulation / Dispersed debris [0.15, 0.35)"]] <- list(pct = mean(vals >= 0.15 & vals < 0.35) * 100, ha = (mean(vals >= 0.15 & vals < 0.35) * area_ha))
+      strata[["High priority / Containers & plastics (>= 0.35)"]] <- list(pct = mean(vals >= 0.35) * 100, ha = (mean(vals >= 0.35) * area_ha))
     } else if (grepl("SLOPE|PENDIENTE", var_upper)) {
-      strata[["Terreno plano / Micro-depresiones (< 5 deg)"]] <- list(pct = mean(vals < 5) * 100, ha = (mean(vals < 5) * area_ha))
-      strata[["Pendiente moderada [5, 15 deg]"]] <- list(pct = mean(vals >= 5 & vals <= 15) * 100, ha = (mean(vals >= 5 & vals <= 15) * area_ha))
-      strata[["Terreno escarpado (> 15 deg)"]] <- list(pct = mean(vals > 15) * 100, ha = (mean(vals > 15) * area_ha))
+      strata[["Flat terrain / Micro-depressions (< 5 deg)"]] <- list(pct = mean(vals < 5) * 100, ha = (mean(vals < 5) * area_ha))
+      strata[["Moderate slope [5, 15 deg]"]] <- list(pct = mean(vals >= 5 & vals <= 15) * 100, ha = (mean(vals >= 5 & vals <= 15) * area_ha))
+      strata[["Steep terrain (> 15 deg)"]] <- list(pct = mean(vals > 15) * 100, ha = (mean(vals > 15) * area_ha))
     } else if (grepl("TWI|IEV", var_upper)) {
-      strata[["Bajo potencial de estancamiento (< 4.0)"]] <- list(pct = mean(vals < 4) * 100, ha = (mean(vals < 4) * area_ha))
-      strata[["Riesgo moderado de acumulacion [4.0, 8.0]"]] <- list(pct = mean(vals >= 4 & vals <= 8) * 100, ha = (mean(vals >= 4 & vals <= 8) * area_ha))
-      strata[["Zona critica de micro-estancamiento (> 8.0)"]] <- list(pct = mean(vals > 8) * 100, ha = (mean(vals > 8) * area_ha))
+      strata[["Low accumulation potential (< 4.0)"]] <- list(pct = mean(vals < 4) * 100, ha = (mean(vals < 4) * area_ha))
+      strata[["Moderate accumulation potential [4.0, 8.0]"]] <- list(pct = mean(vals >= 4 & vals <= 8) * 100, ha = (mean(vals >= 4 & vals <= 8) * area_ha))
+      strata[["Critical stagnation zone (> 8.0)"]] <- list(pct = mean(vals > 8) * 100, ha = (mean(vals > 8) * area_ha))
     } else {
-      strata[["Bajo [Min, Q25)"]] <- list(pct = mean(vals < q25) * 100, ha = (mean(vals < q25) * area_ha))
-      strata[["Medio-Bajo [Q25, Mediana)"]] <- list(pct = mean(vals >= q25 & vals < median_val) * 100, ha = (mean(vals >= q25 & vals < median_val) * area_ha))
-      strata[["Medio-Alto [Mediana, Q75)"]] <- list(pct = mean(vals >= median_val & vals < q75) * 100, ha = (mean(vals >= median_val & vals < q75) * area_ha))
-      strata[["Alto [Q75, Max]"]] <- list(pct = mean(vals >= q75) * 100, ha = (mean(vals >= q75) * area_ha))
+      strata[["Low [Min, Q25)"]] <- list(pct = mean(vals < q25) * 100, ha = (mean(vals < q25) * area_ha))
+      strata[["Medium-Low [Q25, Median)"]] <- list(pct = mean(vals >= q25 & vals < median_val) * 100, ha = (mean(vals >= q25 & vals < median_val) * area_ha))
+      strata[["Medium-High [Median, Q75)"]] <- list(pct = mean(vals >= median_val & vals < q75) * 100, ha = (mean(vals >= median_val & vals < q75) * area_ha))
+      strata[["High [Q75, Max]"]] <- list(pct = mean(vals >= q75) * 100, ha = (mean(vals >= q75) * area_ha))
     }
 
     list(
@@ -340,6 +372,20 @@ d4h_report <- d4h_executive_summary
 #' @param x An object of class \code{d4h_executive_summary}.
 #' @param out_xlsx Character. Path where the .xlsx file will be created.
 #' @return Invisibly returns the input object \code{x}.
+#' @examples
+#' \donttest{
+#' if (interactive()) {
+#'   library(drones4health)
+#'   library(terra)
+#'
+#'   ndvi_file <- system.file("extdata", "ndvi.tif", package = "drones4health")
+#'   exec_rep  <- d4h_executive_summary(ndvi_file, by = "general")
+#'
+#'   # Export executive summary object to Excel workbook
+#'   out_file <- tempfile(fileext = ".xlsx")
+#'   d4h_export_summary(exec_rep, out_xlsx = out_file)
+#' }
+#' }
 #' @export
 d4h_export_summary <- function(x, out_xlsx) {
   if (!inherits(x, "d4h_executive_summary")) {
@@ -358,26 +404,26 @@ d4h_export_summary <- function(x, out_xlsx) {
     st <- item$stats
     ot <- item$outliers
     data.frame(
-      Indicador = item$indicator,
-      Resolucion = paste(sp$res_x, sp$res_unit),
-      Pixeles_Validos = sp$n_valid,
-      Cobertura_Pct = sp$coverage_pct,
+      Indicator = item$indicator,
+      Resolution = paste(sp$res_x, sp$res_unit),
+      Valid_Pixels = sp$n_valid,
+      Coverage_Pct = sp$coverage_pct,
       Area_ha = sp$area_ha,
       Area_m2 = sp$area_m2,
-      Media = st$mean,
-      Desv_Estandar = st$sd,
+      Mean = st$mean,
+      Std_Dev = st$sd,
       CV_Pct = st$cv_pct,
-      Minimo = st$min,
-      Maximo = st$max,
-      Rango = st$range,
-      Mediana_Q50 = st$median,
+      Minimum = st$min,
+      Maximum = st$max,
+      Range = st$range,
+      Median_Q50 = st$median,
       IQR = st$iqr,
       Q25 = st$q25,
       Q75 = st$q75,
       P05 = st$p05,
       P95 = st$p95,
       Outliers_Pct = ot$pct,
-      Diagnostico_Outliers = ot$diagnosis,
+      Outlier_Diagnostics = ot$diagnosis,
       stringsAsFactors = FALSE
     )
   })
@@ -390,10 +436,10 @@ d4h_export_summary <- function(x, out_xlsx) {
     for (st_name in names(item$strata)) {
       st_val <- item$strata[[st_name]]
       strata_rows[[length(strata_rows) + 1L]] <- data.frame(
-        Indicador = item$indicator,
-        Estrato = st_name,
-        Porcentaje = round(st_val$pct, 2),
-        Superficie_ha = round(st_val$ha, 4),
+        Indicator = item$indicator,
+        Stratum = st_name,
+        Percentage = round(st_val$pct, 2),
+        Surface_ha = round(st_val$ha, 4),
         stringsAsFactors = FALSE
       )
     }
@@ -405,39 +451,39 @@ d4h_export_summary <- function(x, out_xlsx) {
     if (!is.null(item$error)) return(NULL)
     ot <- item$outliers
     data.frame(
-      Indicador = item$indicator,
-      Limite_Inferior = ot$lower_fence,
-      Limite_Superior = ot$upper_fence,
-      Atipicos_Bajos = ot$count_low,
-      Atipicos_Altos = ot$count_high,
-      Total_Atipicos = ot$count_total,
-      Porcentaje_Atipicos = ot$pct,
-      Diagnostico = ot$diagnosis,
+      Indicator = item$indicator,
+      Lower_Fence = ot$lower_fence,
+      Upper_Fence = ot$upper_fence,
+      Low_Outliers = ot$count_low,
+      High_Outliers = ot$count_high,
+      Total_Outliers = ot$count_total,
+      Outlier_Pct = ot$pct,
+      Diagnosis = ot$diagnosis,
       stringsAsFactors = FALSE
     )
   })
   df_outliers <- do.call(rbind, outlier_rows)
 
   sheets <- list(
-    Resumen_Global = df_global,
-    Estratificacion = df_strata,
-    Outliers_Detalle = df_outliers
+    Global_Summary = df_global,
+    Thematic_Strata = df_strata,
+    Outliers_Diagnostics = df_outliers
   )
 
   # Escribir con writexl u openxlsx
   if (requireNamespace("writexl", quietly = TRUE)) {
     writexl::write_xlsx(sheets, path = out_xlsx)
-    message(sprintf("Resumen ejecutivo exportado exitosamente a Excel: %s", out_xlsx))
+    message(sprintf("Executive summary successfully exported to Excel: %s", out_xlsx))
   } else if (requireNamespace("openxlsx", quietly = TRUE)) {
     openxlsx::write.xlsx(sheets, file = out_xlsx)
-    message(sprintf("Resumen ejecutivo exportado exitosamente a Excel: %s", out_xlsx))
+    message(sprintf("Executive summary successfully exported to Excel: %s", out_xlsx))
   } else {
     csv_fallback <- sub("\\.xlsx$", ".csv", out_xlsx)
     utils::write.csv(df_global, file = csv_fallback, row.names = FALSE)
     warning(
-      "No se encontro 'writexl' ni 'openxlsx' instalado. Se exporto 'Resumen_Global' a CSV: ",
+      "Neither 'writexl' nor 'openxlsx' is installed. Saved 'Global_Summary' to CSV: ",
       csv_fallback,
-      "\nPara exportar libros completos con multiples hojas (.xlsx), instala writexl ejecutando: install.packages('writexl')",
+      "\nTo export full multi-sheet workbooks (.xlsx), install writexl: install.packages('writexl')",
       call. = FALSE
     )
   }
@@ -449,13 +495,13 @@ d4h_export_summary <- function(x, out_xlsx) {
 print.d4h_executive_summary <- function(x, ...) {
   cat("\n")
   cat(rep("=", 78), "\n", sep = "")
-  cat("             DRONES4HEALTH - INFORME RESUMEN EJECUTIVO\n")
+  cat("             DRONES4HEALTH - EXECUTIVE SUMMARY REPORT\n")
   cat(rep("=", 78), "\n\n", sep = "")
 
   for (i in seq_along(x)) {
     item <- x[[i]]
     if (!is.null(item$error)) {
-      cat(sprintf("Indicador: %s [ERROR: %s]\n\n", item$indicator, item$error))
+      cat(sprintf("Indicator: %s [ERROR: %s]\n\n", item$indicator, item$error))
       next
     }
 
@@ -463,28 +509,28 @@ print.d4h_executive_summary <- function(x, ...) {
     st <- item$stats
     ot <- item$outliers
 
-    cat(sprintf(" INDICADOR: %s\n", toupper(item$indicator)))
+    cat(sprintf(" INDICATOR: %s\n", toupper(item$indicator)))
     cat(rep("-", 78), "\n", sep = "")
 
-    cat(" 1. COBERTURA Y RESOLUCION ESPACIAL:\n")
-    cat(sprintf("    - Resolucion de pixel : %s %s\n", sp$res_x, sp$res_unit))
-    cat(sprintf("    - Area util cubierta  : %s ha (%s m2)\n", format(sp$area_ha, big.mark = ","), format(sp$area_m2, big.mark = ",")))
-    cat(sprintf("    - Pixeles evaluados   : %s (%s%% de la escena util)\n\n", format(sp$n_valid, big.mark = ","), sp$coverage_pct))
+    cat(" 1. SPATIAL COVERAGE AND RESOLUTION:\n")
+    cat(sprintf("    - Pixel Resolution    : %s %s\n", sp$res_x, sp$res_unit))
+    cat(sprintf("    - Surveyed Area       : %s ha (%s m2)\n", format(sp$area_ha, big.mark = ","), format(sp$area_m2, big.mark = ",")))
+    cat(sprintf("    - Evaluated Pixels    : %s (%s%% valid footprint coverage)\n\n", format(sp$n_valid, big.mark = ","), sp$coverage_pct))
 
-    cat(" 2. ESTADISTICAS DESCRIPTIVAS GLOBALES:\n")
-    cat(sprintf("    - Promedio (Media)    : %s (+/- %s SD)\n", st$mean, st$sd))
-    cat(sprintf("    - Coef. de Variacion  : %s %%\n", st$cv_pct))
-    cat(sprintf("    - Rango total [Min,Max]: [%s, %s] (Amplitud: %s)\n", st$min, st$max, st$range))
-    cat(sprintf("    - Mediana (Q50)       : %s\n", st$median))
-    cat(sprintf("    - Rango Intercuartil  : [%s, %s] (IQR: %s)\n", st$q25, st$q75, st$iqr))
-    cat(sprintf("    - Intervalo 90%% central: [%s, %s] (P5 - P95)\n\n", st$p05, st$p95))
+    cat(" 2. GLOBAL DESCRIPTIVE STATISTICAL MOMENTS:\n")
+    cat(sprintf("    - Arithmetic Mean     : %s (+/- %s SD)\n", st$mean, st$sd))
+    cat(sprintf("    - Coeff. of Variation : %s %%\n", st$cv_pct))
+    cat(sprintf("    - Overall Range [Min,Max]: [%s, %s] (Span: %s)\n", st$min, st$max, st$range))
+    cat(sprintf("    - Median (Q50)        : %s\n", st$median))
+    cat(sprintf("    - Interquartile Range : [%s, %s] (IQR: %s)\n", st$q25, st$q75, st$iqr))
+    cat(sprintf("    - Central 90%% Span    : [%s, %s] (P05 - P95)\n\n", st$p05, st$p95))
 
-    cat(" 3. DIAGNOSTICO DE VALORES ATIPICOS (OUTLIERS):\n")
-    cat(sprintf("    - Limites Tukey (IQR) : Inferior < %s | Superior > %s\n", ot$lower_fence, ot$upper_fence))
-    cat(sprintf("    - Atipicos detectados : %s pixeles (%s%% del total)\n", format(ot$count_total, big.mark = ","), ot$pct))
-    cat(sprintf("    - Diagnostico         : %s\n\n", ot$diagnosis))
+    cat(" 3. SPATIAL OUTLIER DIAGNOSTICS (TUKEY IQR):\n")
+    cat(sprintf("    - Tukey IQR Fences    : Lower < %s | Upper > %s\n", ot$lower_fence, ot$upper_fence))
+    cat(sprintf("    - Outliers Detected   : %s pixels (%s%% of valid pixels)\n", format(ot$count_total, big.mark = ","), ot$pct))
+    cat(sprintf("    - Spatial Diagnostics : %s\n\n", ot$diagnosis))
 
-    cat(" 4. ESTRATIFICACION TEMATICA Y SUPERFICIES:\n")
+    cat(" 4. THEMATIC STRATIFICATION & SPATIAL EXTENT:\n")
     for (st_name in names(item$strata)) {
       st_info <- item$strata[[st_name]]
       cat(sprintf("    - %-42s: %5.1f %% (%6.2f ha)\n", st_name, st_info$pct, st_info$ha))

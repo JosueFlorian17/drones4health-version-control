@@ -26,6 +26,26 @@ Zonal extraction aggregates high-resolution pixel values into operational territ
 \deqn{\bar{x}_k = \frac{1}{N_k} \sum_{i \in \text{Cell}_k} x_i}
 Empty grid cells outside the valid flight footprint are automatically pruned when \code{discard_na = TRUE}.
 }
+\examples{
+\donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  # Load continuous indicator raster
+  ndvi_file <- system.file("extdata", "ndvi.tif", package = "drones4health")
+
+  # Aggregate NDVI values into a 50m hexagonal surveillance grid
+  grid_summary <- d4h_summarize_grid(
+    raster_in = ndvi_file,
+    cell_size = 50,
+    square = FALSE,
+    discard_na = TRUE
+  )
+  head(grid_summary)
+}
+}
+}
 \references{
 Birch, C. P., Oom, S. P., & Beecham, J. A. (2007). Rectangular and hexagonal grids used for observation, experiment and simulation in ecology. \emph{Ecological Modelling}, 206(3-4), 347-359. \doi{10.1016/j.ecolmodel.2007.03.041}
 }

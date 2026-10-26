@@ -2,11 +2,10 @@
 
 **`drones4health`** is an R package designed to extract, analyze, and
 synthesize ultra-high resolution (centimeter-level) remote sensing
-indicators from Unmanned Aerial Vehicle (UAV) orthomosaics within a
-**One Health** framework. It bridges micro-environmental landscape
-ecology with spatial epidemiology for precision vector control,
-environmental health surveillance, and localized pathogen transmission
-risk modeling.
+indicators from Unmanned Aerial Vehicle (UAV) orthomosaics for spatial
+epidemiology. It bridges micro-environmental landscape ecology with
+spatial epidemiology for precision vector control, environmental health
+surveillance, and localized pathogen transmission risk modeling.
 
 ------------------------------------------------------------------------
 
@@ -38,60 +37,60 @@ library(sf)
 
 ------------------------------------------------------------------------
 
-## 2. Core Functional Modules & Use Cases
+## 2. Core Functional Modules
 
 `drones4health` provides 7 modular indicator suites tailored for spatial
 epidemiology and field operations:
 
 - **Spectral Vegetation & Canopy Indices:** Quantify photosynthetic
   vigor, biomass density, and canopy chlorophyll (e.g.,
-  [`d4h_ndvi()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_ndvi.md),
-  [`d4h_msavi2()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_msavi2.md),
-  [`d4h_savi()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_savi.md),
-  [`d4h_ndre()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_ndre.md),
-  [`d4h_gndvi()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_gndvi.md),
-  [`d4h_vari()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_vari.md),
-  [`d4h_evi()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_evi.md)).
+  [`d4h_ndvi()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_ndvi.md),
+  [`d4h_msavi2()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_msavi2.md),
+  [`d4h_savi()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_savi.md),
+  [`d4h_ndre()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_ndre.md),
+  [`d4h_gndvi()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_gndvi.md),
+  [`d4h_vari()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_vari.md),
+  [`d4h_evi()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_evi.md)).
   Used to map vegetative shading and canopy roosting habitats for adult
   mosquito vectors.
 - **Land Cover & Substrate Masks:** Classify discrete land surface
   substrates such as bare soil
-  ([`d4h_bare_soil()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_bare_soil.md))
+  ([`d4h_bare_soil()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_bare_soil.md))
   to delineate unpaved roads, exposed earth, and peridomestic clearing
   boundaries.
 - **Hydrological & Micro-Pooling Detection:** Identify open water
   surfaces, irrigation trenches, and standing moisture pools
-  ([`d4h_ndwi()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_ndwi.md))
+  ([`d4h_ndwi()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_ndwi.md))
   that provide aquatic breeding habitats.
 - **Micro-Topography & Terrain Wetness:** Model terrain slope
-  ([`d4h_slope()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_slope.md))
+  ([`d4h_slope()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_slope.md))
   and topographic wetness accumulation
-  ([`d4h_twi()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_twi.md))
+  ([`d4h_twi()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_twi.md))
   from UAV Digital Elevation Models (DEM/DSM) to pinpoint natural
   drainage sinks and runoff depressions.
 - **Eco-Epidemiological Risk Modeling:** Synthesize multi-band metrics
   to locate solid waste micro-accumulations
-  ([`d4h_imsr()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_imsr.md)),
+  ([`d4h_imsr()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_imsr.md)),
   hydric stagnation risk
-  ([`d4h_irhe()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_irhe.md),
-  [`d4h_iev()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_iev.md)),
+  ([`d4h_irhe()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_irhe.md),
+  [`d4h_iev()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_iev.md)),
   thermal micro-climate refuges
-  ([`d4h_irts()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_irts.md)),
+  ([`d4h_irts()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_irts.md)),
   and human-forest ecotone interfaces
-  ([`d4h_irih()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_irih.md),
-  [`d4h_ifeb()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_ifeb.md)).
+  ([`d4h_irih()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_irih.md),
+  [`d4h_ifeb()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_ifeb.md)).
 - **Spatial Zonation & Surveillance Grids:** Tessellate the flight
   footprint into operational hexagonal grids
-  ([`d4h_hex_grid()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_hex_grid.md))
+  ([`d4h_hex_grid()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_hex_grid.md))
   and compute zonal summaries
-  ([`d4h_summarize_grid()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_summarize_grid.md))
+  ([`d4h_summarize_grid()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_summarize_grid.md))
   for community health teams and larviciding logistics.
 - **Executive Reporting & Excel Export:** Generate multi-moment
   descriptive statistics, spatial surface coverage in hectares, and
   Tukey outlier diagnostics with automated multi-sheet Excel workbook
   export
-  ([`d4h_executive_summary()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_executive_summary.md),
-  [`d4h_export_summary()`](https://JosueFlorian17.github.io/drones4health-version-control/reference/d4h_export_summary.md)).
+  ([`d4h_executive_summary()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_executive_summary.md),
+  [`d4h_export_summary()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_export_summary.md)).
 
 *(For full mathematical formulations and derivations, see the individual
 function pages under the
@@ -186,18 +185,18 @@ with a single slider bar and dynamic contrast stretching:
 
 ``` r
 
-# Highlight bare soil pixels (value 1) as teal over MSAVI2 in magma palette
-r_solo_suelo <- terra::ifel(r_bare_soil == 1, 1, NA)
-names(r_solo_suelo) <- "Bare_Soil"
+# Calculate NDVI and Bare Soil mask from multispectral UAV bands
+r_ndvi <- d4h_ndvi(nir = "data/Ohuay_NIR.tif", red = "data/Ohuay_R.tif")
+r_soil <- d4h_bare_soil(ndvi_raster = r_ndvi, threshold = 0.15)
 
+# Render interactive swipe slider
 visor_swipe <- d4h_mapview_swipe(
-  x        = r_solo_suelo,
-  y        = r_msavi2,
+  x        = r_ndvi,                    # Left layer: continuous NDVI
+  y        = r_soil,                    # Right layer: discrete Bare Soil mask
   grid     = NULL,                      # Optional: pass grid_hex to overlay polygons
-  basemap  = FALSE,                     # FALSE = neutral / TRUE = satellite imagery
-  col_x    = "#2a9d8f",                 # Teal discrete color for bare soil
-  col_y    = "magma",                   # Magma continuous palette for MSAVI2
-  limits_y = c(0, 0.8)                  # Dynamic contrast range
+  basemap  = TRUE,                      # TRUE = satellite imagery / FALSE = neutral
+  col_x    = "viridis",                 # Viridis palette for NDVI
+  col_y    = c("#f5f5f5", "#8d5b4c")   # Custom colors for bare soil substrate
 )
 
 visor_swipe
@@ -205,11 +204,11 @@ visor_swipe
 
 #### Visual Outputs:
 
-![Interactive Swipe Viewer - Bare Soil vs
-MSAVI2](reference/figures/swipe_bare_soil_msavi2.png)  
-*Figure 1: Interactive side-by-side swipe comparison between Discrete
-Bare Soil Mask (teal, left) and MSAVI2 (magma, right) with categorical
-and continuous legends.*
+![Interactive Swipe Viewer - NDVI vs Bare Soil
+Mask](reference/figures/swipe_ndvi_vs_bare_soil.png)  
+*Figure 1: Dual-layer side-by-side swipe comparison showing
+photosynthetic vegetative vigor (NDVI) on the left and exposed bare soil
+substrates / pathways (Bare Soil Mask) on the right.*
 
 ![Hexagonal Grid Surveillance
 Overlay](reference/figures/swipe_hex_grid.png)  

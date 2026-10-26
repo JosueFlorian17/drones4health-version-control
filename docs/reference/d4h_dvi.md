@@ -34,3 +34,21 @@ and leaf area index (LAI).
 Tucker, C. J. (1979). Red and photographic infrared linear combinations
 for monitoring vegetation. *Remote Sensing of Environment*, 8(2),
 127-150.
+
+## Examples
+
+``` r
+# \donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  nir_file <- system.file("extdata", "nir.tif", package = "drones4health")
+  red_file <- system.file("extdata", "red.tif", package = "drones4health")
+
+  # Run DVI calculation
+  r_dvi <- d4h_dvi(nir = nir_file, red = red_file)
+  head(r_dvi)
+}
+# }
+```

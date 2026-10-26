@@ -1,5 +1,5 @@
 url: https://josueflorian17.github.io/drones4health-version-control/
-description: "Ultra-High Resolution Drone Metrics for Spatial Health Analysis and Vector-Borne Disease Surveillance 🛸🔬. Micro-environmental remote sensing from UAV orthomosaics within a One Health framework 🦟🏥."
+description: "Ultra-High Resolution Drone Metrics for Spatial Health Analysis and Vector-Borne Disease Surveillance. Micro-environmental remote sensing from UAV orthomosaics for precision vector surveillance."
 
 home:
   title: "drones4health: Ultra-High Resolution Drone Metrics for Spatial Health"
@@ -68,14 +68,16 @@ navbar:
       href: articles/drones4health-quickstart.html
 
     tutorials:
-      text: Regional Case Studies
+      text: Use Cases
       menu:
-        - text: "1. Malaria & Micro-Hydrology - Peruvian Amazon"
-          href: articles/case1_peru_amazon_malaria.html
-        - text: "2. Urban Dengue & Solid Waste - Brazil & Favelas"
-          href: articles/case2_brazil_urban_dengue.html
-        - text: "3. Transboundary & Wet Pacific - Colombia & Ecuador"
-          href: articles/case3_colombia_ecuador_choco.html
+        - text: "Case 01 - Orthomosaic Ingestion & Metric Calculation"
+          href: articles/case1_metrics_calculation.html
+        - text: "Case 02 - Grid Generation & Zonal Statistics"
+          href: articles/case2_grids_zonal_statistics.html
+        - text: "Case 03 - Water Body Segmentation & Grid Analysis"
+          href: articles/case3_water_segmentation_grid_analysis.html
+        - text: "Case 04 - GPS House Buffers & Proximity to Water"
+          href: articles/case4_gps_houses_buffers_distances.html
 
     articles:
       text: Guides & Workflows
@@ -84,6 +86,35 @@ navbar:
           href: articles/drones4health-quickstart.html
         - text: "Interactive Swipe & Visual Analytics"
           href: articles/interactive-swipe-analytics.html
+        - text: "---"
+        - text: "Regional Case Studies"
+        - text: "Malaria & Micro-Hydrology - Peruvian Amazon"
+          href: articles/case1_peru_amazon_malaria.html
+        - text: "Urban Dengue & Solid Waste - Brazil & Favelas"
+          href: articles/case2_brazil_urban_dengue.html
+        - text: "Wet Pacific - Colombia"
+          href: articles/case3_colombia_ecuador_choco.html
+
+articles:
+  - title: "Core Use Cases"
+    navbar: ~
+    desc: "Operational end-to-end workflows for ultra-high resolution drone analytics in vector surveillance and environmental health."
+    contents:
+      - case1_metrics_calculation
+      - case2_grids_zonal_statistics
+      - case3_water_segmentation_grid_analysis
+      - case4_gps_houses_buffers_distances
+  - title: "Operational Guides & Interactive Analytics"
+    desc: "Quickstart guides and interactive swipe comparison viewers."
+    contents:
+      - drones4health-quickstart
+      - interactive-swipe-analytics
+  - title: "Regional Case Studies"
+    desc: "Contextualized field studies across diverse Latin American transmission ecosystems."
+    contents:
+      - case1_peru_amazon_malaria
+      - case2_brazil_urban_dengue
+      - case3_colombia_ecuador_choco
 
 reference:
   - title: "Spectral Vegetation Indices & Land Cover Masks"
@@ -107,8 +138,8 @@ reference:
       - d4h_slope
       - d4h_twi
 
-  - title: "Eco-Epidemiological Risk Indices (One Health)"
-    desc: "Spatial modeling of localized vector-borne disease transmission risks, solid waste micro-accumulation, and hydric breeding suitability."
+  - title: "Eco-Epidemiological Spatial Indices"
+    desc: "Spatial modeling of localized vector-borne disease transmission factors, solid waste micro-accumulation, and hydric breeding suitability."
     contents:
       - d4h_imsr
       - d4h_irhe
@@ -119,11 +150,12 @@ reference:
       - d4h_ifeb
       - d4h_iead
 
-  - title: "Feature Segmentation & Spatial Proximity Risk"
-    desc: "Automated object segmentation of water bodies and residential building footprints from ultra-high resolution RGB imagery, with Euclidean distance risk modeling."
+  - title: "Feature Segmentation & Spatial Proximity to Water"
+    desc: "Automated object segmentation of water bodies and residential building footprints from ultra-high resolution RGB imagery, with Euclidean distance to water modeling."
     contents:
       - d4h_segment_water
       - d4h_segment_buildings
+      - d4h_distance_to_water
       - d4h_distance_to_risk
       - d4h_raster_distance
 
@@ -152,8 +184,10 @@ reference:
       - d4h_export_summary
 
   - title: "Preprocessing, Calibration & Utilities"
-    desc: "Surface reflectance scaling, thermal calibration to Celsius Land Surface Temperature, raster cleaning, and batch mosaic workflows."
+    desc: "Surface reflectance scaling, thermal calibration to Celsius Land Surface Temperature, raster cleaning, and multi-band stack ingestion workflows."
     contents:
+      - d4h_read_stack
+      - d4h_load_stack
       - d4h_normalize_reflectance
       - d4h_thermal_to_celsius
       - d4h_clean_band

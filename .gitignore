@@ -17,5 +17,13 @@ img/
 !man/figures/*.png
 
 docs
+output_figures/
+salidas/
+test_mapview_pipe_files/
+slider-example.html
+test_*.R
+render_clean_*.R
+inspect_ortho.R
+run_exec_en.R
 
 other-package-reference/

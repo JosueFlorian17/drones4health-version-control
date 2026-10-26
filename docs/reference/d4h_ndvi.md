@@ -42,3 +42,22 @@ Tucker, C. J. (1979). Red and photographic infrared linear combinations
 for monitoring vegetation. *Remote Sensing of Environment*, 8(2),
 127-150.
 [doi:10.1016/0034-4257(79)90013-0](https://doi.org/10.1016/0034-4257%2879%2990013-0)
+
+## Examples
+
+``` r
+# \donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  # Define paths to UAV Near-Infrared and Red bands
+  nir_file <- system.file("extdata", "nir.tif", package = "drones4health")
+  red_file <- system.file("extdata", "red.tif", package = "drones4health")
+
+  # Run NDVI calculation
+  r_ndvi <- d4h_ndvi(nir = nir_file, red = red_file)
+  head(r_ndvi)
+}
+# }
+```

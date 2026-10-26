@@ -48,15 +48,23 @@
 #'   red_path   <- system.file("extdata", "red.tif", package = "drones4health")
 #'   houses_csv <- system.file("extdata", "houses.csv", package = "drones4health")
 #'
-#'   # Run focal buffer analysis around houses (150m buffer)
+#'   # Run focal buffer analysis around houses with full parameterization
 #'   res_buffer <- d4h_indicator_buffer(
-#'     indicator = "NDVI",
-#'     houses    = houses_csv,
-#'     radius    = 3,
-#'     cell_size = 50,
-#'     nir       = nir_path,
-#'     red       = red_path,
-#'     palette   = "viridis"
+#'     indicator        = "NDVI",
+#'     houses           = houses_csv,
+#'     radius           = 3,
+#'     cell_size        = 50,
+#'     radius_in_meters = FALSE,
+#'     nir              = nir_path,
+#'     red              = red_path,
+#'     square           = FALSE,
+#'     mask_outside     = TRUE,
+#'     house_color      = "red",
+#'     house_size       = 2.5,
+#'     palette          = "viridis",
+#'     limits           = c(0.1, 0.9),
+#'     title            = "Focal Household Buffer (150m) - NDVI Analysis",
+#'     plot             = TRUE
 #'   )
 #'   head(res_buffer$grid)
 #' }
@@ -208,9 +216,9 @@ d4h_indicator_buffer <- function(indicator = "NDVI",
       "NDRE"   = d4h_ndre(nir = nir_c, red_edge = red_edge_c),
       "EVI"    = d4h_evi(nir = nir_c, red = red_c, blue = blue_c),
       "VARI"   = d4h_vari(green = green_c, red = red_c, blue = blue_c),
-      "TVI"    = d4h_tvi(nir = nir_c, red = red_c),
+      "TVI"    = if (!is.null(dem_c)) d4h_twi(dem_raster = dem_c) else d4h_ndvi(nir = nir_c, red = red_c),
       "MSAVI2" = d4h_msavi2(nir = nir_c, red = red_c),
-      "IRHE"   = d4h_irhe(red = red_c, green = green_c),
+      "IRHE"   = if (!is.null(green_c) && !is.null(nir_c) && !is.null(lst_c)) d4h_irhe(green = green_c, nir = nir_c, lst = lst_c) else d4h_ndwi(green = green_c, nir = nir_c),
       "IMSR"   = d4h_imsr(red_edge = red_edge_c, red = red_c, nir = nir_c),
       "IRTS"   = {
         ndre_tmp <- d4h_ndre(nir = nir_c, red_edge = red_edge_c)

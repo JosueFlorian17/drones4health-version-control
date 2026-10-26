@@ -77,3 +77,32 @@ d4h_mapview_swipe(
 ## Value
 
 A leaflet / htmlwidget interactive slider widget.
+
+## Examples
+
+``` r
+# \donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  # Define paths to left and right raster layers
+  ndvi_file <- system.file("extdata", "ndvi.tif", package = "drones4health")
+  ndre_file <- system.file("extdata", "ndre.tif", package = "drones4health")
+
+  # Render interactive side-by-side swipe comparison widget with full controls
+  swipe_map <- d4h_mapview_swipe(
+    x          = ndvi_file,
+    y          = ndre_file,
+    grid       = NULL,
+    basemap    = TRUE,
+    col_x      = "viridis",
+    col_y      = "magma",
+    limits_x   = c(-0.1, 0.9),
+    limits_y   = c(0.0, 0.8),
+    max_pixels = 500000
+  )
+  swipe_map
+}
+# }
+```

@@ -37,8 +37,8 @@ if (interactive()) {
   r_ndwi  <- d4h_ndwi(green = green_file, nir = nir_file)
   r_slope <- d4h_slope(dem_raster = dem_file, unit = "degrees")
 
-  # Run IEV vulnerability stagnation calculation
-  r_iev <- d4h_iev(delta_ndwi = r_ndwi, slope_dsm = r_slope)
+  # Run IEV vulnerability stagnation calculation with stabilization parameter
+  r_iev <- d4h_iev(delta_ndwi = r_ndwi, slope_dsm = r_slope, eps = 0.001)
   head(r_iev)
 }
 }

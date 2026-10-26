@@ -17,3 +17,18 @@ Invisibly returns the input object \code{x}.
 \description{
 Exports a \code{d4h_executive_summary} object to an Excel workbook (.xlsx) with dedicated sheets for Global Summary, Stratification, and Outlier Diagnostics.
 }
+\examples{
+\donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  ndvi_file <- system.file("extdata", "ndvi.tif", package = "drones4health")
+  exec_rep  <- d4h_executive_summary(ndvi_file, by = "general")
+
+  # Export executive summary object to Excel workbook
+  out_file <- tempfile(fileext = ".xlsx")
+  d4h_export_summary(exec_rep, out_xlsx = out_file)
+}
+}
+}

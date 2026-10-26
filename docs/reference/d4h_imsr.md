@@ -59,3 +59,28 @@ Fornace, K. M., Drakeley, C. J., William, T., Espino, F., & Cox, J.
 (2014). Mapping infectious disease landscapes: unmanned aerial vehicles
 and epidemiology. *Trends in Parasitology*, 30(11), 514-519.
 [doi:10.1016/j.pt.2014.09.001](https://doi.org/10.1016/j.pt.2014.09.001)
+
+## Examples
+
+``` r
+# \donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  re_file  <- system.file("extdata", "rededge.tif", package = "drones4health")
+  red_file <- system.file("extdata", "red.tif", package = "drones4health")
+  nir_file <- system.file("extdata", "nir.tif", package = "drones4health")
+
+  # Run IMSR calculation for solid waste / plastics with explicit thresholds
+  r_imsr <- d4h_imsr(
+    red_edge      = re_file,
+    red           = red_file,
+    nir           = nir_file,
+    veg_threshold = 0.2,
+    eps           = 0.001
+  )
+  head(r_imsr)
+}
+# }
+```

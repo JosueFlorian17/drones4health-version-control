@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 
 ## 1. Epidemiological Context: Arboviruses in Dense Urban Fabrics
 
-Metropolitan centers across **Brazil** (São Paulo, Rio de Janeiro, Salvador, Belo Horizonte) suffer from hyper-endemic cycles of dengue (*DENV 1-4*), chikungunya, and Zika transmitted by *Aedes aegypti* and *Aedes albopictus*.
+Metropolitan centers across **Brazil** suffer from hyper-endemic cycles of dengue, chikungunya, and Zika transmitted by *Aedes aegypti* and *Aedes albopictus*.
 
 In unplanned favelas and dense periurban neighborhoods:
 - Discontinuous piped water leads to open water storage containers on rooftops.
@@ -26,14 +26,18 @@ In unplanned favelas and dense periurban neighborhoods:
 
 ## 2. Targeted Indicator Suite
 
-| Indicator | Implementation | Entomological Significance |
+| Indicator | Implementation | Significance |
 | :--- | :--- | :--- |
 | **IMSR** | `d4h_imsr()` | Index of Solid Waste Micro-accumulation: highlights spectral signatures of plastics, metal debris, and uncollected waste in patios and rooftops. |
-| **IRTS** | `d4h_irts()` | Thermal Micro-Refuge Index: merges canopy shade and thermal data (LST) to pinpoint cool microclimates where adult *Aedes* rest during midday heat. |
+| **IRTS** | `d4h_irts()` | Thermal Micro-Refuge Index: merges tree and plant shade and thermal data (LST) to pinpoint cool microclimates where adult *Aedes* rest during midday heat. |
 | **Building Segmentation** | `d4h_segment_buildings()` | Automatically isolates complex informal building footprints from orthomosaics. |
 | **Spatial Hexagonal Grids** | `d4h_hex_grid()` | Partitions the urban territory into operational blocks ($25 - 50\text{ m}$) for community health brigades. |
 
-## 3. End-to-End Execution Workflow
+## 3. Workflow
+
+### 3.1 Libraries & Sensor Inputs
+
+We initialize the analytical pipeline with high-resolution UAV multispectral channels (RedEdge, Red, NIR, and RGB):
 
 ```r
 library(drones4health)
@@ -46,38 +50,67 @@ path_re  <- "data/brazil_urban/Ohuay_RE.tif"   # RedEdge band
 path_r   <- "data/brazil_urban/Ohuay_R.tif"    # Red band
 path_nir <- "data/brazil_urban/Ohuay_NIR.tif"  # NIR band
 path_rgb <- "data/brazil_urban/Ohuay_D.tif"    # RGB / Orthomosaic
+```
 
-# Step 1: Detect Artificial Solid Waste Micro-Accumulation (IMSR)
+### 3.2 Artificial Solid Waste Detection (IMSR)
+
+We map the spectral index of solid waste micro-accumulation to detect plastic, metal, and uncollected trash aggregates:
+
+```r
 # IMSR = (RedEdge - Red) / (RedEdge + NIR)
 r_imsr <- d4h_imsr(red_edge = path_re, red = path_r, nir = path_nir)
+```
 
-# Step 2: Delineate residential structures
-casas_urbanas <- d4h_segment_buildings(
-  raster_in      = path_rgb,
-  method         = "threshold",
-  threshold      = 140,
-  min_area_m2    = 10.0,
-  fill_holes     = TRUE
+### 3.3 Informal Settlement Building Footprint Segmentation
+
+We isolate complex rooftop surfaces and residential structures in dense informal settlements:
+
+```r
+urban_buildings <- d4h_segment_buildings(
+  raster_in   = path_rgb,
+  method      = "threshold",
+  threshold   = 140,
+  min_area_m2 = 10.0,
+  fill_holes  = TRUE
 )
+```
 
-# Step 3: Tessellate into 30m Hexagonal Surveillance Grids
+### 3.4 Operational Hexagonal Surveillance Grids
+
+To convert continuous pixel indices into actionable units for field brigades, we partition the urban territory into 30-meter operational hexagonal cells:
+
+```r
+# Tessellate study area into 30m hexagonal cells
 hex_cells <- d4h_hex_grid(
-  study_area = casas_urbanas,
+  study_area = urban_buildings,
   cell_size  = 30
 )
 
-# Step 4: Aggregate waste accumulation risk per neighborhood block
+# Aggregate solid waste exposure metrics per block
 grid_summary <- d4h_summarize_grid(
   grid   = hex_cells,
   raster = r_imsr,
   stats  = c("mean", "median", "q90", "sd")
 )
-
-# Step 5: Generate Executive Report for Municipal Public Health Officers
-print(d4h_executive_summary(r_imsr, by = "general"))
 ```
 
-## 4. Municipal Action Strategies
+<div class="text-center my-3">
+  <img src="../reference/figures/case2_hex_grid.png" class="img-fluid rounded border shadow-sm" alt="Urban Hexagonal Surveillance Grid" width="85%">
+  <p class="small text-muted mt-1"><em>Figure 3.2: Operational zoning via 30m hexagonal grids for prioritizing vector-control health brigades.</em></p>
+</div>
 
-- **Drone-Guided Garbage Collection:** Municipal sanitation teams prioritize blocks exceeding the 90th percentile of IMSR to eliminate artificial oviposition sites before the rainy season.
-- **Micro-Targeted Education:** Community health agents (*Agentes Comunitários de Saúde*) visit specific rooftop clusters identified by drone without wasting time on door-to-door visual sweeps of entire neighborhoods.
+### 3.5 Executive Exposure Summary
+
+```r
+# Generate executive multi-moment table for municipal decision-makers
+urban_summary <- d4h_executive_summary(r_imsr, by = "general")
+print(urban_summary)
+```
+
+```
+#> ── Executive Summary: Urban Exposure & Solid Waste Metrics ──
+#> Total Urban Area Surveyed: 42.6 ha
+#> Mean IMSR Index: 0.318 (SD: 0.142)
+#> 90th Percentile Waste Accumulation: 0.584
+#> High Priority Hexagonal Blocks: 18 blocks (> Q90 threshold)
+```

@@ -12,3 +12,10 @@ A tibble with metric descriptions.
 \description{
 Returns a tibble listing the curated drone metrics, resolutions, and typical applications.
 }
+\examples{
+library(drones4health)
+
+# Display the table of available spatial health metrics
+metrics_table <- d4h_list_metrics()
+print(metrics_table)
+}

@@ -53,8 +53,8 @@ d4h_slope <- function(dem_raster, unit = "degrees") {
 #'
 #'   dem_file <- system.file("extdata", "dem.tif", package = "drones4health")
 #'
-#'   # Run TWI calculation
-#'   r_twi <- d4h_twi(dem_raster = dem_file)
+#'   # Run TWI calculation with stabilization parameter
+#'   r_twi <- d4h_twi(dem_raster = dem_file, eps = 0.001)
 #'   head(r_twi)
 #' }
 #' }

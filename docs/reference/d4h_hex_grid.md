@@ -37,3 +37,21 @@ Carr, D. B., Olsen, A. R., & White, D. (1992). Hexagon mosaic maps for
 display of univariate and bivariate data. *Cartography and Geographic
 Information Systems*, 19(4), 228-236.
 [doi:10.1559/152304092783721231](https://doi.org/10.1559/152304092783721231)
+
+## Examples
+
+``` r
+# \donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  # Define Area of Interest raster
+  aoi_file <- system.file("extdata", "ortho_rgb.tif", package = "drones4health")
+
+  # Create hexagonal grid cells with 50-meter diameter
+  hex_grid <- d4h_hex_grid(aoi = aoi_file, cell_size = 50)
+  plot(hex_grid)
+}
+# }
+```

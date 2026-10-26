@@ -47,3 +47,20 @@ topographic wetness index: evaluation of different methods based on
 field observations. *Hydrology and Earth System Sciences*, 10(1),
 101-112.
 [doi:10.5194/hess-10-101-2006](https://doi.org/10.5194/hess-10-101-2006)
+
+## Examples
+
+``` r
+# \donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  dem_file <- system.file("extdata", "dem.tif", package = "drones4health")
+
+  # Run TWI calculation with stabilization parameter
+  r_twi <- d4h_twi(dem_raster = dem_file, eps = 0.001)
+  head(r_twi)
+}
+# }
+```

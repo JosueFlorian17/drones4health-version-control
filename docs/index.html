@@ -5,23 +5,54 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>drones4health: Ultra-High Resolution Drone Metrics for Spatial Health Analysis • drones4health</title>
+<title>drones4health: Ultra-High Resolution Drone Metrics for Spatial Health • drones4health</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" sizes="any" href="favicon.ico">
+<link rel="manifest" href="site.webmanifest">
 <script src="lightswitch.js"></script><script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="drones4health: Ultra-High Resolution Drone Metrics for Spatial Health Analysis">
-<meta name="description" content="Extract micro-environmental and eco-epidemiological remote sensing metrics from UAV orthomosaics within a One Health framework.">
-<meta property="og:description" content="Extract micro-environmental and eco-epidemiological remote sensing metrics from UAV orthomosaics within a One Health framework.">
-<script>
-  MathJax = {
-    tex: {
-      inlineMath: [['$', '$'], ['\\(', '\\)']],
-      displayMath: [['$$', '$$'], ['\\[', '\\]']],
-      processEscapes: true
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="drones4health: Ultra-High Resolution Drone Metrics for Spatial Health">
+<meta name="description" content="Calculate and extract ultra-high resolution remote sensing metrics for spatial health analysis from UAV orthomosaics for precision vector surveillance.">
+<meta property="og:description" content="Calculate and extract ultra-high resolution remote sensing metrics for spatial health analysis from UAV orthomosaics for precision vector surveillance.">
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script>
+  document.addEventListener('DOMContentLoaded', function() {
+    function initSwipers() {
+      var sliders = document.querySelectorAll('.d4h-swipe-range');
+      sliders.forEach(function(slider) {
+        var container = slider.closest('.d4h-swipe-container');
+        if (!container) return;
+        var overlay = container.querySelector('.d4h-swipe-overlay');
+        var overlayImg = overlay ? overlay.querySelector('img') : null;
+        var handle = container.querySelector('.d4h-swipe-handle');
+        var baseImg = container.querySelector('.d4h-swipe-base');
+
+        function updateSlider() {
+          var val = slider.value;
+          if (overlay) overlay.style.width = val + '%';
+          if (handle) handle.style.left = val + '%';
+          if (overlayImg && baseImg) {
+            overlayImg.style.width = baseImg.offsetWidth + 'px';
+            overlayImg.style.height = baseImg.offsetHeight + 'px';
+          }
+        }
+
+        slider.addEventListener('input', updateSlider);
+        slider.addEventListener('change', updateSlider);
+        window.addEventListener('resize', updateSlider);
+        if (baseImg && baseImg.complete) {
+          updateSlider();
+        } else if (baseImg) {
+          baseImg.addEventListener('load', updateSlider);
+        }
+      });
     }
-  };
-</script><script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    initSwipers();
+  });
+</script>
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -40,12 +71,43 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="active nav-item"><a class="nav-link" href="index.html">Get Started</a></li>
+<li class="nav-item"><a class="nav-link" href="articles/drones4health-quickstart.html">Get Started</a></li>
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-use-cases" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Use Cases</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-use-cases">
+<li><a class="dropdown-item" href="articles/case1_metrics_calculation.html">Case 01 - Orthomosaic Ingestion &amp; Metric Calculation</a></li>
+    <li><a class="dropdown-item" href="articles/case2_grids_zonal_statistics.html">Case 02 - Grid Generation &amp; Zonal Statistics</a></li>
+    <li><a class="dropdown-item" href="articles/case3_water_segmentation_grid_analysis.html">Case 03 - Water Body Segmentation &amp; Grid Analysis</a></li>
+    <li><a class="dropdown-item" href="articles/case4_gps_houses_buffers_distances.html">Case 04 - GPS House Buffers &amp; Proximity to Water</a></li>
+  </ul>
+</li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-guides-workflows" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Guides &amp; Workflows</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-guides-workflows">
+<li><a class="dropdown-item" href="articles/drones4health-quickstart.html">Quickstart &amp; Workflow Pipeline</a></li>
+    <li><a class="dropdown-item" href="articles/interactive-swipe-analytics.html">Interactive Swipe &amp; Visual Analytics</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Regional Case Studies</h6></li>
+    <li><a class="dropdown-item" href="articles/case1_peru_amazon_malaria.html">Malaria &amp; Micro-Hydrology - Peruvian Amazon</a></li>
+    <li><a class="dropdown-item" href="articles/case2_brazil_urban_dengue.html">Urban Dengue &amp; Solid Waste - Brazil &amp; Favelas</a></li>
+    <li><a class="dropdown-item" href="articles/case3_colombia_ecuador_choco.html">Wet Pacific - Colombia</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JosueFlorian17/drones4health-version-control" aria-label="GitHub Repository"><span class="fa fa-github fa-lg"></span></a></li>
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="search.json">
+</form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JosueFlorian17/drones4health-version-control" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
+  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch">
+<li><button class="dropdown-item" data-bs-theme-value="light"><span class="fa fa-sun"></span> Light</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="dark"><span class="fa fa-moon"></span> Dark</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="auto"><span class="fa fa-adjust"></span> Auto</button></li>
+  </ul>
+</li>
       </ul>
 </div>
 
@@ -58,7 +120,8 @@
 </h1></div>
 <!-- badges: start -->
 
-<p><strong><code>drones4health</code></strong> is an R package designed to extract, analyze, and synthesize ultra-high resolution (centimeter-level) remote sensing indicators from Unmanned Aerial Vehicle (UAV) orthomosaics within a <strong>One Health</strong> framework. It bridges micro-environmental landscape ecology with spatial epidemiology for precision vector control, environmental health surveillance, and localized pathogen transmission risk modeling.</p>
+<!-- badges: end -->
+<p><strong><code>drones4health</code></strong> is an R package designed to extract, analyze, and synthesize ultra-high resolution (centimeter-level) remote sensing indicators from Unmanned Aerial Vehicle (UAV) orthomosaics for spatial epidemiology. It bridges micro-environmental landscape ecology with spatial epidemiology for precision vector control, environmental health surveillance, and localized pathogen transmission risk modeling.</p>
 <hr>
 <div class="section level2">
 <h2 id="id_1-installation">1. Installation<a class="anchor" aria-label="anchor" href="#id_1-installation"></a>
@@ -78,7 +141,7 @@
 <hr>
 </div>
 <div class="section level2">
-<h2 id="id_2-core-functional-modules--use-cases">2. Core Functional Modules &amp; Use Cases<a class="anchor" aria-label="anchor" href="#id_2-core-functional-modules--use-cases"></a>
+<h2 id="id_2-core-functional-modules">2. Core Functional Modules<a class="anchor" aria-label="anchor" href="#id_2-core-functional-modules"></a>
 </h2>
 <p><code>drones4health</code> provides 7 modular indicator suites tailored for spatial epidemiology and field operations:</p>
 <ul>
@@ -97,7 +160,7 @@
 <li>
 <strong>Executive Reporting &amp; Excel Export:</strong> Generate multi-moment descriptive statistics, spatial surface coverage in hectares, and Tukey outlier diagnostics with automated multi-sheet Excel workbook export (<code><a href="reference/d4h_executive_summary.html">d4h_executive_summary()</a></code>, <code><a href="reference/d4h_export_summary.html">d4h_export_summary()</a></code>).</li>
 </ul>
-<p><em>(For full mathematical formulations and derivations, see the individual function pages under the <a href="https://JosueFlorian17.github.io/drones4health-version-control/reference/index.html">Reference</a> tab).</em></p>
+<p><em>(For full mathematical formulations and derivations, see the individual function pages under the <a href="https://JosueFlorian17.github.io/drones4health-version-control/reference/index.html" class="external-link">Reference</a> tab).</em></p>
 <hr>
 </div>
 <div class="section level2">
@@ -167,18 +230,18 @@
 </h3>
 <p>Compare continuous indices, discrete binary masks, and hexagonal grids with a single slider bar and dynamic contrast stretching:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Highlight bare soil pixels (value 1) as teal over MSAVI2 in magma palette</span></span>
-<span><span class="va">r_solo_suelo</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/ifelse.html" class="external-link">ifel</a></span><span class="op">(</span><span class="va">r_bare_soil</span> <span class="op">==</span> <span class="fl">1</span>, <span class="fl">1</span>, <span class="cn">NA</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">r_solo_suelo</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"Bare_Soil"</span></span>
+<code class="sourceCode R"><span><span class="co"># Calculate NDVI and Bare Soil mask from multispectral UAV bands</span></span>
+<span><span class="va">r_ndvi</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/d4h_ndvi.html">d4h_ndvi</a></span><span class="op">(</span>nir <span class="op">=</span> <span class="st">"data/Ohuay_NIR.tif"</span>, red <span class="op">=</span> <span class="st">"data/Ohuay_R.tif"</span><span class="op">)</span></span>
+<span><span class="va">r_soil</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/d4h_bare_soil.html">d4h_bare_soil</a></span><span class="op">(</span>ndvi_raster <span class="op">=</span> <span class="va">r_ndvi</span>, threshold <span class="op">=</span> <span class="fl">0.15</span><span class="op">)</span></span>
 <span></span>
+<span><span class="co"># Render interactive swipe slider</span></span>
 <span><span class="va">visor_swipe</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/d4h_mapview_swipe.html">d4h_mapview_swipe</a></span><span class="op">(</span></span>
-<span>  x        <span class="op">=</span> <span class="va">r_solo_suelo</span>,</span>
-<span>  y        <span class="op">=</span> <span class="va">r_msavi2</span>,</span>
+<span>  x        <span class="op">=</span> <span class="va">r_ndvi</span>,                    <span class="co"># Left layer: continuous NDVI</span></span>
+<span>  y        <span class="op">=</span> <span class="va">r_soil</span>,                    <span class="co"># Right layer: discrete Bare Soil mask</span></span>
 <span>  grid     <span class="op">=</span> <span class="cn">NULL</span>,                      <span class="co"># Optional: pass grid_hex to overlay polygons</span></span>
-<span>  basemap  <span class="op">=</span> <span class="cn">FALSE</span>,                     <span class="co"># FALSE = neutral / TRUE = satellite imagery</span></span>
-<span>  col_x    <span class="op">=</span> <span class="st">"#2a9d8f"</span>,                 <span class="co"># Teal discrete color for bare soil</span></span>
-<span>  col_y    <span class="op">=</span> <span class="st">"magma"</span>,                   <span class="co"># Magma continuous palette for MSAVI2</span></span>
-<span>  limits_y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.8</span><span class="op">)</span>                  <span class="co"># Dynamic contrast range</span></span>
+<span>  basemap  <span class="op">=</span> <span class="cn">TRUE</span>,                      <span class="co"># TRUE = satellite imagery / FALSE = neutral</span></span>
+<span>  col_x    <span class="op">=</span> <span class="st">"viridis"</span>,                 <span class="co"># Viridis palette for NDVI</span></span>
+<span>  col_y    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#f5f5f5"</span>, <span class="st">"#8d5b4c"</span><span class="op">)</span>   <span class="co"># Custom colors for bare soil substrate</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">visor_swipe</span></span></code></pre></div>
@@ -186,7 +249,7 @@
 <h4 id="visual-outputs">Visual Outputs:<a class="anchor" aria-label="anchor" href="#visual-outputs"></a>
 </h4>
 <p align="center">
-<img src="reference/figures/swipe_bare_soil_msavi2.png" width="85%" alt="Interactive Swipe Viewer - Bare Soil vs MSAVI2"><br><em>Figure 1: Interactive side-by-side swipe comparison between Discrete Bare Soil Mask (teal, left) and MSAVI2 (magma, right) with categorical and continuous legends.</em>
+<img src="reference/figures/swipe_ndvi_vs_bare_soil.png" width="90%" alt="Interactive Swipe Viewer - NDVI vs Bare Soil Mask"><br><em>Figure 1: Dual-layer side-by-side swipe comparison showing photosynthetic vegetative vigor (NDVI) on the left and exposed bare soil substrates / pathways (Bare Soil Mask) on the right.</em>
 </p>
 <p align="center">
 <img src="reference/figures/swipe_hex_grid.png" width="45%" alt="Hexagonal Grid Surveillance Overlay"><br><em>Figure 2: Operative hexagonal surveillance grid (50 m) overlaid on the swipe viewer.</em>
@@ -228,7 +291,7 @@
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/JosueFlorian17/drones4health-version-control/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/JosueFlorian17/drones4health-version-control" class="external-link">Browse source code</a></li>
 <li><a href="https://github.com/JosueFlorian17/drones4health-version-control/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
@@ -253,7 +316,8 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Josue Florian <br><small class="roles"> Author, maintainer </small>   </li>
+<li>
+<a href="https://github.com/JosueFlorian17" class="external-link">Josue Florian</a> <br><small class="roles"> Author, maintainer </small>   </li>
 </ul>
 </div>
 
@@ -262,7 +326,6 @@
 <ul class="list-unstyled">
 <li><a href="https://www.r-project.org/" class="external-link"><img src="https://img.shields.io/badge/R-4.6+-blue.svg" alt="R-CMD-check"></a></li>
 <li><a href="https://opensource.org/licenses/MIT" class="external-link"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a></li>
-<li><a href="https://www.who.int/health-topics/one-health" class="external-link"><img src="https://img.shields.io/badge/Framework-One%20Health-green.svg" alt="One Health"></a></li>
 </ul>
 </div>
 
@@ -271,7 +334,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Josue Florian.</p>
+  <p>Developed by <a href="https://github.com/JosueFlorian17" class="external-link">Josue Florian</a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">

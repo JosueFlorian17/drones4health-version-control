@@ -14,6 +14,33 @@
 #' @param sam_checkpoint Character path (optional). Path to SAM model weights (.pth) when \code{method = "sam"}.
 #' @param exclude_buildings \code{sf} POLYGON object (optional). Residential buildings, roofs, or structures to strictly exclude from water bodies to prevent metal/calamina roofs from being misclassified as water.
 #' @return An \code{sf} POLYGON object with columns: \code{water_id}, \code{area_m2}, \code{perimeter_m}, and spatial geometry.
+#' @examples
+#' \donttest{
+#' if (interactive()) {
+#'   library(drones4health)
+#'   library(terra)
+#'   library(sf)
+#'
+#'   # Define paths to NDWI, RGB orthomosaic, and building exclusion layers
+#'   ndwi_file  <- system.file("extdata", "ndwi.tif", package = "drones4health")
+#'   rgb_file   <- system.file("extdata", "ortho_rgb.tif", package = "drones4health")
+#'   houses_sf  <- st_read(system.file("extdata", "buildings.gpkg", package = "drones4health"))
+#'
+#'   # Segment surface water bodies with brightness filtering and building exclusion
+#'   water_sf <- d4h_segment_water(
+#'     raster_in            = ndwi_file,
+#'     rgb_raster           = rgb_file,
+#'     threshold            = 0.0,
+#'     is_ndwi              = TRUE,
+#'     max_water_brightness = 95.0,
+#'     min_area_m2          = 2.0,
+#'     max_area_m2          = 50000.0,
+#'     method               = "spectral",
+#'     exclude_buildings    = houses_sf
+#'   )
+#'   print(water_sf)
+#' }
+#' }
 #' @export
 d4h_segment_water <- function(raster_in, rgb_raster = NULL, threshold = -0.05, is_ndwi = FALSE, max_water_brightness = 95.0, min_area_m2 = 2.0, max_area_m2 = 50000.0, method = c("spectral", "sam"), sam_checkpoint = NULL, exclude_buildings = NULL) {
   method <- match.arg(method)
@@ -135,6 +162,29 @@ d4h_segment_water <- function(raster_in, rgb_raster = NULL, threshold = -0.05, i
 #' Blaschke, T. (2010). Object based image analysis for remote sensing. \emph{ISPRS Journal of Photogrammetry and Remote Sensing}, 65(1), 2-16. \doi{10.1016/j.isprsjprs.2009.06.004}
 #'
 #' Kirillov, A., et al. (2023). Segment anything. \emph{arXiv preprint arXiv:2304.02643}.
+#' @examples
+#' \donttest{
+#' if (interactive()) {
+#'   library(drones4health)
+#'   library(terra)
+#'
+#'   # Define paths to RGB orthomosaic and optional NDVI layer
+#'   rgb_file  <- system.file("extdata", "ortho_rgb.tif", package = "drones4health")
+#'   ndvi_file <- system.file("extdata", "ndvi.tif", package = "drones4health")
+#'
+#'   # Extract building footprints with optical brightness thresholds and vegetation masking
+#'   buildings_sf <- d4h_segment_buildings(
+#'     rgb_raster     = rgb_file,
+#'     ndvi_raster    = ndvi_file,
+#'     min_area_m2    = 12.0,
+#'     max_area_m2    = 600.0,
+#'     brightness_min = 135.0,
+#'     ndvi_max       = 0.25,
+#'     method         = "spectral"
+#'   )
+#'   print(buildings_sf)
+#' }
+#' }
 #' @export
 d4h_segment_buildings <- function(rgb_raster, ndvi_raster = NULL, min_area_m2 = 12.0, max_area_m2 = 600.0, brightness_min = 135.0, ndvi_max = 0.25, method = c("spectral", "sam"), sam_checkpoint = NULL) {
   method <- match.arg(method)
@@ -385,13 +435,38 @@ masks = mask_gen.generate(img_np)
 #' @param decay_lambda Numeric. Flight dispersal decay parameter in meters (default: 100.0).
 #' @param buffer_breaks Numeric vector. Distance cutoffs in meters for risk tier stratification (default: \code{c(50, 100, 200)}).
 #' @param risk_labels Character vector. Names for each stratified risk tier (default: \code{c("Critico (<50m)", "Alto (50-100m)", "Moderado (100-200m)", "Bajo (>200m)")}).
-#' @return An \code{sf} object matching \code{buildings} with appended columns: \code{dist_water_m}, \code{nearest_water_id}, \code{risk_score} in \code{[0, 1]}, and \code{risk_level}.
+#' @param proximity_labels Character vector (optional). Custom names for each stratified proximity tier (alternative to \code{risk_labels}).
+#' @return An \code{sf} object matching \code{buildings} with appended columns: \code{dist_water_m}, \code{nearest_water_id}, \code{proximity_score} in \code{[0, 1]}, and \code{proximity_level}.
 #' @references
 #' World Health Organization. (2020). \emph{Operational framework for building climate resilient health systems}. World Health Organization.
 #'
 #' Guerra, C. A., Snow, R. W., & Hay, S. I. (2006). Mapping the global extent of malaria in 2005. \emph{Trends in Parasitology}, 22(8), 353-358. \doi{10.1016/j.pt.2006.06.006}
+#' @examples
+#' \donttest{
+#' if (interactive()) {
+#'   library(drones4health)
+#'   library(sf)
+#'
+#'   # Load building and water source polygons
+#'   houses_sf <- st_read(system.file("extdata", "buildings.gpkg", package = "drones4health"))
+#'   water_sf  <- st_read(system.file("extdata", "water_bodies.gpkg", package = "drones4health"))
+#'
+#'   # Calculate Euclidean distance and vector proximity scores with custom tiers
+#'   proximity_sf <- d4h_distance_to_water(
+#'     buildings        = houses_sf,
+#'     sources          = water_sf,
+#'     decay_lambda     = 100.0,
+#'     buffer_breaks    = c(50, 100, 200),
+#'     proximity_labels = c("Immediate (<50m)", "High (50-100m)", "Moderate (100-200m)", "Distal (>200m)")
+#'   )
+#'   head(proximity_sf)
+#' }
+#' }
 #' @export
-d4h_distance_to_risk <- function(buildings, sources, decay_lambda = 100.0, buffer_breaks = c(50, 100, 200), risk_labels = c("Critico (<50m)", "Alto (50-100m)", "Moderado (100-200m)", "Bajo (>200m)")) {
+d4h_distance_to_risk <- function(buildings, sources, decay_lambda = 100.0, buffer_breaks = c(50, 100, 200), risk_labels = c("Critico (<50m)", "Alto (50-100m)", "Moderado (100-200m)", "Bajo (>200m)"), proximity_labels = NULL) {
+  if (!is.null(proximity_labels)) {
+    risk_labels <- proximity_labels
+  }
   if (!inherits(buildings, "sf") || !inherits(sources, "sf")) {
     stop("'buildings' and 'sources' must be sf spatial objects.", call. = FALSE)
   }
@@ -425,15 +500,40 @@ d4h_distance_to_risk <- function(buildings, sources, decay_lambda = 100.0, buffe
     labels = risk_labels,
     include.lowest = TRUE
   )
+  res_sf$proximity_score <- res_sf$risk_score
+  res_sf$proximity_level <- res_sf$risk_level
 
   res_sf
 }
+
+#' @title Calculate Distance and Proximity to Water Sources
+#' @description Computes the minimum Euclidean distance from each residential building to the nearest water body or aquatic site.
+#' @inheritParams d4h_distance_to_risk
+#' @return An \code{sf} object with distance to water, nearest water ID, and proximity score columns.
+#' @export
+d4h_distance_to_water <- d4h_distance_to_risk
 
 #' @title Continuous Euclidean Distance Raster from Risk Sources
 #' @description Computes a continuous Euclidean distance surface raster (heat map) measuring proximity to water bodies, breeding sites, or waste clusters across the entire flight extent.
 #' @param sources \code{sf} or \code{SpatVector} spatial object containing risk source polygons/points.
 #' @param raster_ref SpatRaster or character path. Reference raster layer defining spatial grid dimensions and CRS.
 #' @return A SpatRaster where each pixel represents the Euclidean distance in meters to the nearest risk source.
+#' @examples
+#' \donttest{
+#' if (interactive()) {
+#'   library(drones4health)
+#'   library(terra)
+#'   library(sf)
+#'
+#'   # Reference flight raster and water polygon sources
+#'   ref_file <- system.file("extdata", "ndvi.tif", package = "drones4health")
+#'   water_sf <- st_read(system.file("extdata", "water_bodies.gpkg", package = "drones4health"))
+#'
+#'   # Compute continuous distance-to-water risk surface
+#'   r_dist <- d4h_raster_distance(sources = water_sf, raster_ref = ref_file)
+#'   plot(r_dist)
+#' }
+#' }
 #' @export
 d4h_raster_distance <- function(sources, raster_ref) {
   r_ref <- .ensure_raster(raster_ref, mask_zeros = FALSE)

@@ -57,6 +57,39 @@ The executive summary computes descriptive moments (mean, standard deviation, co
 Surface strata are categorized by biophysical domain thresholds and translated into percentage and hectare metrics.
 When \code{by = "grid"}, each row represents an operational surveillance grid cell with full descriptive moments, Tukey outlier rates, and stratum area percentages.
 }
+\examples{
+\donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  # Load raster indicator
+  ndvi_file <- system.file("extdata", "ndvi.tif", package = "drones4health")
+
+  # 1. Generate general executive report with outlier diagnostics
+  exec_rep <- d4h_executive_summary(
+    raster_in   = ndvi_file,
+    by          = "general",
+    out_xlsx    = tempfile(fileext = ".xlsx"),
+    sample_size = 1000000,
+    digits      = 3
+  )
+  print(exec_rep)
+
+  # 2. Generate zonal grid executive summary per hexagonal cell
+  exec_grid <- d4h_executive_summary(
+    raster_in   = ndvi_file,
+    by          = "grid",
+    cell_size   = 50,
+    square      = FALSE,
+    out_xlsx    = tempfile(fileext = ".xlsx"),
+    sample_size = 1000000,
+    digits      = 3
+  )
+  head(exec_grid)
+}
+}
+}
 \references{
 Tukey, J. W. (1977). \emph{Exploratory Data Analysis}. Addison-Wesley.
 }

@@ -38,3 +38,22 @@ Montandon, L. M., & Small, E. E. (2008). The impact of soil reflectance
 on the quantification of green vegetation fraction in arid and semi-arid
 environments. *Remote Sensing of Environment*, 112(2), 635-645.
 [doi:10.1016/j.rse.2007.05.016](https://doi.org/10.1016/j.rse.2007.05.016)
+
+## Examples
+
+``` r
+# \donttest{
+if (interactive()) {
+  library(drones4health)
+  library(terra)
+
+  nir_file <- system.file("extdata", "nir.tif", package = "drones4health")
+  red_file <- system.file("extdata", "red.tif", package = "drones4health")
+  r_ndvi   <- d4h_ndvi(nir = nir_file, red = red_file)
+
+  # Run Bare Soil mask classification
+  r_soil <- d4h_bare_soil(ndvi_raster = r_ndvi, threshold = 0.15)
+  head(r_soil)
+}
+# }
+```

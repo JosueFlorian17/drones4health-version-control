@@ -10,7 +10,8 @@ d4h_distance_to_risk(
   decay_lambda = 100,
   buffer_breaks = c(50, 100, 200),
   risk_labels = c("Critico (<50m)", "Alto (50-100m)", "Moderado (100-200m)",
-    "Bajo (>200m)")
+    "Bajo (>200m)"),
+  proximity_labels = NULL
 )
 }
 \arguments{
@@ -23,9 +24,11 @@ d4h_distance_to_risk(
 \item{buffer_breaks}{Numeric vector. Distance cutoffs in meters for risk tier stratification (default: \code{c(50, 100, 200)}).}
 
 \item{risk_labels}{Character vector. Names for each stratified risk tier (default: \code{c("Critico (<50m)", "Alto (50-100m)", "Moderado (100-200m)", "Bajo (>200m)")}).}
+
+\item{proximity_labels}{Character vector (optional). Custom names for each stratified proximity tier (alternative to \code{risk_labels}).}
 }
 \value{
-An \code{sf} object matching \code{buildings} with appended columns: \code{dist_water_m}, \code{nearest_water_id}, \code{risk_score} in \code{[0, 1]}, and \code{risk_level}.
+An \code{sf} object matching \code{buildings} with appended columns: \code{dist_water_m}, \code{nearest_water_id}, \code{proximity_score} in \code{[0, 1]}, and \code{proximity_level}.
 }
 \description{
 Computes the minimum Euclidean distance from each residential building to the nearest aquatic vector breeding site, calculates an exponential infection exposure risk score, and stratifies epidemiological vulnerability levels.
@@ -34,6 +37,28 @@ Computes the minimum Euclidean distance from each residential building to the ne
 The distance-decay transmission risk score is formulated based on vector flight dispersion models:
 \deqn{\text{RiskScore}_i = \exp\left(-\frac{d_{\text{min}}(i)}{\lambda}\right)}
 where \eqn{d_{\text{min}}(i)} is the minimum Euclidean distance (in meters) from building centroid \eqn{i} to the closest water polygon, and \eqn{\lambda} is the characteristic dispersal radius of disease vectors (e.g. \eqn{\lambda = 100\text{ m}} for \emph{Aedes aegypti} / \emph{Anopheles}).
+}
+\examples{
+\donttest{
+if (interactive()) {
+  library(drones4health)
+  library(sf)
+
+  # Load building and water source polygons
+  houses_sf <- st_read(system.file("extdata", "buildings.gpkg", package = "drones4health"))
+  water_sf  <- st_read(system.file("extdata", "water_bodies.gpkg", package = "drones4health"))
+
+  # Calculate Euclidean distance and vector proximity scores with custom tiers
+  proximity_sf <- d4h_distance_to_water(
+    buildings        = houses_sf,
+    sources          = water_sf,
+    decay_lambda     = 100.0,
+    buffer_breaks    = c(50, 100, 200),
+    proximity_labels = c("Immediate (<50m)", "High (50-100m)", "Moderate (100-200m)", "Distal (>200m)")
+  )
+  head(proximity_sf)
+}
+}
 }
 \references{
 World Health Organization. (2020). \emph{Operational framework for building climate resilient health systems}. World Health Organization.

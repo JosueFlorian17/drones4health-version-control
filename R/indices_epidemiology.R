@@ -24,8 +24,14 @@
 #'   red_file <- system.file("extdata", "red.tif", package = "drones4health")
 #'   nir_file <- system.file("extdata", "nir.tif", package = "drones4health")
 #'
-#'   # Run IMSR calculation for solid waste / plastics
-#'   r_imsr <- d4h_imsr(red_edge = re_file, red = red_file, nir = nir_file)
+#'   # Run IMSR calculation for solid waste / plastics with explicit thresholds
+#'   r_imsr <- d4h_imsr(
+#'     red_edge      = re_file,
+#'     red           = red_file,
+#'     nir           = nir_file,
+#'     veg_threshold = 0.2,
+#'     eps           = 0.001
+#'   )
 #'   head(r_imsr)
 #' }
 #' }
@@ -84,9 +90,14 @@ d4h_imsr <- function(red_edge, red, nir, veg_threshold = 0.2, eps = 0.001) {
 #'   r_lst_local <- terra::rast(lst_file)
 #'   r_lst_surr  <- terra::focal(r_lst_local, w = 9, fun = "mean", na.rm = TRUE)
 #'
-#'   # Run IRTS thermal refuge calculation
-#'   r_irts <- d4h_irts(ndre = ndre_file, lst_local = r_lst_local,
-#'                      lst_surrounding = r_lst_surr, nir = nir_file)
+#'   # Run IRTS thermal refuge calculation with stabilization parameter
+#'   r_irts <- d4h_irts(
+#'     ndre            = ndre_file,
+#'     lst_local       = r_lst_local,
+#'     lst_surrounding = r_lst_surr,
+#'     nir             = nir_file,
+#'     eps             = 0.001
+#'   )
 #'   head(r_irts)
 #' }
 #' }
@@ -129,8 +140,8 @@ d4h_irts <- function(ndre, lst_local, lst_surrounding, nir, eps = 0.001) {
 #'   r_ndwi  <- d4h_ndwi(green = green_file, nir = nir_file)
 #'   r_slope <- d4h_slope(dem_raster = dem_file, unit = "degrees")
 #'
-#'   # Run IEV vulnerability stagnation calculation
-#'   r_iev <- d4h_iev(delta_ndwi = r_ndwi, slope_dsm = r_slope)
+#'   # Run IEV vulnerability stagnation calculation with stabilization parameter
+#'   r_iev <- d4h_iev(delta_ndwi = r_ndwi, slope_dsm = r_slope, eps = 0.001)
 #'   head(r_iev)
 #' }
 #' }

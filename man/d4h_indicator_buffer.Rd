@@ -104,15 +104,23 @@ if (interactive()) {
   red_path   <- system.file("extdata", "red.tif", package = "drones4health")
   houses_csv <- system.file("extdata", "houses.csv", package = "drones4health")
 
-  # Run focal buffer analysis around houses (150m buffer)
+  # Run focal buffer analysis around houses with full parameterization
   res_buffer <- d4h_indicator_buffer(
-    indicator = "NDVI",
-    houses    = houses_csv,
-    radius    = 3,
-    cell_size = 50,
-    nir       = nir_path,
-    red       = red_path,
-    palette   = "viridis"
+    indicator        = "NDVI",
+    houses           = houses_csv,
+    radius           = 3,
+    cell_size        = 50,
+    radius_in_meters = FALSE,
+    nir              = nir_path,
+    red              = red_path,
+    square           = FALSE,
+    mask_outside     = TRUE,
+    house_color      = "red",
+    house_size       = 2.5,
+    palette          = "viridis",
+    limits           = c(0.1, 0.9),
+    title            = "Focal Household Buffer (150m) - NDVI Analysis",
+    plot             = TRUE
   )
   head(res_buffer$grid)
 }

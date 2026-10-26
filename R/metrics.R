@@ -1,6 +1,12 @@
-#' @title List Available Micro-Environmental and Epidemiological Metrics
+﻿#' @title List Available Micro-Environmental and Epidemiological Metrics
 #' @description Returns a tibble listing the curated drone metrics, resolutions, and typical applications.
 #' @return A tibble with metric descriptions.
+#' @examples
+#' library(drones4health)
+#'
+#' # Display the table of available spatial health metrics
+#' metrics_table <- d4h_list_metrics()
+#' print(metrics_table)
 #' @export
 d4h_list_metrics <- function() {
   tibble::tribble(
@@ -20,6 +26,25 @@ d4h_list_metrics <- function() {
 #' @param quantiles Logical. If TRUE, includes 25th percentile, median (50th percentile), and 75th percentile (default: TRUE).
 #' @param digits Numeric. Number of decimal places to round results. If NULL, values are not rounded (default: 4).
 #' @return A tibble data frame containing summary statistics per layer.
+#' @examples
+#' \donttest{
+#' if (interactive()) {
+#'   library(drones4health)
+#'   library(terra)
+#'
+#'   # Load multi-band or single-band index raster
+#'   ndvi_file <- system.file("extdata", "ndvi.tif", package = "drones4health")
+#'
+#'   # Calculate global summary statistics and quantiles
+#'   global_stats <- d4h_summarize_global(
+#'     raster_in = ndvi_file,
+#'     na.rm = TRUE,
+#'     quantiles = TRUE,
+#'     digits = 3
+#'   )
+#'   print(global_stats)
+#' }
+#' }
 #' @export
 d4h_summarize_global <- function(raster_in, na.rm = TRUE, quantiles = TRUE, digits = 4) {
   r <- if (is.character(raster_in) && length(raster_in) == 1L) {
