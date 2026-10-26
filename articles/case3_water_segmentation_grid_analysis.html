@@ -85,6 +85,11 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-guides-workflows">
 <li><a class="dropdown-item" href="../articles/drones4health-quickstart.html">Quickstart &amp; Workflow Pipeline</a></li>
     <li><a class="dropdown-item" href="../articles/interactive-swipe-analytics.html">Interactive Swipe &amp; Visual Analytics</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Regional Case Studies</h6></li>
+    <li><a class="dropdown-item" href="../articles/case1_peru_amazon_malaria.html">Malaria &amp; Micro-Hydrology - Peruvian Amazon</a></li>
+    <li><a class="dropdown-item" href="../articles/case2_brazil_urban_dengue.html">Urban Dengue &amp; Solid Waste - Brazil &amp; Favelas</a></li>
+    <li><a class="dropdown-item" href="../articles/case3_colombia_ecuador_choco.html">Wet Pacific - Colombia</a></li>
   </ul>
 </li>
       </ul>
@@ -297,9 +302,9 @@ houses and water bodies per cell:</p>
 <span><span class="va">water_join</span>  <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_join.html" class="external-link">st_join</a></span><span class="op">(</span><span class="va">water_cents</span>, <span class="va">grid_sf</span><span class="op">)</span></span>
 <span><span class="va">water_counts</span> <span class="op">&lt;-</span> <span class="va">water_join</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_drop_geometry</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">grid_id</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span></span>
-<span>    n_water_bodies   <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">grid_id</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">summarise</span><span class="op">(</span></span>
+<span>    n_water_bodies   <span class="op">=</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span>,</span>
 <span>    total_water_area <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">area_m2</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
@@ -308,23 +313,23 @@ houses and water bodies per cell:</p>
 <span><span class="va">build_join</span>  <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_join.html" class="external-link">st_join</a></span><span class="op">(</span><span class="va">build_cents</span>, <span class="va">grid_sf</span><span class="op">)</span></span>
 <span><span class="va">build_counts</span> <span class="op">&lt;-</span> <span class="va">build_join</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_drop_geometry</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">grid_id</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span></span>
-<span>    n_houses          <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">grid_id</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">summarise</span><span class="op">(</span></span>
+<span>    n_houses          <span class="op">=</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span>,</span>
 <span>    total_built_area  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">area_m2</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
 <span><span class="co"># 5. Consolidate combined metrics into the spatial grid</span></span>
 <span><span class="va">grid_analysis</span> <span class="op">&lt;-</span> <span class="va">grid_sf</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">water_counts</span>, by <span class="op">=</span> <span class="st">"grid_id"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">build_counts</span>, by <span class="op">=</span> <span class="st">"grid_id"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
-<span>    n_water_bodies   <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/coalesce.html" class="external-link">coalesce</a></span><span class="op">(</span><span class="va">n_water_bodies</span>, <span class="fl">0L</span><span class="op">)</span>,</span>
-<span>    total_water_area <span class="op">=</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/math-generics.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/coalesce.html" class="external-link">coalesce</a></span><span class="op">(</span><span class="va">total_water_area</span>, <span class="fl">0</span><span class="op">)</span>, <span class="fl">1</span><span class="op">)</span>,</span>
-<span>    n_houses         <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/coalesce.html" class="external-link">coalesce</a></span><span class="op">(</span><span class="va">n_houses</span>, <span class="fl">0L</span><span class="op">)</span>,</span>
-<span>    total_built_area <span class="op">=</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/math-generics.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/coalesce.html" class="external-link">coalesce</a></span><span class="op">(</span><span class="va">total_built_area</span>, <span class="fl">0</span><span class="op">)</span>, <span class="fl">1</span><span class="op">)</span>,</span>
+<span>  <span class="fu">left_join</span><span class="op">(</span><span class="va">water_counts</span>, by <span class="op">=</span> <span class="st">"grid_id"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">left_join</span><span class="op">(</span><span class="va">build_counts</span>, by <span class="op">=</span> <span class="st">"grid_id"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span></span>
+<span>    n_water_bodies   <span class="op">=</span> <span class="fu">coalesce</span><span class="op">(</span><span class="va">n_water_bodies</span>, <span class="fl">0L</span><span class="op">)</span>,</span>
+<span>    total_water_area <span class="op">=</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/math-generics.html" class="external-link">round</a></span><span class="op">(</span><span class="fu">coalesce</span><span class="op">(</span><span class="va">total_water_area</span>, <span class="fl">0</span><span class="op">)</span>, <span class="fl">1</span><span class="op">)</span>,</span>
+<span>    n_houses         <span class="op">=</span> <span class="fu">coalesce</span><span class="op">(</span><span class="va">n_houses</span>, <span class="fl">0L</span><span class="op">)</span>,</span>
+<span>    total_built_area <span class="op">=</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/math-generics.html" class="external-link">round</a></span><span class="op">(</span><span class="fu">coalesce</span><span class="op">(</span><span class="va">total_built_area</span>, <span class="fl">0</span><span class="op">)</span>, <span class="fl">1</span><span class="op">)</span>,</span>
 <span>    <span class="co"># Priority classification: cells with co-occurring dwellings and water bodies</span></span>
-<span>    priority_tier <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
+<span>    priority_tier <span class="op">=</span> <span class="fu">case_when</span><span class="op">(</span></span>
 <span>      <span class="va">n_water_bodies</span> <span class="op">&gt;=</span> <span class="fl">2</span> <span class="op">&amp;</span> <span class="va">n_houses</span> <span class="op">&gt;=</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"High Priority"</span>,</span>
 <span>      <span class="va">n_water_bodies</span> <span class="op">&gt;=</span> <span class="fl">1</span> <span class="op">&amp;</span> <span class="va">n_houses</span> <span class="op">&gt;=</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"Moderate Priority"</span>,</span>
 <span>      <span class="va">n_water_bodies</span> <span class="op">&gt;=</span> <span class="fl">1</span> <span class="op">&amp;</span> <span class="va">n_houses</span> <span class="op">==</span> <span class="fl">0</span> <span class="op">~</span> <span class="st">"Water Source Focus"</span>,</span>
