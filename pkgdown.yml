@@ -3,15 +3,12 @@ pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
   case1_metrics_calculation: case1_metrics_calculation.html
-  case1_peru_amazon_malaria: case1_peru_amazon_malaria.html
-  case2_brazil_urban_dengue: case2_brazil_urban_dengue.html
   case2_grids_zonal_statistics: case2_grids_zonal_statistics.html
-  case3_colombia_ecuador_choco: case3_colombia_ecuador_choco.html
   case3_water_segmentation_grid_analysis: case3_water_segmentation_grid_analysis.html
   case4_gps_houses_buffers_distances: case4_gps_houses_buffers_distances.html
   drones4health-quickstart: drones4health-quickstart.html
   interactive-swipe-analytics: interactive-swipe-analytics.html
-last_built: 2026-10-26T02:17Z
+last_built: 2026-10-26T02:19Z
 urls:
   reference: https://josueflorian17.github.io/drones4health-version-control/reference
   article: https://josueflorian17.github.io/drones4health-version-control/articles
