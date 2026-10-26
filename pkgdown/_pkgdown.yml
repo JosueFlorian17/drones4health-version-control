@@ -86,14 +86,6 @@ navbar:
           href: articles/drones4health-quickstart.html
         - text: "Interactive Swipe & Visual Analytics"
           href: articles/interactive-swipe-analytics.html
-        - text: "---"
-        - text: "Regional Case Studies"
-        - text: "Malaria & Micro-Hydrology - Peruvian Amazon"
-          href: articles/case1_peru_amazon_malaria.html
-        - text: "Urban Dengue & Solid Waste - Brazil & Favelas"
-          href: articles/case2_brazil_urban_dengue.html
-        - text: "Wet Pacific - Colombia"
-          href: articles/case3_colombia_ecuador_choco.html
 
 articles:
   - title: "Core Use Cases"
@@ -109,12 +101,6 @@ articles:
     contents:
       - drones4health-quickstart
       - interactive-swipe-analytics
-  - title: "Regional Case Studies"
-    desc: "Contextualized field studies across diverse Latin American transmission ecosystems."
-    contents:
-      - case1_peru_amazon_malaria
-      - case2_brazil_urban_dengue
-      - case3_colombia_ecuador_choco
 
 reference:
   - title: "Spectral Vegetation Indices & Land Cover Masks"
