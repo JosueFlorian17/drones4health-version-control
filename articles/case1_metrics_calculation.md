@@ -122,14 +122,14 @@ distributions for both NDVI and NDWI:
 ``` r
 
 # Generate multi-moment executive summary with direct multi-sheet Excel export
-resumen_caso01 <- d4h_executive_summary(
+exec_summary_case01 <- d4h_executive_summary(
   raster_in   = c(r_ndvi, r_ndwi),
   by          = "general",
   out_xlsx    = "salidas/Executive_Summary_Case01_Metrics.xlsx",
   sample_size = 1000000,
   digits      = 3
 )
-print(resumen_caso01)
+print(exec_summary_case01)
 ```
 
 ``` text

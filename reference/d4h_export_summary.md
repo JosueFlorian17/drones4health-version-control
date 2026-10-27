@@ -2,12 +2,12 @@
 
 Exports a `d4h_executive_summary` object to an Excel workbook (.xlsx)
 with dedicated sheets for Global Summary, Stratification, Outlier
-Diagnostics, and optional Household Distance-to-Water Risk.
+Diagnostics, and optional Household Water Proximity.
 
 ## Usage
 
 ``` r
-d4h_export_summary(x, out_xlsx, houses_risk = NULL)
+d4h_export_summary(x, out_xlsx, houses_proximity = NULL, houses_risk = NULL)
 ```
 
 ## Arguments
@@ -20,10 +20,14 @@ d4h_export_summary(x, out_xlsx, houses_risk = NULL)
 
   Character. Path where the .xlsx file will be created.
 
-- houses_risk:
+- houses_proximity:
 
   Optional `sf` or `data.frame` of residential dwellings with distance
-  to water and risk attributes.
+  to water and proximity attributes.
+
+- houses_risk:
+
+  Deprecated alias for `houses_proximity`.
 
 ## Value
 

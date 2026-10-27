@@ -297,9 +297,9 @@ houses and water bodies per cell:</p>
 <span><span class="va">water_join</span>  <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_join.html" class="external-link">st_join</a></span><span class="op">(</span><span class="va">water_cents</span>, <span class="va">grid_sf</span><span class="op">)</span></span>
 <span><span class="va">water_counts</span> <span class="op">&lt;-</span> <span class="va">water_join</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_drop_geometry</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">grid_id</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">summarise</span><span class="op">(</span></span>
-<span>    n_water_bodies   <span class="op">=</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">grid_id</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span></span>
+<span>    n_water_bodies   <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>    total_water_area <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">area_m2</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
@@ -308,23 +308,23 @@ houses and water bodies per cell:</p>
 <span><span class="va">build_join</span>  <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_join.html" class="external-link">st_join</a></span><span class="op">(</span><span class="va">build_cents</span>, <span class="va">grid_sf</span><span class="op">)</span></span>
 <span><span class="va">build_counts</span> <span class="op">&lt;-</span> <span class="va">build_join</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_drop_geometry</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">grid_id</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">summarise</span><span class="op">(</span></span>
-<span>    n_houses          <span class="op">=</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">grid_id</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span></span>
+<span>    n_houses          <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>    total_built_area  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">area_m2</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
 <span><span class="co"># 5. Consolidate combined metrics into the spatial grid</span></span>
 <span><span class="va">grid_analysis</span> <span class="op">&lt;-</span> <span class="va">grid_sf</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">left_join</span><span class="op">(</span><span class="va">water_counts</span>, by <span class="op">=</span> <span class="st">"grid_id"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">left_join</span><span class="op">(</span><span class="va">build_counts</span>, by <span class="op">=</span> <span class="st">"grid_id"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">mutate</span><span class="op">(</span></span>
-<span>    n_water_bodies   <span class="op">=</span> <span class="fu">coalesce</span><span class="op">(</span><span class="va">n_water_bodies</span>, <span class="fl">0L</span><span class="op">)</span>,</span>
-<span>    total_water_area <span class="op">=</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/math-generics.html" class="external-link">round</a></span><span class="op">(</span><span class="fu">coalesce</span><span class="op">(</span><span class="va">total_water_area</span>, <span class="fl">0</span><span class="op">)</span>, <span class="fl">1</span><span class="op">)</span>,</span>
-<span>    n_houses         <span class="op">=</span> <span class="fu">coalesce</span><span class="op">(</span><span class="va">n_houses</span>, <span class="fl">0L</span><span class="op">)</span>,</span>
-<span>    total_built_area <span class="op">=</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/math-generics.html" class="external-link">round</a></span><span class="op">(</span><span class="fu">coalesce</span><span class="op">(</span><span class="va">total_built_area</span>, <span class="fl">0</span><span class="op">)</span>, <span class="fl">1</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">water_counts</span>, by <span class="op">=</span> <span class="st">"grid_id"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">build_counts</span>, by <span class="op">=</span> <span class="st">"grid_id"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>    n_water_bodies   <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/coalesce.html" class="external-link">coalesce</a></span><span class="op">(</span><span class="va">n_water_bodies</span>, <span class="fl">0L</span><span class="op">)</span>,</span>
+<span>    total_water_area <span class="op">=</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/math-generics.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/coalesce.html" class="external-link">coalesce</a></span><span class="op">(</span><span class="va">total_water_area</span>, <span class="fl">0</span><span class="op">)</span>, <span class="fl">1</span><span class="op">)</span>,</span>
+<span>    n_houses         <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/coalesce.html" class="external-link">coalesce</a></span><span class="op">(</span><span class="va">n_houses</span>, <span class="fl">0L</span><span class="op">)</span>,</span>
+<span>    total_built_area <span class="op">=</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/math-generics.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/coalesce.html" class="external-link">coalesce</a></span><span class="op">(</span><span class="va">total_built_area</span>, <span class="fl">0</span><span class="op">)</span>, <span class="fl">1</span><span class="op">)</span>,</span>
 <span>    <span class="co"># Priority classification: cells with co-occurring dwellings and water bodies</span></span>
-<span>    priority_tier <span class="op">=</span> <span class="fu">case_when</span><span class="op">(</span></span>
+<span>    priority_tier <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
 <span>      <span class="va">n_water_bodies</span> <span class="op">&gt;=</span> <span class="fl">2</span> <span class="op">&amp;</span> <span class="va">n_houses</span> <span class="op">&gt;=</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"High Priority"</span>,</span>
 <span>      <span class="va">n_water_bodies</span> <span class="op">&gt;=</span> <span class="fl">1</span> <span class="op">&amp;</span> <span class="va">n_houses</span> <span class="op">&gt;=</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"Moderate Priority"</span>,</span>
 <span>      <span class="va">n_water_bodies</span> <span class="op">&gt;=</span> <span class="fl">1</span> <span class="op">&amp;</span> <span class="va">n_houses</span> <span class="op">==</span> <span class="fl">0</span> <span class="op">~</span> <span class="st">"Water Source Focus"</span>,</span>
@@ -372,18 +372,16 @@ cells prioritized for immediate vector surveillance interventions:</p>
 <h3 id="granular-grid-percentage-composition-d4h_grid_composition">4.1 Granular Grid Percentage Composition
 (<code>d4h_grid_composition</code>)<a class="anchor" aria-label="anchor" href="#granular-grid-percentage-composition-d4h_grid_composition"></a>
 </h3>
-<p>To address operational vector planning,
-<code><a href="../reference/d4h_grid_composition.html">d4h_grid_composition()</a></code> computes the exact percentage
-composition of physical features per operational grid cell:
-houses/dwellings (<code>pct_casas</code>), standing water bodies
-(<code>pct_agua</code>), vegetative canopy
-(<code>pct_vegetacion</code>), and bare soil/terrain
-(<code>pct_suelo_desnudo</code>), identifying the dominant land cover
-class and assigning priority tiers for environmental health
-brigades:</p>
+<p>To address operational planning, <code><a href="../reference/d4h_grid_composition.html">d4h_grid_composition()</a></code>
+computes the exact percentage composition of physical features per
+operational grid cell: houses/dwellings (<code>pct_houses</code>),
+standing water bodies (<code>pct_water</code>), vegetative canopy
+(<code>pct_vegetation</code>), and bare soil/terrain
+(<code>pct_bare_soil</code>), identifying the dominant land cover class
+and assigning priority tiers for environmental surveillance:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Compute percentage composition and sectoral priority stratification per grid unit</span></span>
-<span><span class="va">composicion_grillas</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_grid_composition.html">d4h_grid_composition</a></span><span class="op">(</span></span>
+<span><span class="va">grid_composition</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_grid_composition.html">d4h_grid_composition</a></span><span class="op">(</span></span>
 <span>  grid           <span class="op">=</span> <span class="va">grid_sf</span>,</span>
 <span>  water          <span class="op">=</span> <span class="va">water_sf</span>,</span>
 <span>  buildings      <span class="op">=</span> <span class="va">buildings_sf</span>,</span>
@@ -394,7 +392,7 @@ brigades:</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Inspect first grid cells with explicit percentage breakdown</span></span>
-<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_drop_geometry</a></span><span class="op">(</span><span class="va">composicion_grillas</span><span class="op">)</span>, <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_drop_geometry</a></span><span class="op">(</span><span class="va">grid_composition</span><span class="op">)</span>, <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
 <pre class="text"><code>==============================================================================
        DRONES4HEALTH - GRID FEATURE PERCENTAGE COMPOSITION SUMMARY
 ==============================================================================
@@ -408,11 +406,11 @@ Average Landscape Composition:
  - Residential Dwellings / Roofs :  8.4 %
 
 Surveillance Priority Stratification:
- - Crítico (Co-ocurrencia Agua + Casas)     :  18 celdas ( 5.6%) -&gt; Intervención inmediata
- - Prioridad Alta (Densidad Residencial)    :  42 celdas (13.0%) -&gt; Control vectorial domiciliario
- - Prioridad Foco Acuático                  :  36 celdas (11.1%) -&gt; Tratamiento larvicida focal
- - Vigilancia Moderada / Peridomicilio      :  86 celdas (26.5%) -&gt; Monitoreo de ovitrampas
- - Línea Base (Cobertura Natural)           : 142 celdas (43.8%) -&gt; Vigilancia pasiva
+ - Critical (Water &amp; Household Co-occurrence): 18 cells ( 5.6%)
+ - High Priority (Residential Density)      : 42 cells (13.0%)
+ - Aquatic Focus Priority                   : 36 cells (11.1%)
+ - Moderate Surveillance / Peridomestic     : 86 cells (26.5%)
+ - Baseline (Natural Canopy Cover)          : 142 cells (43.8%)
 ==============================================================================</code></pre>
 </div>
 <div class="section level3">
@@ -423,24 +421,24 @@ Surveillance Priority Stratification:
 3 dedicated sheets:</p>
 <ol style="list-style-type: decimal">
 <li>
-<strong><code>Composicion_Por_Grilla</code></strong>: Granular
-record of every grid cell with its total area
+<strong><code>Grid_Composition</code></strong>: Granular record of
+every grid cell with its total area
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>m</mi><mn>2</mn></msup><annotation encoding="application/x-tex">m^2</annotation></semantics></math>),
-percentage of houses (<code>pct_casas</code>), water bodies
-(<code>pct_agua</code>), vegetation (<code>pct_vegetacion</code>), bare
-soil (<code>pct_suelo_desnudo</code>), counts, dominant class, and
+percentage of houses (<code>pct_houses</code>), water bodies
+(<code>pct_water</code>), vegetation (<code>pct_vegetation</code>), bare
+soil (<code>pct_bare_soil</code>), counts, dominant class, and
 surveillance priority.</li>
 <li>
-<strong><code>Estratificacion_Prioridad</code></strong>: Aggregated
+<strong><code>Priority_Stratification</code></strong>: Aggregated
 count and percentage of cells classified by operational intervention
 tier.</li>
 <li>
-<strong><code>Distribucion_Global_Clases</code></strong>: Global
-mean percentage distribution of each land cover class across the flight
+<strong><code>Global_Class_Distribution</code></strong>: Global mean
+percentage distribution of each land cover class across the flight
 scene.</li>
 </ol>
 <div class="section level4">
-<h4 id="sheet-1-composicion_por_grilla-preview">Sheet 1: <code>Composicion_Por_Grilla</code> Preview<a class="anchor" aria-label="anchor" href="#sheet-1-composicion_por_grilla-preview"></a>
+<h4 id="sheet-1-grid_composition-preview">Sheet 1: <code>Grid_Composition</code> Preview<a class="anchor" aria-label="anchor" href="#sheet-1-grid_composition-preview"></a>
 </h4>
 <table style="width:100%;" class="table">
 <colgroup>
@@ -458,14 +456,14 @@ scene.</li>
 <thead><tr class="header">
 <th align="left">grid_id</th>
 <th align="left">area_m2</th>
-<th align="left">pct_casas</th>
-<th align="left">pct_agua</th>
-<th align="left">pct_vegetacion</th>
-<th align="left">pct_suelo_desnudo</th>
-<th align="left">n_casas</th>
-<th align="left">n_cuerpos_agua</th>
-<th align="left">clase_dominante</th>
-<th align="left">prioridad_vigilancia</th>
+<th align="left">pct_houses</th>
+<th align="left">pct_water</th>
+<th align="left">pct_vegetation</th>
+<th align="left">pct_bare_soil</th>
+<th align="left">n_houses</th>
+<th align="left">n_water_bodies</th>
+<th align="left">dominant_class</th>
+<th align="left">surveillance_priority</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
@@ -477,8 +475,8 @@ scene.</li>
 <td align="left"><strong>12.0%</strong></td>
 <td align="left">3</td>
 <td align="left">2</td>
-<td align="left">Vegetacion</td>
-<td align="left">Crítico (Co-ocurrencia Agua + Casas)</td>
+<td align="left">Vegetation</td>
+<td align="left">Critical (Water &amp; Household Co-occurrence)</td>
 </tr>
 <tr class="even">
 <td align="left"><strong>H0002</strong></td>
@@ -489,8 +487,8 @@ scene.</li>
 <td align="left"><strong>10.0%</strong></td>
 <td align="left">0</td>
 <td align="left">1</td>
-<td align="left">Vegetacion</td>
-<td align="left">Prioridad Foco Acuático</td>
+<td align="left">Vegetation</td>
+<td align="left">Aquatic Focus Priority</td>
 </tr>
 <tr class="odd">
 <td align="left"><strong>H0003</strong></td>
@@ -501,8 +499,8 @@ scene.</li>
 <td align="left"><strong>15.5%</strong></td>
 <td align="left">4</td>
 <td align="left">0</td>
-<td align="left">Vegetacion</td>
-<td align="left">Prioridad Alta (Densidad Residencial)</td>
+<td align="left">Vegetation</td>
+<td align="left">High Priority (Residential Density)</td>
 </tr>
 <tr class="even">
 <td align="left"><strong>H0004</strong></td>
@@ -513,8 +511,8 @@ scene.</li>
 <td align="left"><strong>21.6%</strong></td>
 <td align="left">0</td>
 <td align="left">0</td>
-<td align="left">Vegetacion</td>
-<td align="left">Línea Base (Cobertura Natural)</td>
+<td align="left">Vegetation</td>
+<td align="left">Baseline (Natural Canopy Cover)</td>
 </tr>
 <tr class="odd">
 <td align="left"><strong>H0005</strong></td>
@@ -525,8 +523,8 @@ scene.</li>
 <td align="left"><strong>20.5%</strong></td>
 <td align="left">2</td>
 <td align="left">1</td>
-<td align="left">Vegetacion</td>
-<td align="left">Crítico (Co-ocurrencia Agua + Casas)</td>
+<td align="left">Vegetation</td>
+<td align="left">Critical (Water &amp; Household Co-occurrence)</td>
 </tr>
 <tr class="even">
 <td align="left"><strong>H0006</strong></td>
@@ -537,8 +535,8 @@ scene.</li>
 <td align="left"><strong>27.2%</strong></td>
 <td align="left">5</td>
 <td align="left">0</td>
-<td align="left">Vegetacion</td>
-<td align="left">Prioridad Alta (Densidad Residencial)</td>
+<td align="left">Vegetation</td>
+<td align="left">High Priority (Residential Density)</td>
 </tr>
 <tr class="odd">
 <td align="left"><strong>H0007</strong></td>
@@ -549,8 +547,8 @@ scene.</li>
 <td align="left"><strong>16.5%</strong></td>
 <td align="left">0</td>
 <td align="left">3</td>
-<td align="left">Agua</td>
-<td align="left">Prioridad Foco Acuático</td>
+<td align="left">Water</td>
+<td align="left">Aquatic Focus Priority</td>
 </tr>
 <tr class="even">
 <td align="left"><strong>H0008</strong></td>
@@ -561,48 +559,47 @@ scene.</li>
 <td align="left"><strong>25.0%</strong></td>
 <td align="left">1</td>
 <td align="left">1</td>
-<td align="left">Vegetacion</td>
-<td align="left">Crítico (Co-ocurrencia Agua + Casas)</td>
+<td align="left">Vegetation</td>
+<td align="left">Critical (Water &amp; Household Co-occurrence)</td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="section level4">
-<h4 id="sheet-2-estratificacion_prioridad-preview">Sheet 2: <code>Estratificacion_Prioridad</code> Preview<a class="anchor" aria-label="anchor" href="#sheet-2-estratificacion_prioridad-preview"></a>
+<h4 id="sheet-2-priority_stratification-preview">Sheet 2: <code>Priority_Stratification</code> Preview<a class="anchor" aria-label="anchor" href="#sheet-2-priority_stratification-preview"></a>
 </h4>
 <table class="table">
 <thead><tr class="header">
-<th align="left">prioridad_vigilancia</th>
-<th align="left">n_celdas</th>
-<th align="left">pct_celdas</th>
+<th align="left">surveillance_priority</th>
+<th align="left">cell_count</th>
+<th align="left">cell_pct</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left"><strong>Crítico (Co-ocurrencia Agua +
-Casas)</strong></td>
+<td align="left"><strong>Critical (Water &amp; Household
+Co-occurrence)</strong></td>
 <td align="left">18</td>
 <td align="left">5.6%</td>
 </tr>
 <tr class="even">
-<td align="left"><strong>Prioridad Alta (Densidad
-Residencial)</strong></td>
+<td align="left"><strong>High Priority (Residential
+Density)</strong></td>
 <td align="left">42</td>
 <td align="left">13.0%</td>
 </tr>
 <tr class="odd">
-<td align="left"><strong>Prioridad Foco Acuático</strong></td>
+<td align="left"><strong>Aquatic Focus Priority</strong></td>
 <td align="left">36</td>
 <td align="left">11.1%</td>
 </tr>
 <tr class="even">
-<td align="left"><strong>Vigilancia Moderada /
-Peridomicilio</strong></td>
+<td align="left"><strong>Moderate Surveillance /
+Peridomestic</strong></td>
 <td align="left">86</td>
 <td align="left">26.5%</td>
 </tr>
 <tr class="odd">
-<td align="left"><strong>Línea Base (Vegetacion / Cobertura
-Natural)</strong></td>
+<td align="left"><strong>Baseline (Natural Canopy Cover)</strong></td>
 <td align="left">142</td>
 <td align="left">43.8%</td>
 </tr>
@@ -610,28 +607,28 @@ Natural)</strong></td>
 </table>
 </div>
 <div class="section level4">
-<h4 id="sheet-3-distribucion_global_clases-preview">Sheet 3: <code>Distribucion_Global_Clases</code> Preview<a class="anchor" aria-label="anchor" href="#sheet-3-distribucion_global_clases-preview"></a>
+<h4 id="sheet-3-global_class_distribution-preview">Sheet 3: <code>Global_Class_Distribution</code> Preview<a class="anchor" aria-label="anchor" href="#sheet-3-global_class_distribution-preview"></a>
 </h4>
 <table class="table">
 <thead><tr class="header">
-<th align="left">Clase_Cobertura</th>
-<th align="left">Porcentaje_Promedio (%)</th>
+<th align="left">Land_Cover_Class</th>
+<th align="left">Mean_Percentage (%)</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left"><strong>Casas / Edificaciones</strong></td>
+<td align="left"><strong>Residential / Buildings</strong></td>
 <td align="left">8.4%</td>
 </tr>
 <tr class="even">
-<td align="left"><strong>Cuerpos de Agua</strong></td>
+<td align="left"><strong>Water Bodies</strong></td>
 <td align="left">12.6%</td>
 </tr>
 <tr class="odd">
-<td align="left"><strong>Vegetacion</strong></td>
+<td align="left"><strong>Vegetation Canopy</strong></td>
 <td align="left">54.8%</td>
 </tr>
 <tr class="even">
-<td align="left"><strong>Suelo Desnudo / Terreno</strong></td>
+<td align="left"><strong>Bare Soil / Ground</strong></td>
 <td align="left">24.2%</td>
 </tr>
 </tbody>

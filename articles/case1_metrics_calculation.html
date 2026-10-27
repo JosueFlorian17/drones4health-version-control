@@ -273,14 +273,14 @@ interquartile range), Tukey outlier fences, and thematic stratum
 distributions for both NDVI and NDWI:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Generate multi-moment executive summary with direct multi-sheet Excel export</span></span>
-<span><span class="va">resumen_caso01</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_executive_summary.html">d4h_executive_summary</a></span><span class="op">(</span></span>
+<span><span class="va">exec_summary_case01</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_executive_summary.html">d4h_executive_summary</a></span><span class="op">(</span></span>
 <span>  raster_in   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">r_ndvi</span>, <span class="va">r_ndwi</span><span class="op">)</span>,</span>
 <span>  by          <span class="op">=</span> <span class="st">"general"</span>,</span>
 <span>  out_xlsx    <span class="op">=</span> <span class="st">"salidas/Executive_Summary_Case01_Metrics.xlsx"</span>,</span>
 <span>  sample_size <span class="op">=</span> <span class="fl">1000000</span>,</span>
 <span>  digits      <span class="op">=</span> <span class="fl">3</span></span>
 <span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">resumen_caso01</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">exec_summary_case01</span><span class="op">)</span></span></code></pre></div>
 <pre class="text"><code>==============================================================================
              DRONES4HEALTH - EXECUTIVE SUMMARY REPORT
 ==============================================================================

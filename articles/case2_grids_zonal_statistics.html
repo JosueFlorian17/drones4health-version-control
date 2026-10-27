@@ -271,18 +271,18 @@ IQR), detecting spatial anomalies with Tukey fences
 and exporting directly to Excel:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Multi-moment executive summary aggregated by grid cell</span></span>
-<span><span class="va">resumen_grillas</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_executive_summary.html">d4h_executive_summary</a></span><span class="op">(</span></span>
+<span><span class="va">grid_exec_summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_executive_summary.html">d4h_executive_summary</a></span><span class="op">(</span></span>
 <span>  raster_in   <span class="op">=</span> <span class="va">r_ndvi</span>,</span>
 <span>  by          <span class="op">=</span> <span class="st">"grid"</span>,</span>
 <span>  cell_size   <span class="op">=</span> <span class="fl">50</span>,</span>
 <span>  square      <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  out_xlsx    <span class="op">=</span> <span class="st">"salidas/Executive_Summary_Grids_NDVI.xlsx"</span>,</span>
+<span>  out_xlsx    <span class="op">=</span> <span class="st">"salidas/Executive_Summary_Case02_Grids.xlsx"</span>,</span>
 <span>  sample_size <span class="op">=</span> <span class="fl">1000000</span>,</span>
 <span>  digits      <span class="op">=</span> <span class="fl">3</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Inspect report output</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">resumen_grillas</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">grid_exec_summary</span><span class="op">)</span></span></code></pre></div>
 <pre class="text"><code>==============================================================================
              DRONES4HEALTH - EXECUTIVE SUMMARY REPORT
 ==============================================================================
@@ -355,7 +355,7 @@ IQR), detecting spatial Tukey anomalies per cell, and extracting
 granular percentage composition across environmental strata:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Execute zonal grid executive summary per 50m hexagonal cell</span></span>
-<span><span class="va">resumen_grillas</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_executive_summary.html">d4h_executive_summary</a></span><span class="op">(</span></span>
+<span><span class="va">grid_exec_summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_executive_summary.html">d4h_executive_summary</a></span><span class="op">(</span></span>
 <span>  raster_in   <span class="op">=</span> <span class="va">r_ndvi</span>,</span>
 <span>  by          <span class="op">=</span> <span class="st">"grid"</span>,</span>
 <span>  cell_size   <span class="op">=</span> <span class="fl">50</span>,</span>
@@ -366,7 +366,7 @@ granular percentage composition across environmental strata:</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Preview first grid cells</span></span>
-<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">resumen_grillas</span>, <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">grid_exec_summary</span>, <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="excel-export-structure-sheet-previews">4.2 Excel Export Structure &amp; Sheet Previews<a class="anchor" aria-label="anchor" href="#excel-export-structure-sheet-previews"></a>
@@ -376,20 +376,20 @@ granular percentage composition across environmental strata:</p>
 dedicated sheets:</p>
 <ol style="list-style-type: decimal">
 <li>
-<strong><code>Resumen_Por_Grilla</code></strong>: Granular zonal
-record for every hexagonal cell with descriptive moments, percentage
-cover composition (<code>NDVI_pct_agua_degradado</code>,
-<code>NDVI_pct_suelo_desnudo</code>,
-<code>NDVI_pct_vegetacion_densa</code>), and Tukey anomaly
+<strong><code>Grid_Summary</code></strong>: Granular zonal record
+for every hexagonal cell with descriptive moments, percentage cover
+composition (<code>NDVI_pct_water_substrate</code>,
+<code>NDVI_pct_bare_soil</code>,
+<code>NDVI_pct_dense_vegetation</code>), and Tukey anomaly
 percentages.</li>
 <li>
-<strong><code>Resumen_Global_Grillas</code></strong>: Cross-grid
+<strong><code>Global_Grid_Summary</code></strong>: Cross-grid
 aggregated metrics summarizing inter-cell variability across the
 operational landscape.</li>
 </ol>
 <div class="section level4">
-<h4 id="sheet-1-resumen_por_grilla-preview-first-5-hexagonal-cells">Sheet 1: <code>Resumen_Por_Grilla</code> Preview (First 5 Hexagonal
-Cells)<a class="anchor" aria-label="anchor" href="#sheet-1-resumen_por_grilla-preview-first-5-hexagonal-cells"></a>
+<h4 id="sheet-1-grid_summary-preview-first-5-hexagonal-cells">Sheet 1: <code>Grid_Summary</code> Preview (First 5 Hexagonal
+Cells)<a class="anchor" aria-label="anchor" href="#sheet-1-grid_summary-preview-first-5-hexagonal-cells"></a>
 </h4>
 <table class="table">
 <colgroup>
@@ -410,14 +410,14 @@ Cells)<a class="anchor" aria-label="anchor" href="#sheet-1-resumen_por_grilla-pr
 <th align="left">grid_id</th>
 <th align="left">centroid_x</th>
 <th align="left">centroid_y</th>
-<th align="left">NDVI_pixeles</th>
-<th align="left">NDVI_media</th>
+<th align="left">NDVI_pixels</th>
+<th align="left">NDVI_mean</th>
 <th align="left">NDVI_sd</th>
 <th align="left">NDVI_cv_pct</th>
-<th align="left">NDVI_mediana</th>
-<th align="left">NDVI_pct_agua_degradado</th>
-<th align="left">NDVI_pct_suelo_desnudo</th>
-<th align="left">NDVI_pct_vegetacion_densa</th>
+<th align="left">NDVI_median</th>
+<th align="left">NDVI_pct_water_substrate</th>
+<th align="left">NDVI_pct_bare_soil</th>
+<th align="left">NDVI_pct_dense_vegetation</th>
 <th align="left">NDVI_outliers_pct</th>
 </tr></thead>
 <tbody>
@@ -495,21 +495,21 @@ Cells)<a class="anchor" aria-label="anchor" href="#sheet-1-resumen_por_grilla-pr
 </table>
 </div>
 <div class="section level4">
-<h4 id="sheet-2-resumen_global_grillas-preview-summary-across-all-324-grid-cells">Sheet 2: <code>Resumen_Global_Grillas</code> Preview (Summary Across
-All 324 Grid Cells)<a class="anchor" aria-label="anchor" href="#sheet-2-resumen_global_grillas-preview-summary-across-all-324-grid-cells"></a>
+<h4 id="sheet-2-global_grid_summary-preview-summary-across-all-324-grid-cells">Sheet 2: <code>Global_Grid_Summary</code> Preview (Summary Across
+All 324 Grid Cells)<a class="anchor" aria-label="anchor" href="#sheet-2-global_grid_summary-preview-summary-across-all-324-grid-cells"></a>
 </h4>
 <table class="table">
 <thead><tr class="header">
 <th align="left">Variable</th>
-<th align="left">Media</th>
-<th align="left">Desv_Estandar</th>
-<th align="left">Minimo</th>
-<th align="left">Mediana</th>
-<th align="left">Maximo</th>
+<th align="left">Mean</th>
+<th align="left">Std_Dev</th>
+<th align="left">Min</th>
+<th align="left">Median</th>
+<th align="left">Max</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left"><strong>NDVI_pixeles</strong></td>
+<td align="left"><strong>NDVI_pixels</strong></td>
 <td align="left">2,026.6</td>
 <td align="left">312.4</td>
 <td align="left">148</td>
@@ -517,7 +517,7 @@ All 324 Grid Cells)<a class="anchor" aria-label="anchor" href="#sheet-2-resumen_
 <td align="left">2,196</td>
 </tr>
 <tr class="even">
-<td align="left"><strong>NDVI_media</strong></td>
+<td align="left"><strong>NDVI_mean</strong></td>
 <td align="left">0.254</td>
 <td align="left">0.142</td>
 <td align="left">-0.342</td>
@@ -541,7 +541,7 @@ All 324 Grid Cells)<a class="anchor" aria-label="anchor" href="#sheet-2-resumen_
 <td align="left">345.8%</td>
 </tr>
 <tr class="odd">
-<td align="left"><strong>NDVI_mediana</strong></td>
+<td align="left"><strong>NDVI_median</strong></td>
 <td align="left">0.228</td>
 <td align="left">0.155</td>
 <td align="left">-0.395</td>
@@ -549,7 +549,7 @@ All 324 Grid Cells)<a class="anchor" aria-label="anchor" href="#sheet-2-resumen_
 <td align="left">0.702</td>
 </tr>
 <tr class="even">
-<td align="left"><strong>NDVI_pct_agua_degradado</strong></td>
+<td align="left"><strong>NDVI_pct_water_substrate</strong></td>
 <td align="left">14.2%</td>
 <td align="left">12.8%</td>
 <td align="left">0.0%</td>
@@ -557,7 +557,7 @@ All 324 Grid Cells)<a class="anchor" aria-label="anchor" href="#sheet-2-resumen_
 <td align="left">68.4%</td>
 </tr>
 <tr class="odd">
-<td align="left"><strong>NDVI_pct_suelo_desnudo</strong></td>
+<td align="left"><strong>NDVI_pct_bare_soil</strong></td>
 <td align="left">36.8%</td>
 <td align="left">14.1%</td>
 <td align="left">4.2%</td>
@@ -565,7 +565,7 @@ All 324 Grid Cells)<a class="anchor" aria-label="anchor" href="#sheet-2-resumen_
 <td align="left">74.2%</td>
 </tr>
 <tr class="even">
-<td align="left"><strong>NDVI_pct_vegetacion_densa</strong></td>
+<td align="left"><strong>NDVI_pct_dense_vegetation</strong></td>
 <td align="left">19.5%</td>
 <td align="left">15.6%</td>
 <td align="left">0.0%</td>

@@ -81,8 +81,8 @@ distance to water modeling.
 ## Spatial Grids & Zonation
 
 Operational surveillance grids (hexagons/squares), grid-level
-distance-to-water risk modeling, land cover percentage composition, and
-zonal summary statistics extraction.
+distance-to-water proximity exposure modeling, land cover percentage
+composition, and zonal summary statistics extraction.
 
 - [`d4h_hex_grid()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_hex_grid.md)
   : Generate Hexagonal Surveillance Grid

@@ -219,7 +219,7 @@ Excel file (<code>nuevas_casas_localizadas.xlsx</code>):</p>
 <span><span class="va">path_dem</span> <span class="op">&lt;-</span> <span class="st">"img/Ohuay_D.tif"</span></span>
 <span></span>
 <span><span class="co"># Inspect ingested coordinates</span></span>
-<span><span class="va">houses_df</span> <span class="op">&lt;-</span> <span class="fu">readxl</span><span class="fu">::</span><span class="fu">read_excel</span><span class="op">(</span><span class="va">houses_file</span><span class="op">)</span></span>
+<span><span class="va">houses_df</span> <span class="op">&lt;-</span> <span class="fu">readxl</span><span class="fu">::</span><span class="fu"><a href="https://readxl.tidyverse.org/reference/read_excel.html" class="external-link">read_excel</a></span><span class="op">(</span><span class="va">houses_file</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">houses_df</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lat"</span>, <span class="st">"lon"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -302,45 +302,31 @@ for <em>Anopheles</em>):</p>
 <h3 id="proximity-stratification">Proximity Stratification<a class="anchor" aria-label="anchor" href="#proximity-stratification"></a>
 </h3>
 <table class="table">
-<colgroup>
-<col width="25%">
-<col width="25%">
-<col width="25%">
-<col width="25%">
-</colgroup>
 <thead><tr class="header">
 <th align="left">Proximity Tier</th>
 <th align="left">Proximity to Water</th>
 <th align="left">Proximity Score</th>
-<th align="left">Recommended Vector Surveillance Action</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td align="left"><strong>Immediate Proximity</strong></td>
 <td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&lt;</mo><mn>50</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> m</mtext></mrow></mrow><annotation encoding="application/x-tex">&lt; 50\text{ m}</annotation></semantics></math></td>
 <td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&gt;</mo><mn>0.606</mn></mrow><annotation encoding="application/x-tex">&gt; 0.606</annotation></semantics></math></td>
-<td align="left">Targeted indoor residual spraying and immediate
-larvicide application.</td>
 </tr>
 <tr class="even">
 <td align="left"><strong>High Proximity</strong></td>
 <td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>50</mn><mo>−</mo><mn>100</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> m</mtext></mrow></mrow><annotation encoding="application/x-tex">50 - 100\text{ m}</annotation></semantics></math></td>
 <td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.368</mn><mo>−</mo><mn>0.606</mn></mrow><annotation encoding="application/x-tex">0.368 - 0.606</annotation></semantics></math></td>
-<td align="left">Intensive peridomestic inspection, drainage trenching,
-and water container netting.</td>
 </tr>
 <tr class="odd">
 <td align="left"><strong>Moderate Proximity</strong></td>
 <td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>100</mn><mo>−</mo><mn>200</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> m</mtext></mrow></mrow><annotation encoding="application/x-tex">100 - 200\text{ m}</annotation></semantics></math></td>
 <td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.135</mn><mo>−</mo><mn>0.368</mn></mrow><annotation encoding="application/x-tex">0.135 - 0.368</annotation></semantics></math></td>
-<td align="left">Oviposition trap monitoring and community sensitization
-campaigns.</td>
 </tr>
 <tr class="even">
 <td align="left"><strong>Distal</strong></td>
 <td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&gt;</mo><mn>200</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> m</mtext></mrow></mrow><annotation encoding="application/x-tex">&gt; 200\text{ m}</annotation></semantics></math></td>
 <td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&lt;</mo><mn>0.135</mn></mrow><annotation encoding="application/x-tex">&lt; 0.135</annotation></semantics></math></td>
-<td align="left">Routine seasonal surveillance.</td>
 </tr>
 </tbody>
 </table>
@@ -371,24 +357,23 @@ entire flight footprint:</p>
 <h2 id="results-executive-reporting">4 Results &amp; Executive Reporting<a class="anchor" aria-label="anchor" href="#results-executive-reporting"></a>
 </h2>
 <div class="section level3">
-<h3 id="multi-tier-household-distance-vector-risk-assessment">4.1 Multi-Tier Household Distance &amp; Vector Risk Assessment<a class="anchor" aria-label="anchor" href="#multi-tier-household-distance-vector-risk-assessment"></a>
+<h3 id="household-water-proximity-exposure-assessment">4.1 Household Water Proximity &amp; Exposure Assessment<a class="anchor" aria-label="anchor" href="#household-water-proximity-exposure-assessment"></a>
 </h3>
 <p>We generate an integrated executive summary combining focal
 vegetation canopy indicators with individual household Euclidean
-distance to water sources, proximity exposure decay modeling
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>e</mi><mrow><mi>−</mi><mi>d</mi><mi>/</mi><mi>λ</mi></mrow></msup><annotation encoding="application/x-tex">e^{-d/\lambda}</annotation></semantics></math>),
-and priority epidemiological action tiers:</p>
+distance to water sources and proximity exposure decay modeling
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>e</mi><mrow><mi>−</mi><mi>d</mi><mi>/</mi><mi>λ</mi></mrow></msup><annotation encoding="application/x-tex">e^{-d/\lambda}</annotation></semantics></math>):</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Generate integrated executive summary passing water proximity risk for each household</span></span>
-<span><span class="va">resumen_casas</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_executive_summary.html">d4h_executive_summary</a></span><span class="op">(</span></span>
-<span>  raster_in   <span class="op">=</span> <span class="va">res_buffer</span><span class="op">$</span><span class="va">raster</span>,</span>
-<span>  houses_risk <span class="op">=</span> <span class="va">water_proximity_sf</span>,</span>
-<span>  by          <span class="op">=</span> <span class="st">"general"</span>,</span>
-<span>  out_xlsx    <span class="op">=</span> <span class="st">"salidas/Executive_Summary_Case04_Houses_Risk.xlsx"</span>,</span>
-<span>  sample_size <span class="op">=</span> <span class="fl">1000000</span>,</span>
-<span>  digits      <span class="op">=</span> <span class="fl">3</span></span>
+<code class="sourceCode R"><span><span class="co"># Generate integrated executive summary with household water proximity data</span></span>
+<span><span class="va">houses_exec_summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_executive_summary.html">d4h_executive_summary</a></span><span class="op">(</span></span>
+<span>  raster_in        <span class="op">=</span> <span class="va">res_buffer</span><span class="op">$</span><span class="va">raster</span>,</span>
+<span>  houses_proximity <span class="op">=</span> <span class="va">water_proximity_sf</span>,</span>
+<span>  by               <span class="op">=</span> <span class="st">"general"</span>,</span>
+<span>  out_xlsx         <span class="op">=</span> <span class="st">"salidas/Executive_Summary_Case04_Houses_Proximity.xlsx"</span>,</span>
+<span>  sample_size      <span class="op">=</span> <span class="fl">1000000</span>,</span>
+<span>  digits           <span class="op">=</span> <span class="fl">3</span></span>
 <span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">resumen_casas</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">houses_exec_summary</span><span class="op">)</span></span></code></pre></div>
 <pre class="text"><code>==============================================================================
              DRONES4HEALTH - EXECUTIVE SUMMARY REPORT
 ==============================================================================
@@ -420,11 +405,11 @@ and priority epidemiological action tiers:</p>
     - Dense vegetation / High vigor [&gt;= 0.5)    :  19.2 % ( 10.71 ha)
 
 ------------------------------------------------------------------------------
- 5. HOUSEHOLD DISTANCE-TO-WATER &amp; VECTOR RISK ASSESSMENT:
+ 5. HOUSEHOLD WATER PROXIMITY &amp; EXPOSURE ASSESSMENT:
     - Total Households Evaluated : 55 dwellings
     - Euclidean Distance to Water: Mean = 214.6 m (Min = 34.2 m, Max = 458.0 m)
 
-    - Proximity &amp; Epidemiological Risk Stratification:
+    - Proximity Exposure Stratification:
       * Immediate Proximity (&lt;50m) :   1 houses (  1.8%) | Mean dist:  34.2 m
       * High Proximity (50-100m)   :   3 houses (  5.5%) | Mean dist:  78.4 m
       * Moderate Proximity (100-200m): 24 houses ( 43.6%) | Mean dist: 154.2 m
@@ -436,8 +421,8 @@ and priority epidemiological action tiers:</p>
 <h3 id="excel-export-structure-sheet-previews">4.2 Excel Export Structure &amp; Sheet Previews<a class="anchor" aria-label="anchor" href="#excel-export-structure-sheet-previews"></a>
 </h3>
 <p>The workbook exported to
-<code>salidas/Executive_Summary_Case04_Houses_Risk.xlsx</code> contains
-5 comprehensive sheets:</p>
+<code>salidas/Executive_Summary_Case04_Houses_Proximity.xlsx</code>
+contains 5 comprehensive sheets:</p>
 <ol style="list-style-type: decimal">
 <li>
 <strong><code>Global_Summary</code></strong>: Statistical moments
@@ -449,29 +434,28 @@ moisture stratum percentages inside buffers.</li>
 <strong><code>Outliers_Diagnostics</code></strong>: Tukey outlier
 thresholds and anomaly rates.</li>
 <li>
-<strong><code>Casas_Distancia_Riesgo</code></strong>: Individual
+<strong><code>Household_Water_Proximity</code></strong>: Individual
 record for every georeferenced house with coordinates, minimum distance
-to water (<code>dist_water_m</code>), nearest water body ID, risk score,
-risk level, and recommended epidemiological action.</li>
+to water (<code>dist_water_m</code>), nearest water body ID, proximity
+score, and proximity tier.</li>
 <li>
-<strong><code>Estratificacion_Riesgo_Casas</code></strong>:
+<strong><code>Household_Proximity_Summary</code></strong>:
 Consolidated count, percentage, mean distance, and min/max distance
-stratified by risk tier.</li>
+stratified by proximity tier.</li>
 </ol>
 <div class="section level4">
-<h4 id="sheet-4-casas_distancia_riesgo-preview-first-10-households-with-distance-risk">Sheet 4: <code>Casas_Distancia_Riesgo</code> Preview (First 10
-Households with Distance &amp; Risk)<a class="anchor" aria-label="anchor" href="#sheet-4-casas_distancia_riesgo-preview-first-10-households-with-distance-risk"></a>
+<h4 id="sheet-4-household_water_proximity-preview-first-10-households">Sheet 4: <code>Household_Water_Proximity</code> Preview (First 10
+Households)<a class="anchor" aria-label="anchor" href="#sheet-4-household_water_proximity-preview-first-10-households"></a>
 </h4>
-<table class="table">
+<table style="width:100%;" class="table">
 <colgroup>
-<col width="12%">
-<col width="12%">
-<col width="12%">
-<col width="12%">
-<col width="12%">
-<col width="12%">
-<col width="12%">
-<col width="12%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">house_id</th>
@@ -479,9 +463,8 @@ Households with Distance &amp; Risk)<a class="anchor" aria-label="anchor" href="
 <th align="left">coord_y</th>
 <th align="left">dist_water_m</th>
 <th align="left">nearest_water_id</th>
-<th align="left">risk_score</th>
-<th align="left">risk_level</th>
-<th align="left">accion_recomendada</th>
+<th align="left">proximity_score</th>
+<th align="left">proximity_tier</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
@@ -492,8 +475,6 @@ Households with Distance &amp; Risk)<a class="anchor" aria-label="anchor" href="
 <td align="left">W004</td>
 <td align="left"><strong>0.710</strong></td>
 <td align="left"><strong>Immediate Proximity (&lt;50m)</strong></td>
-<td align="left">Rociado residual intradomiciliario y aplicación
-inmediata de larvicida</td>
 </tr>
 <tr class="even">
 <td align="left"><strong>H002</strong></td>
@@ -503,8 +484,6 @@ inmediata de larvicida</td>
 <td align="left">W004</td>
 <td align="left"><strong>0.504</strong></td>
 <td align="left"><strong>High Proximity (50-100m)</strong></td>
-<td align="left">Inspección peridomiciliaria intensiva, zanjas de
-drenaje y mallas</td>
 </tr>
 <tr class="odd">
 <td align="left"><strong>H003</strong></td>
@@ -514,8 +493,6 @@ drenaje y mallas</td>
 <td align="left">W009</td>
 <td align="left"><strong>0.431</strong></td>
 <td align="left"><strong>High Proximity (50-100m)</strong></td>
-<td align="left">Inspección peridomiciliaria intensiva, zanjas de
-drenaje y mallas</td>
 </tr>
 <tr class="even">
 <td align="left"><strong>H004</strong></td>
@@ -525,8 +502,6 @@ drenaje y mallas</td>
 <td align="left">W004</td>
 <td align="left"><strong>0.396</strong></td>
 <td align="left"><strong>High Proximity (50-100m)</strong></td>
-<td align="left">Inspección peridomiciliaria intensiva, zanjas de
-drenaje y mallas</td>
 </tr>
 <tr class="odd">
 <td align="left"><strong>H005</strong></td>
@@ -536,8 +511,6 @@ drenaje y mallas</td>
 <td align="left">W002</td>
 <td align="left"><strong>0.325</strong></td>
 <td align="left"><strong>Moderate Proximity (100-200m)</strong></td>
-<td align="left">Monitoreo con ovitrampas y sensibilización
-comunitaria</td>
 </tr>
 <tr class="even">
 <td align="left"><strong>H006</strong></td>
@@ -547,8 +520,6 @@ comunitaria</td>
 <td align="left">W002</td>
 <td align="left"><strong>0.250</strong></td>
 <td align="left"><strong>Moderate Proximity (100-200m)</strong></td>
-<td align="left">Monitoreo con ovitrampas y sensibilización
-comunitaria</td>
 </tr>
 <tr class="odd">
 <td align="left"><strong>H007</strong></td>
@@ -558,8 +529,6 @@ comunitaria</td>
 <td align="left">W004</td>
 <td align="left"><strong>0.234</strong></td>
 <td align="left"><strong>Moderate Proximity (100-200m)</strong></td>
-<td align="left">Monitoreo con ovitrampas y sensibilización
-comunitaria</td>
 </tr>
 <tr class="even">
 <td align="left"><strong>H008</strong></td>
@@ -569,8 +538,6 @@ comunitaria</td>
 <td align="left">W012</td>
 <td align="left"><strong>0.196</strong></td>
 <td align="left"><strong>Moderate Proximity (100-200m)</strong></td>
-<td align="left">Monitoreo con ovitrampas y sensibilización
-comunitaria</td>
 </tr>
 <tr class="odd">
 <td align="left"><strong>H009</strong></td>
@@ -580,7 +547,6 @@ comunitaria</td>
 <td align="left">W015</td>
 <td align="left"><strong>0.106</strong></td>
 <td align="left"><strong>Distal (&gt;200m)</strong></td>
-<td align="left">Vigilancia rutinaria estacional de bajo impacto</td>
 </tr>
 <tr class="even">
 <td align="left"><strong>H010</strong></td>
@@ -590,13 +556,12 @@ comunitaria</td>
 <td align="left">W015</td>
 <td align="left"><strong>0.062</strong></td>
 <td align="left"><strong>Distal (&gt;200m)</strong></td>
-<td align="left">Vigilancia rutinaria estacional de bajo impacto</td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="section level4">
-<h4 id="sheet-5-estratificacion_riesgo_casas-preview">Sheet 5: <code>Estratificacion_Riesgo_Casas</code> Preview<a class="anchor" aria-label="anchor" href="#sheet-5-estratificacion_riesgo_casas-preview"></a>
+<h4 id="sheet-5-household_proximity_summary-preview">Sheet 5: <code>Household_Proximity_Summary</code> Preview<a class="anchor" aria-label="anchor" href="#sheet-5-household_proximity_summary-preview"></a>
 </h4>
 <table style="width:100%;" class="table">
 <colgroup>
@@ -608,12 +573,12 @@ comunitaria</td>
 <col width="16%">
 </colgroup>
 <thead><tr class="header">
-<th align="left">Nivel_Riesgo</th>
-<th align="left">N_Casas</th>
-<th align="left">Porcentaje_Casas (%)</th>
-<th align="left">Distancia_Media_m</th>
-<th align="left">Distancia_Minima_m</th>
-<th align="left">Distancia_Maxima_m</th>
+<th align="left">Proximity_Tier</th>
+<th align="left">Household_Count</th>
+<th align="left">Household_Pct (%)</th>
+<th align="left">Mean_Distance_m</th>
+<th align="left">Min_Distance_m</th>
+<th align="left">Max_Distance_m</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
