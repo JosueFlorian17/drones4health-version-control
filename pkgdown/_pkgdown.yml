@@ -146,9 +146,11 @@ reference:
       - d4h_raster_distance
 
   - title: "Spatial Grids & Zonation"
-    desc: "Operational surveillance grids (hexagons/squares) and zonal summary statistics extraction."
+    desc: "Operational surveillance grids (hexagons/squares), grid-level distance-to-water risk modeling, land cover percentage composition, and zonal summary statistics extraction."
     contents:
       - d4h_hex_grid
+      - d4h_grid_distance_to_water
+      - d4h_grid_composition
       - d4h_summarize_grid
       - d4h_summarize_general
       - d4h_raster_general

@@ -9,6 +9,7 @@ d4h_executive_summary(
   raster_in,
   by = c("general", "grid"),
   grid = NULL,
+  houses_risk = NULL,
   cell_size = 50,
   square = TRUE,
   out_xlsx = NULL,
@@ -20,6 +21,7 @@ d4h_report(
   raster_in,
   by = c("general", "grid"),
   grid = NULL,
+  houses_risk = NULL,
   cell_size = 50,
   square = TRUE,
   out_xlsx = NULL,
@@ -33,6 +35,8 @@ d4h_report(
 \item{by}{Character. Summary aggregation scope: \code{"general"} (default, overall scene report) or \code{"grid"} (zonal summary per grid cell, with one row per cell).}
 
 \item{grid}{Optional SpatVector, sf, or character path to existing grid polygon boundaries when \code{by = "grid"}. If NULL, automatically generated using \code{cell_size} and \code{square}.}
+
+\item{houses_risk}{Optional \code{sf} or \code{data.frame} of residential dwellings with calculated distance to water and risk scores (e.g. from \code{d4h_distance_to_water} or buffer analysis). If provided, appends dedicated household distance and epidemiological risk sheets to the Excel workbook.}
 
 \item{cell_size}{Numeric. Grid cell size / diameter in meters when generating a new grid for \code{by = "grid"} (default: 50).}
 

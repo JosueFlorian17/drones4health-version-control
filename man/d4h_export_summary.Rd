@@ -4,18 +4,20 @@
 \alias{d4h_export_summary}
 \title{Export Executive Summary to Multi-Sheet Excel File}
 \usage{
-d4h_export_summary(x, out_xlsx)
+d4h_export_summary(x, out_xlsx, houses_risk = NULL)
 }
 \arguments{
 \item{x}{An object of class \code{d4h_executive_summary}.}
 
 \item{out_xlsx}{Character. Path where the .xlsx file will be created.}
+
+\item{houses_risk}{Optional \code{sf} or \code{data.frame} of residential dwellings with distance to water and risk attributes.}
 }
 \value{
 Invisibly returns the input object \code{x}.
 }
 \description{
-Exports a \code{d4h_executive_summary} object to an Excel workbook (.xlsx) with dedicated sheets for Global Summary, Stratification, and Outlier Diagnostics.
+Exports a \code{d4h_executive_summary} object to an Excel workbook (.xlsx) with dedicated sheets for Global Summary, Stratification, Outlier Diagnostics, and optional Household Distance-to-Water Risk.
 }
 \examples{
 \donttest{

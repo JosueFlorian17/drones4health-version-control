@@ -16,7 +16,6 @@ img/
 *.png
 !man/figures/*.png
 
-docs
 output_figures/
 salidas/
 test_mapview_pipe_files/

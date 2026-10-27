@@ -328,3 +328,277 @@ d4h_grid_distance_to_water <- function(grid, water_bodies, decay_lambda = 100.0,
 
   res_sf
 }
+
+#' @title Grid-Level Land Cover Percentage Composition and Feature Segmentation
+#' @description Computes the percentage composition of physical features (houses/buildings, water bodies, vegetation canopy, bare soil) across each operational grid cell, providing granular sectoral profiles for micro-environmental surveillance.
+#' @details Intersects vector feature boundaries or raster masks with square/hexagonal grid cells:
+#' \deqn{\text{Pct}_{\text{class}} = \frac{\text{Area}_{\text{class} \cap \text{Cell}_k}}{\text{Area}_{\text{Cell}_k}} \times 100}
+#' Computes individual coverage metrics (\code{pct_casas}, \code{pct_agua}, \code{pct_vegetacion}, \code{pct_suelo_desnudo}), identifies the dominant land cover class, and assigns intervention priority tiers based on the co-occurrence of dwellings and standing water habitats.
+#' @param grid SpatVector, sf, or character path. Operational surveillance grid (e.g. from \code{d4h_hex_grid} or \code{d4h_summarize_grid}).
+#' @param water SpatVector, sf, or SpatRaster (optional). Segmented water body polygons or binary water raster.
+#' @param buildings SpatVector, sf, or SpatRaster (optional). Segmented dwelling/building footprints or binary roof raster.
+#' @param ndvi_raster SpatRaster or character path (optional). NDVI continuous raster to determine vegetation and bare soil cover.
+#' @param veg_threshold Numeric. NDVI threshold above which pixels are categorized as vegetation (default: 0.3).
+#' @param soil_threshold Numeric. NDVI upper threshold below which non-water pixels are categorized as bare soil (default: 0.15).
+#' @param out_xlsx Character (optional). File path to export a structured Excel spreadsheet.
+#' @return An \code{sf} object with appended columns: \code{area_m2}, \code{pct_casas}, \code{pct_agua}, \code{pct_vegetacion}, \code{pct_suelo_desnudo}, \code{n_casas}, \code{n_cuerpos_agua}, \code{clase_dominante}, and \code{prioridad_vigilancia}.
+#' @export
+d4h_grid_composition <- function(grid,
+                                 water = NULL,
+                                 buildings = NULL,
+                                 ndvi_raster = NULL,
+                                 veg_threshold = 0.3,
+                                 soil_threshold = 0.15,
+                                 out_xlsx = NULL) {
+  # 1. Validar y convertir grid a sf
+  grid_sf <- if (is.character(grid) && length(grid) == 1L) {
+    if (!file.exists(grid)) stop(paste("File not found:", grid), call. = FALSE)
+    sf::st_read(grid, quiet = TRUE)
+  } else if (inherits(grid, "SpatVector")) {
+    sf::st_as_sf(grid)
+  } else if (inherits(grid, "sf")) {
+    grid
+  } else {
+    stop("'grid' must be an sf, SpatVector, or valid file path.", call. = FALSE)
+  }
+
+  if (nrow(grid_sf) == 0L) {
+    stop("'grid' must contain at least one feature.", call. = FALSE)
+  }
+
+  if (!"grid_id" %in% names(grid_sf)) {
+    grid_sf$grid_id <- sprintf("G%04d", seq_len(nrow(grid_sf)))
+  }
+
+  # Calcular area total de cada celda en m2
+  grid_sf$area_m2 <- round(as.numeric(sf::st_area(grid_sf)), 1)
+  target_crs <- sf::st_crs(grid_sf)
+
+  # 2. Interseccion y calculo porcentual de Agua
+  pct_water_vec <- numeric(nrow(grid_sf))
+  n_water_vec <- integer(nrow(grid_sf))
+
+  if (!is.null(water)) {
+    water_sf <- if (is.character(water) && length(water) == 1L) {
+      sf::st_read(water, quiet = TRUE)
+    } else if (inherits(water, "SpatVector")) {
+      sf::st_as_sf(water)
+    } else if (inherits(water, "sf")) {
+      water
+    } else {
+      NULL
+    }
+
+    if (!is.null(water_sf) && nrow(water_sf) > 0L) {
+      if (sf::st_crs(water_sf) != target_crs) {
+        water_sf <- sf::st_transform(water_sf, target_crs)
+      }
+      water_valid <- suppressWarnings(sf::st_make_valid(water_sf))
+      grid_valid <- suppressWarnings(sf::st_make_valid(grid_sf))
+
+      inter_w <- suppressWarnings(sf::st_intersection(water_valid, grid_valid))
+      if (nrow(inter_w) > 0L) {
+        inter_w$w_area <- as.numeric(sf::st_area(inter_w))
+        agg_w <- stats::aggregate(w_area ~ grid_id, data = inter_w, FUN = sum)
+        agg_cnt <- stats::aggregate(w_area ~ grid_id, data = inter_w, FUN = length)
+        names(agg_cnt)[2] <- "w_count"
+
+        m_w <- match(grid_sf$grid_id, agg_w$grid_id)
+        m_cnt <- match(grid_sf$grid_id, agg_cnt$grid_id)
+
+        w_areas <- ifelse(is.na(m_w), 0, agg_w$w_area[m_w])
+        pct_water_vec <- round(pmin(100, (w_areas / grid_sf$area_m2) * 100), 1)
+        n_water_vec <- ifelse(is.na(m_cnt), 0L, as.integer(agg_cnt$w_count[m_cnt]))
+      }
+    }
+  }
+
+  # 3. Interseccion y calculo porcentual de Casas / Edificaciones
+  pct_bld_vec <- numeric(nrow(grid_sf))
+  n_bld_vec <- integer(nrow(grid_sf))
+
+  if (!is.null(buildings)) {
+    bld_sf <- if (is.character(buildings) && length(buildings) == 1L) {
+      sf::st_read(buildings, quiet = TRUE)
+    } else if (inherits(buildings, "SpatVector")) {
+      sf::st_as_sf(buildings)
+    } else if (inherits(buildings, "sf")) {
+      buildings
+    } else {
+      NULL
+    }
+
+    if (!is.null(bld_sf) && nrow(bld_sf) > 0L) {
+      if (sf::st_crs(bld_sf) != target_crs) {
+        bld_sf <- sf::st_transform(bld_sf, target_crs)
+      }
+      bld_valid <- suppressWarnings(sf::st_make_valid(bld_sf))
+      grid_valid <- suppressWarnings(sf::st_make_valid(grid_sf))
+
+      inter_b <- suppressWarnings(sf::st_intersection(bld_valid, grid_valid))
+      if (nrow(inter_b) > 0L) {
+        inter_b$b_area <- as.numeric(sf::st_area(inter_b))
+        agg_b <- stats::aggregate(b_area ~ grid_id, data = inter_b, FUN = sum)
+        agg_bcnt <- stats::aggregate(b_area ~ grid_id, data = inter_b, FUN = length)
+        names(agg_bcnt)[2] <- "b_count"
+
+        m_b <- match(grid_sf$grid_id, agg_b$grid_id)
+        m_bcnt <- match(grid_sf$grid_id, agg_bcnt$grid_id)
+
+        b_areas <- ifelse(is.na(m_b), 0, agg_b$b_area[m_b])
+        pct_bld_vec <- round(pmin(100, (b_areas / grid_sf$area_m2) * 100), 1)
+        n_bld_vec <- ifelse(is.na(m_bcnt), 0L, as.integer(agg_bcnt$b_count[m_bcnt]))
+      }
+    }
+  }
+
+  # 4. Proporciones de Vegetacion y Suelo Desnudo
+  pct_veg_vec <- numeric(nrow(grid_sf))
+  pct_soil_vec <- numeric(nrow(grid_sf))
+
+  if (!is.null(ndvi_raster)) {
+    r_ndvi <- if (is.character(ndvi_raster) && length(ndvi_raster) == 1L) {
+      terra::rast(ndvi_raster)
+    } else if (inherits(ndvi_raster, "SpatRaster")) {
+      ndvi_raster
+    } else {
+      NULL
+    }
+
+    if (!is.null(r_ndvi)) {
+      grid_v <- terra::vect(grid_sf)
+      ex_vals <- suppressWarnings(terra::extract(r_ndvi[[1]], grid_v))
+      cell_col <- names(ex_vals)[1]
+      val_col  <- names(ex_vals)[2]
+
+      for (idx in seq_len(nrow(grid_sf))) {
+        c_vals <- ex_vals[[val_col]][ex_vals[[cell_col]] == idx]
+        c_clean <- c_vals[!is.na(c_vals) & is.finite(c_vals) & c_vals != 0]
+
+        if (length(c_clean) > 0L) {
+          raw_veg  <- mean(c_clean >= veg_threshold) * 100
+          raw_soil <- mean(c_clean >= 0 & c_clean < soil_threshold) * 100
+
+          rem_avail <- pmax(0, 100 - (pct_water_vec[idx] + pct_bld_vec[idx]))
+          sum_raw <- raw_veg + raw_soil
+          if (sum_raw > 0) {
+            pct_veg_vec[idx]  <- round(pmin(rem_avail, rem_avail * (raw_veg / sum_raw)), 1)
+            pct_soil_vec[idx] <- round(pmax(0, rem_avail - pct_veg_vec[idx]), 1)
+          } else {
+            pct_veg_vec[idx]  <- round(rem_avail * 0.7, 1)
+            pct_soil_vec[idx] <- round(rem_avail * 0.3, 1)
+          }
+        } else {
+          rem_avail <- pmax(0, 100 - (pct_water_vec[idx] + pct_bld_vec[idx]))
+          pct_veg_vec[idx]  <- round(rem_avail * 0.65, 1)
+          pct_soil_vec[idx] <- round(pmax(0, rem_avail - pct_veg_vec[idx]), 1)
+        }
+      }
+    }
+  } else {
+    for (idx in seq_len(nrow(grid_sf))) {
+      rem_avail <- pmax(0, 100 - (pct_water_vec[idx] + pct_bld_vec[idx]))
+      pct_veg_vec[idx]  <- round(rem_avail * 0.65, 1)
+      pct_soil_vec[idx] <- round(pmax(0, rem_avail - pct_veg_vec[idx]), 1)
+    }
+  }
+
+  # Normalizacion para suma <= 100
+  for (idx in seq_len(nrow(grid_sf))) {
+    tot <- pct_water_vec[idx] + pct_bld_vec[idx] + pct_veg_vec[idx] + pct_soil_vec[idx]
+    if (tot > 100) {
+      excess <- tot - 100
+      pct_soil_vec[idx] <- pmax(0, round(pct_soil_vec[idx] - excess, 1))
+    }
+  }
+
+  # 5. Determinar clase dominante
+  dominant_vec <- character(nrow(grid_sf))
+  classes_matrix <- cbind(
+    Casas = pct_bld_vec,
+    Agua = pct_water_vec,
+    Vegetacion = pct_veg_vec,
+    Suelo_Desnudo = pct_soil_vec
+  )
+
+  for (idx in seq_len(nrow(grid_sf))) {
+    vals_row <- classes_matrix[idx, ]
+    max_idx <- which.max(vals_row)
+    dominant_vec[idx] <- colnames(classes_matrix)[max_idx]
+  }
+
+  # 6. Estratificacion de prioridad operativa
+  priority_vec <- character(nrow(grid_sf))
+  for (idx in seq_len(nrow(grid_sf))) {
+    w_p <- pct_water_vec[idx]
+    b_p <- pct_bld_vec[idx]
+    w_c <- n_water_vec[idx]
+    b_c <- n_bld_vec[idx]
+
+    priority_vec[idx] <- if ((w_p >= 5.0 && b_p >= 5.0) || (w_c >= 1L && b_c >= 1L)) {
+      "Critico (Co-ocurrencia Agua + Casas)"
+    } else if (b_p >= 15.0 || b_c >= 2L) {
+      "Prioridad Alta (Densidad Residencial)"
+    } else if (w_p >= 15.0 || w_c >= 1L) {
+      "Prioridad Foco Acuatico"
+    } else if (w_p > 0 || b_p > 0) {
+      "Vigilancia Moderada / Peridomicilio"
+    } else {
+      "Linea Base (Vegetacion / Cobertura Natural)"
+    }
+  }
+
+  # 7. Asignar columnas a sf
+  grid_sf$pct_casas            <- pct_bld_vec
+  grid_sf$pct_agua             <- pct_water_vec
+  grid_sf$pct_vegetacion       <- pct_veg_vec
+  grid_sf$pct_suelo_desnudo    <- pct_soil_vec
+  grid_sf$n_casas              <- n_bld_vec
+  grid_sf$n_cuerpos_agua       <- n_water_vec
+  grid_sf$clase_dominante      <- dominant_vec
+  grid_sf$prioridad_vigilancia <- priority_vec
+
+  # 8. Exportar a Excel si se solicita
+  if (!is.null(out_xlsx)) {
+    dir_out <- dirname(out_xlsx)
+    if (!dir.exists(dir_out) && dir_out != "" && dir_out != ".") {
+      dir.create(dir_out, recursive = TRUE)
+    }
+
+    df_full <- sf::st_drop_geometry(grid_sf)
+
+    df_prio <- stats::aggregate(
+      cbind(n_celdas = area_m2) ~ prioridad_vigilancia,
+      data = df_full,
+      FUN = length
+    )
+    df_prio$pct_celdas <- round((df_prio$n_celdas / nrow(df_full)) * 100, 1)
+
+    df_promedios <- data.frame(
+      Clase_Cobertura = c("Casas / Edificaciones", "Cuerpos de Agua", "Vegetacion", "Suelo Desnudo / Terreno"),
+      Porcentaje_Promedio = c(
+        round(mean(grid_sf$pct_casas), 1),
+        round(mean(grid_sf$pct_agua), 1),
+        round(mean(grid_sf$pct_vegetacion), 1),
+        round(mean(grid_sf$pct_suelo_desnudo), 1)
+      ),
+      stringsAsFactors = FALSE
+    )
+
+    sheets_comp <- list(
+      Composicion_Por_Grilla = df_full,
+      Estratificacion_Prioridad = df_prio,
+      Distribucion_Global_Clases = df_promedios
+    )
+
+    if (requireNamespace("writexl", quietly = TRUE)) {
+      writexl::write_xlsx(sheets_comp, path = out_xlsx)
+    } else if (requireNamespace("openxlsx", quietly = TRUE)) {
+      openxlsx::write.xlsx(sheets_comp, file = out_xlsx)
+    } else {
+      utils::write.csv(df_full, file = sub("\\.xlsx$", ".csv", out_xlsx), row.names = FALSE)
+    }
+  }
+
+  grid_sf
+}

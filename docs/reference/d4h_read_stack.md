@@ -1,0 +1,67 @@
+# Read and Validate Multi-Band Stack Raster
+
+Loads a multi-band raster stack from a file or SpatRaster, verifies that
+required spectral or terrain bands are present, and throws an
+informative error if any required band is missing.
+
+## Usage
+
+``` r
+d4h_read_stack(file_path, required_bands = NULL, band_names = NULL)
+
+d4h_load_stack(file_path, required_bands = NULL, band_names = NULL)
+```
+
+## Arguments
+
+- file_path:
+
+  Character path or SpatRaster. File path to a multi-band GeoTIFF/raster
+  file, or an existing SpatRaster object.
+
+- required_bands:
+
+  Character vector (optional). Names of bands that must be present in
+  the stack (e.g. `c("NIR", "Red")`). Matching is case-insensitive.
+
+- band_names:
+
+  Character vector (optional). Layer names to assign or override on the
+  raster stack. Must match the number of layers if provided.
+
+## Value
+
+A
+[`terra::SpatRaster`](https://rspatial.github.io/terra/reference/SpatRaster-class.html)
+object with validated layers and band names.
+
+## Details
+
+In drone remote sensing pipelines, multi-band orthomosaics often combine
+optical (Red, Green, Blue), Red Edge, Near-Infrared (NIR), and digital
+elevation (DEM/DSM) channels into a single stacked GeoTIFF.
+`d4h_read_stack` reads the multi-layer raster, assigns or verifies layer
+names, and strictly validates that all bands required for downstream
+metric calculations (such as NDVI or NDWI) exist in the stack. If a
+required band is absent, execution halts immediately with an informative
+error listing the missing band(s) and currently available layers.
+
+## Examples
+
+``` r
+# \donttest{
+if (interactive()) {
+  library(drones4health)
+
+  # Define path to multi-band drone raster stack
+  stack_file <- system.file("extdata", "ortho_multiband.tif", package = "drones4health")
+
+  # Read stack and assert presence of NIR and Red bands
+  r_stack <- d4h_read_stack(
+    file_path      = stack_file,
+    required_bands = c("NIR", "Red")
+  )
+  print(r_stack)
+}
+# }
+```

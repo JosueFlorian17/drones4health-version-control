@@ -1,13 +1,13 @@
 # Export Executive Summary to Multi-Sheet Excel File
 
 Exports a `d4h_executive_summary` object to an Excel workbook (.xlsx)
-with dedicated sheets for Global Summary, Stratification, and Outlier
-Diagnostics.
+with dedicated sheets for Global Summary, Stratification, Outlier
+Diagnostics, and optional Household Distance-to-Water Risk.
 
 ## Usage
 
 ``` r
-d4h_export_summary(x, out_xlsx)
+d4h_export_summary(x, out_xlsx, houses_risk = NULL)
 ```
 
 ## Arguments
@@ -19,6 +19,11 @@ d4h_export_summary(x, out_xlsx)
 - out_xlsx:
 
   Character. Path where the .xlsx file will be created.
+
+- houses_risk:
+
+  Optional `sf` or `data.frame` of residential dwellings with distance
+  to water and risk attributes.
 
 ## Value
 
