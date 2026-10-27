@@ -58,9 +58,9 @@ d4h_grid_composition(
 
 ## Value
 
-An `sf` object with appended columns: `area_m2`, `pct_casas`,
-`pct_agua`, `pct_vegetacion`, `pct_suelo_desnudo`, `n_casas`,
-`n_cuerpos_agua`, `clase_dominante`, and `prioridad_vigilancia`.
+An `sf` object with appended columns: `area_m2`, `pct_houses`,
+`pct_water`, `pct_vegetation`, `pct_bare_soil`, `n_houses`,
+`n_water_bodies`, `dominant_class`, and `surveillance_priority`.
 
 ## Details
 
@@ -68,7 +68,7 @@ Intersects vector feature boundaries or raster masks with
 square/hexagonal grid cells: \$\$\text{Pct}\_{\text{class}} =
 \frac{\text{Area}\_{\text{class} \cap
 \text{Cell}\_k}}{\text{Area}\_{\text{Cell}\_k}} \times 100\$\$ Computes
-individual coverage metrics (`pct_casas`, `pct_agua`, `pct_vegetacion`,
-`pct_suelo_desnudo`), identifies the dominant land cover class, and
-assigns intervention priority tiers based on the co-occurrence of
+individual coverage metrics (`pct_houses`, `pct_water`,
+`pct_vegetation`, `pct_bare_soil`), identifies the dominant land cover
+class, and assigns sectoral priority tiers based on the co-occurrence of
 dwellings and standing water habitats.

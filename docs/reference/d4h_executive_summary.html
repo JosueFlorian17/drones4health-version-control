@@ -95,6 +95,7 @@
 <span>  <span class="va">raster_in</span>,</span>
 <span>  by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"general"</span>, <span class="st">"grid"</span><span class="op">)</span>,</span>
 <span>  grid <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  houses_proximity <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  houses_risk <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  cell_size <span class="op">=</span> <span class="fl">50</span>,</span>
 <span>  square <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -107,6 +108,7 @@
 <span>  <span class="va">raster_in</span>,</span>
 <span>  by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"general"</span>, <span class="st">"grid"</span><span class="op">)</span>,</span>
 <span>  grid <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  houses_proximity <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  houses_risk <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  cell_size <span class="op">=</span> <span class="fl">50</span>,</span>
 <span>  square <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -132,8 +134,12 @@
 <dd><p>Optional SpatVector, sf, or character path to existing grid polygon boundaries when <code>by = "grid"</code>. If NULL, automatically generated using <code>cell_size</code> and <code>square</code>.</p></dd>
 
 
+<dt id="arg-houses-proximity">houses_proximity<a class="anchor" aria-label="anchor" href="#arg-houses-proximity"></a></dt>
+<dd><p>Optional <code>sf</code> or <code>data.frame</code> of residential dwellings with calculated distance to water and proximity scores (e.g. from <code>d4h_distance_to_water</code> or buffer analysis). If provided, appends dedicated household distance and proximity exposure sheets to the Excel workbook.</p></dd>
+
+
 <dt id="arg-houses-risk">houses_risk<a class="anchor" aria-label="anchor" href="#arg-houses-risk"></a></dt>
-<dd><p>Optional <code>sf</code> or <code>data.frame</code> of residential dwellings with calculated distance to water and risk scores (e.g. from <code>d4h_distance_to_water</code> or buffer analysis). If provided, appends dedicated household distance and epidemiological risk sheets to the Excel workbook.</p></dd>
+<dd><p>Deprecated alias for <code>houses_proximity</code>.</p></dd>
 
 
 <dt id="arg-cell-size">cell_size<a class="anchor" aria-label="anchor" href="#arg-cell-size"></a></dt>

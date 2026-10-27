@@ -14,6 +14,7 @@ d4h_executive_summary(
   raster_in,
   by = c("general", "grid"),
   grid = NULL,
+  houses_proximity = NULL,
   houses_risk = NULL,
   cell_size = 50,
   square = TRUE,
@@ -26,6 +27,7 @@ d4h_report(
   raster_in,
   by = c("general", "grid"),
   grid = NULL,
+  houses_proximity = NULL,
   houses_risk = NULL,
   cell_size = 50,
   square = TRUE,
@@ -53,12 +55,17 @@ d4h_report(
   boundaries when `by = "grid"`. If NULL, automatically generated using
   `cell_size` and `square`.
 
-- houses_risk:
+- houses_proximity:
 
   Optional `sf` or `data.frame` of residential dwellings with calculated
-  distance to water and risk scores (e.g. from `d4h_distance_to_water`
-  or buffer analysis). If provided, appends dedicated household distance
-  and epidemiological risk sheets to the Excel workbook.
+  distance to water and proximity scores (e.g. from
+  `d4h_distance_to_water` or buffer analysis). If provided, appends
+  dedicated household distance and proximity exposure sheets to the
+  Excel workbook.
+
+- houses_risk:
+
+  Deprecated alias for `houses_proximity`.
 
 - cell_size:
 

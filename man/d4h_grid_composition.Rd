@@ -30,7 +30,7 @@ d4h_grid_composition(
 \item{out_xlsx}{Character (optional). File path to export a structured Excel spreadsheet.}
 }
 \value{
-An \code{sf} object with appended columns: \code{area_m2}, \code{pct_casas}, \code{pct_agua}, \code{pct_vegetacion}, \code{pct_suelo_desnudo}, \code{n_casas}, \code{n_cuerpos_agua}, \code{clase_dominante}, and \code{prioridad_vigilancia}.
+An \code{sf} object with appended columns: \code{area_m2}, \code{pct_houses}, \code{pct_water}, \code{pct_vegetation}, \code{pct_bare_soil}, \code{n_houses}, \code{n_water_bodies}, \code{dominant_class}, and \code{surveillance_priority}.
 }
 \description{
 Computes the percentage composition of physical features (houses/buildings, water bodies, vegetation canopy, bare soil) across each operational grid cell, providing granular sectoral profiles for micro-environmental surveillance.
@@ -38,5 +38,5 @@ Computes the percentage composition of physical features (houses/buildings, wate
 \details{
 Intersects vector feature boundaries or raster masks with square/hexagonal grid cells:
 \deqn{\text{Pct}_{\text{class}} = \frac{\text{Area}_{\text{class} \cap \text{Cell}_k}}{\text{Area}_{\text{Cell}_k}} \times 100}
-Computes individual coverage metrics (\code{pct_casas}, \code{pct_agua}, \code{pct_vegetacion}, \code{pct_suelo_desnudo}), identifies the dominant land cover class, and assigns intervention priority tiers based on the co-occurrence of dwellings and standing water habitats.
+Computes individual coverage metrics (\code{pct_houses}, \code{pct_water}, \code{pct_vegetation}, \code{pct_bare_soil}), identifies the dominant land cover class, and assigns sectoral priority tiers based on the co-occurrence of dwellings and standing water habitats.
 }

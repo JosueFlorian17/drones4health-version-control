@@ -8,7 +8,8 @@
 #' @param raster_in SpatRaster, list of SpatRaster layers, or character file path.
 #' @param by Character. Summary aggregation scope: \code{"general"} (default, overall scene report) or \code{"grid"} (zonal summary per grid cell, with one row per cell).
 #' @param grid Optional SpatVector, sf, or character path to existing grid polygon boundaries when \code{by = "grid"}. If NULL, automatically generated using \code{cell_size} and \code{square}.
-#' @param houses_risk Optional \code{sf} or \code{data.frame} of residential dwellings with calculated distance to water and risk scores (e.g. from \code{d4h_distance_to_water} or buffer analysis). If provided, appends dedicated household distance and epidemiological risk sheets to the Excel workbook.
+#' @param houses_proximity Optional \code{sf} or \code{data.frame} of residential dwellings with calculated distance to water and proximity scores (e.g. from \code{d4h_distance_to_water} or buffer analysis). If provided, appends dedicated household distance and proximity exposure sheets to the Excel workbook.
+#' @param houses_risk Deprecated alias for \code{houses_proximity}.
 #' @param cell_size Numeric. Grid cell size / diameter in meters when generating a new grid for \code{by = "grid"} (default: 50).
 #' @param square Logical. If TRUE, square grid; if FALSE, hexagonal grid (default: TRUE).
 #' @param out_xlsx Character (optional). File path to export a structured multi-sheet Excel workbook (.xlsx). Default: NULL.
@@ -50,8 +51,11 @@
 #' }
 #' }
 #' @export
-d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = NULL, houses_risk = NULL, cell_size = 50, square = TRUE, out_xlsx = NULL, sample_size = 1000000, digits = 3) {
+d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = NULL, houses_proximity = NULL, houses_risk = NULL, cell_size = 50, square = TRUE, out_xlsx = NULL, sample_size = 1000000, digits = 3) {
   by <- match.arg(by)
+  if (is.null(houses_proximity) && !is.null(houses_risk)) {
+    houses_proximity <- houses_risk
+  }
 
   r <- if (is.character(raster_in) && length(raster_in) == 1L) {
     if (!file.exists(raster_in)) stop(paste("File not found:", raster_in), call. = FALSE)
@@ -157,37 +161,47 @@ d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = N
           out_tot <- sum(v_clean < l_fence | v_clean > u_fence)
           out_pct <- (out_tot / n_v) * 100
 
-          cell_data[[paste0(v_name, "_media")]]        <- round(m_val, digits)
+          cell_data[[paste0(v_name, "_mean")]]         <- round(m_val, digits)
           cell_data[[paste0(v_name, "_sd")]]           <- round(sd_val, digits)
           cell_data[[paste0(v_name, "_cv_pct")]]       <- round(cv_val, 1)
           cell_data[[paste0(v_name, "_min")]]          <- round(min(v_clean), digits)
           cell_data[[paste0(v_name, "_max")]]          <- round(max(v_clean), digits)
-          cell_data[[paste0(v_name, "_mediana")]]      <- round(med, digits)
+          cell_data[[paste0(v_name, "_median")]]       <- round(med, digits)
           cell_data[[paste0(v_name, "_iqr")]]          <- round(iqr, digits)
           cell_data[[paste0(v_name, "_outliers_pct")]] <- round(out_pct, 1)
 
-          # Estratificación simplificada clave
+          # Backward compatibility aliases
+          cell_data[[paste0(v_name, "_media")]]        <- round(m_val, digits)
+          cell_data[[paste0(v_name, "_mediana")]]      <- round(med, digits)
+
+          # Simplified key stratification
           v_up <- toupper(v_name)
           if (grepl("NDVI|SAVI|GNDVI", v_up)) {
-            cell_data[[paste0(v_name, "_pct_agua_degradado")]] <- round(mean(v_clean < 0) * 100, 1)
-            cell_data[[paste0(v_name, "_pct_suelo_desnudo")]]   <- round(mean(v_clean >= 0 & v_clean < 0.2) * 100, 1)
-            cell_data[[paste0(v_name, "_pct_vegetacion_densa")]] <- round(mean(v_clean >= 0.5) * 100, 1)
+            cell_data[[paste0(v_name, "_pct_water_substrate")]] <- round(mean(v_clean < 0) * 100, 1)
+            cell_data[[paste0(v_name, "_pct_bare_soil")]]       <- round(mean(v_clean >= 0 & v_clean < 0.2) * 100, 1)
+            cell_data[[paste0(v_name, "_pct_dense_vegetation")]] <- round(mean(v_clean >= 0.5) * 100, 1)
+            # Aliases
+            cell_data[[paste0(v_name, "_pct_agua_degradado")]]  <- cell_data[[paste0(v_name, "_pct_water_substrate")]]
+            cell_data[[paste0(v_name, "_pct_suelo_desnudo")]]    <- cell_data[[paste0(v_name, "_pct_bare_soil")]]
+            cell_data[[paste0(v_name, "_pct_vegetacion_densa")]] <- cell_data[[paste0(v_name, "_pct_dense_vegetation")]]
           } else if (grepl("NDWI|IRHE", v_up)) {
-            cell_data[[paste0(v_name, "_pct_agua_saturado")]] <- round(mean(v_clean > 0) * 100, 1)
+            cell_data[[paste0(v_name, "_pct_water_saturated")]] <- round(mean(v_clean > 0) * 100, 1)
           } else if (grepl("IMSR", v_up)) {
-            cell_data[[paste0(v_name, "_pct_alto_riesgo_plasticos")]] <- round(mean(v_clean >= 0.35) * 100, 1)
+            cell_data[[paste0(v_name, "_pct_high_debris_exposure")]] <- round(mean(v_clean >= 0.35) * 100, 1)
           } else if (grepl("TWI|IEV", v_up)) {
-            cell_data[[paste0(v_name, "_pct_zona_critica_estancamiento")]] <- round(mean(v_clean > 8) * 100, 1)
+            cell_data[[paste0(v_name, "_pct_stagnation_zone")]] <- round(mean(v_clean > 8) * 100, 1)
           }
         } else {
-          cell_data[[paste0(v_name, "_media")]]        <- NA_real_
+          cell_data[[paste0(v_name, "_mean")]]         <- NA_real_
           cell_data[[paste0(v_name, "_sd")]]           <- NA_real_
           cell_data[[paste0(v_name, "_cv_pct")]]       <- NA_real_
           cell_data[[paste0(v_name, "_min")]]          <- NA_real_
           cell_data[[paste0(v_name, "_max")]]          <- NA_real_
-          cell_data[[paste0(v_name, "_mediana")]]      <- NA_real_
+          cell_data[[paste0(v_name, "_median")]]       <- NA_real_
           cell_data[[paste0(v_name, "_iqr")]]          <- NA_real_
           cell_data[[paste0(v_name, "_outliers_pct")]] <- NA_real_
+          cell_data[[paste0(v_name, "_media")]]        <- NA_real_
+          cell_data[[paste0(v_name, "_mediana")]]      <- NA_real_
         }
       }
 
@@ -200,7 +214,7 @@ d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = N
     rownames(df_grid_final) <- NULL
     class(df_grid_final) <- c("d4h_grid_summary", "data.frame")
 
-    # Exportar a Excel si se solicita
+    # Export to Excel if requested
     if (!is.null(out_xlsx)) {
       dir_out <- dirname(out_xlsx)
       if (!dir.exists(dir_out) && dir_out != "" && dir_out != ".") {
@@ -208,34 +222,35 @@ d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = N
       }
 
       num_cols <- names(df_grid_final)[vapply(df_grid_final, is.numeric, logical(1))]
-      num_cols <- num_cols[!num_cols %in% c("centroid_x", "centroid_y")]
+      num_cols <- num_cols[!num_cols %in% c("centroid_x", "centroid_y") & !grepl("_media$|_mediana$|_pct_agua_degradado$|_pct_suelo_desnudo$|_pct_vegetacion_densa$", num_cols)]
       res_glob <- lapply(num_cols, function(col_n) {
         vals <- df_grid_final[[col_n]]
         vals <- vals[!is.na(vals) & is.finite(vals)]
         if (length(vals) == 0) return(NULL)
         data.frame(
-          Variable = col_n,
-          Media = round(mean(vals), 3),
-          Desv_Estandar = round(stats::sd(vals), 3),
-          Minimo = round(min(vals), 3),
-          Mediana = round(stats::median(vals), 3),
-          Maximo = round(max(vals), 3),
+          Variable  = col_n,
+          Mean      = round(mean(vals), 3),
+          Std_Dev   = round(stats::sd(vals), 3),
+          Min       = round(min(vals), 3),
+          Median    = round(stats::median(vals), 3),
+          Max       = round(max(vals), 3),
           stringsAsFactors = FALSE
         )
       })
       df_glob_grid <- do.call(rbind, res_glob[!vapply(res_glob, is.null, logical(1))])
 
       sheets_grid <- list(
-        Resumen_Por_Grilla = df_grid_final,
-        Resumen_Global_Grillas = df_glob_grid
+        Grid_Summary = df_grid_final,
+        Global_Grid_Summary = df_glob_grid
       )
 
-      # Si se incluye houses_risk, agregar tambien hojas de casas
-      if (!is.null(houses_risk)) {
-        h_list <- .build_houses_risk_sheets(houses_risk)
+      # Append household water proximity sheets if provided
+      h_target <- if (!is.null(houses_proximity)) houses_proximity else houses_risk
+      if (!is.null(h_target)) {
+        h_list <- .build_houses_proximity_sheets(h_target)
         if (!is.null(h_list)) {
-          sheets_grid[["Casas_Distancia_Riesgo"]] <- h_list$Casas_Distancia_Riesgo
-          sheets_grid[["Estratificacion_Riesgo_Casas"]] <- h_list$Estratificacion_Riesgo_Casas
+          sheets_grid[["Household_Water_Proximity"]]   <- h_list$Household_Water_Proximity
+          sheets_grid[["Household_Proximity_Summary"]] <- h_list$Household_Proximity_Summary
         }
       }
 
@@ -249,9 +264,12 @@ d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = N
       }
     }
 
-    if (!is.null(houses_risk)) {
-      attr(df_grid_final, "houses_risk") <- houses_risk
+    h_target <- if (!is.null(houses_proximity)) houses_proximity else houses_risk
+    if (!is.null(h_target)) {
+      attr(df_grid_final, "houses_proximity") <- h_target
     }
+
+    return(df_grid_final)
 
     return(df_grid_final)
   }
@@ -392,29 +410,30 @@ d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = N
   names(summaries) <- layer_names
   class(summaries) <- "d4h_executive_summary"
 
-  if (!is.null(houses_risk)) {
-    attr(summaries, "houses_risk") <- houses_risk
+  h_target <- if (!is.null(houses_proximity)) houses_proximity else houses_risk
+  if (!is.null(h_target)) {
+    attr(summaries, "houses_proximity") <- h_target
   }
 
-  # Exportar a Excel si se solicita
+  # Export to Excel if requested
   if (!is.null(out_xlsx)) {
-    d4h_export_summary(summaries, out_xlsx = out_xlsx, houses_risk = houses_risk)
+    d4h_export_summary(summaries, out_xlsx = out_xlsx, houses_proximity = h_target)
   }
 
   summaries
 }
 
-# Helper interno para construir hojas de riesgo y distancia por vivienda
-.build_houses_risk_sheets <- function(houses_risk) {
-  if (is.null(houses_risk)) return(NULL)
+# Internal helper to construct household water proximity sheets
+.build_houses_proximity_sheets <- function(houses_data) {
+  if (is.null(houses_data)) return(NULL)
 
-  # Extraer coordenadas si es sf o SpatVector
-  h_sf <- if (inherits(houses_risk, "sf")) {
-    houses_risk
-  } else if (inherits(houses_risk, "SpatVector")) {
-    sf::st_as_sf(houses_risk)
-  } else if (is.data.frame(houses_risk)) {
-    houses_risk
+  # Extract coordinates if sf or SpatVector
+  h_sf <- if (inherits(houses_data, "sf")) {
+    houses_data
+  } else if (inherits(houses_data, "SpatVector")) {
+    sf::st_as_sf(houses_data)
+  } else if (is.data.frame(houses_data)) {
+    houses_data
   } else {
     NULL
   }
@@ -431,22 +450,21 @@ d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = N
     as.data.frame(h_sf)
   }
 
-  # Detectar o generar columnas requeridas
   # 1. House ID
   id_col <- grep("^(house_id|id|casa_id|vivienda_id|codigo)$", names(df_raw), ignore.case = TRUE, value = TRUE)[1]
   house_id <- if (!is.na(id_col)) as.character(df_raw[[id_col]]) else sprintf("H%03d", seq_len(nrow(df_raw)))
 
-  # 2. Distancia a agua
+  # 2. Distance to water
   dist_col <- grep("^(dist_water_m|dist_water|dist_agua_m|distance|dist_m|dist)$", names(df_raw), ignore.case = TRUE, value = TRUE)[1]
   dist_val <- if (!is.na(dist_col)) as.numeric(df_raw[[dist_col]]) else rep(NA_real_, nrow(df_raw))
 
-  # 3. ID de cuerpo de agua mas cercano
+  # 3. Nearest water body ID
   near_col <- grep("^(nearest_water_id|near_water_id|cuerpo_agua_cercano)$", names(df_raw), ignore.case = TRUE, value = TRUE)[1]
   near_id <- if (!is.na(near_col)) as.character(df_raw[[near_col]]) else sprintf("W%03d", seq_len(nrow(df_raw)))
 
-  # 4. Score de riesgo
-  score_col <- grep("^(risk_score|proximity_score|score_riesgo|score)$", names(df_raw), ignore.case = TRUE, value = TRUE)[1]
-  risk_score <- if (!is.na(score_col)) {
+  # 4. Proximity score (decay exposure)
+  score_col <- grep("^(proximity_score|risk_score|score)$", names(df_raw), ignore.case = TRUE, value = TRUE)[1]
+  prox_score <- if (!is.na(score_col)) {
     round(as.numeric(df_raw[[score_col]]), 3)
   } else if (any(!is.na(dist_val))) {
     round(exp(-dist_val / 100.0), 3)
@@ -454,36 +472,22 @@ d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = N
     rep(NA_real_, nrow(df_raw))
   }
 
-  # 5. Nivel de riesgo
-  level_col <- grep("^(risk_level|proximity_level|nivel_riesgo|categoria_riesgo)$", names(df_raw), ignore.case = TRUE, value = TRUE)[1]
-  risk_level <- if (!is.na(level_col)) {
-    as.character(df_raw[[level_col]])
+  # 5. Proximity tier (objective distance strata)
+  tier_col <- grep("^(proximity_tier|proximity_level|risk_level|tier)$", names(df_raw), ignore.case = TRUE, value = TRUE)[1]
+  prox_tier <- if (!is.na(tier_col)) {
+    as.character(df_raw[[tier_col]])
   } else if (any(!is.na(dist_val))) {
     as.character(cut(
       dist_val,
       breaks = c(-Inf, 50, 100, 200, Inf),
-      labels = c("Critico (<50m)", "Alto (50-100m)", "Moderado (100-200m)", "Bajo (>200m)"),
+      labels = c("Immediate Proximity (<50m)", "High Proximity (50-100m)", "Moderate Proximity (100-200m)", "Distal (>200m)"),
       right = TRUE
     ))
   } else {
-    rep("Sin clasificar", nrow(df_raw))
+    rep("Unclassified", nrow(df_raw))
   }
 
-  # 6. Accion recomendada
-  accion_rec <- vapply(risk_level, function(lvl) {
-    l_up <- toupper(lvl)
-    if (grepl("CRITIC|IMMEDIATE|<50", l_up)) {
-      "Rociado residual intradomiciliario y aplicacion inmediata de larvicida"
-    } else if (grepl("ALT|HIGH|50-100", l_up)) {
-      "Inspeccion peridomiciliaria intensiva, zanjas de drenaje y mallas"
-    } else if (grepl("MODERAT|100-200", l_up)) {
-      "Monitoreo con ovitrampas y sensibilizacion comunitaria"
-    } else {
-      "Vigilancia rutinaria estacional de bajo impacto"
-    }
-  }, character(1))
-
-  # Coordenadas X/Y
+  # Coordinates X/Y
   cx <- if ("coord_x" %in% names(df_raw)) df_raw$coord_x else if ("lon" %in% names(df_raw)) df_raw$lon else NA_real_
   cy <- if ("coord_y" %in% names(df_raw)) df_raw$coord_y else if ("lat" %in% names(df_raw)) df_raw$lat else NA_real_
 
@@ -493,16 +497,15 @@ d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = N
     coord_y            = cy,
     dist_water_m       = round(dist_val, 1),
     nearest_water_id   = near_id,
-    risk_score         = risk_score,
-    risk_level         = risk_level,
-    accion_recomendada = accion_rec,
+    proximity_score    = prox_score,
+    proximity_tier     = prox_tier,
     stringsAsFactors   = FALSE
   )
 
-  # Resumen agrupado de estratificacion
-  df_agg_cnt <- stats::aggregate(house_id ~ risk_level, data = df_casas_export, FUN = length)
+  # Aggregated proximity stratification
+  df_agg_cnt <- stats::aggregate(house_id ~ proximity_tier, data = df_casas_export, FUN = length)
   names(df_agg_cnt)[2] <- "n_casas"
-  df_agg_dist <- stats::aggregate(dist_water_m ~ risk_level, data = df_casas_export, FUN = function(v) {
+  df_agg_dist <- stats::aggregate(dist_water_m ~ proximity_tier, data = df_casas_export, FUN = function(v) {
     c(mean = round(mean(v, na.rm = TRUE), 1),
       min  = round(min(v, na.rm = TRUE), 1),
       max  = round(max(v, na.rm = TRUE), 1))
@@ -510,18 +513,18 @@ d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = N
   dist_mat <- df_agg_dist$dist_water_m
 
   df_strat <- data.frame(
-    Nivel_Riesgo = df_agg_cnt$risk_level,
-    N_Casas = df_agg_cnt$n_casas,
-    Porcentaje_Casas = round((df_agg_cnt$n_casas / nrow(df_casas_export)) * 100, 1),
-    Distancia_Media_m = dist_mat[, "mean"],
-    Distancia_Minima_m = dist_mat[, "min"],
-    Distancia_Maxima_m = dist_mat[, "max"],
-    stringsAsFactors = FALSE
+    Proximity_Tier    = df_agg_cnt$proximity_tier,
+    Household_Count   = df_agg_cnt$n_casas,
+    Household_Pct     = round((df_agg_cnt$n_casas / nrow(df_casas_export)) * 100, 1),
+    Mean_Distance_m   = dist_mat[, "mean"],
+    Min_Distance_m    = dist_mat[, "min"],
+    Max_Distance_m    = dist_mat[, "max"],
+    stringsAsFactors  = FALSE
   )
 
   list(
-    Casas_Distancia_Riesgo = df_casas_export,
-    Estratificacion_Riesgo_Casas = df_strat
+    Household_Water_Proximity   = df_casas_export,
+    Household_Proximity_Summary = df_strat
   )
 }
 
@@ -530,10 +533,11 @@ d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = N
 d4h_report <- d4h_executive_summary
 
 #' @title Export Executive Summary to Multi-Sheet Excel File
-#' @description Exports a \code{d4h_executive_summary} object to an Excel workbook (.xlsx) with dedicated sheets for Global Summary, Stratification, Outlier Diagnostics, and optional Household Distance-to-Water Risk.
+#' @description Exports a \code{d4h_executive_summary} object to an Excel workbook (.xlsx) with dedicated sheets for Global Summary, Stratification, Outlier Diagnostics, and optional Household Water Proximity.
 #' @param x An object of class \code{d4h_executive_summary}.
 #' @param out_xlsx Character. Path where the .xlsx file will be created.
-#' @param houses_risk Optional \code{sf} or \code{data.frame} of residential dwellings with distance to water and risk attributes.
+#' @param houses_proximity Optional \code{sf} or \code{data.frame} of residential dwellings with distance to water and proximity attributes.
+#' @param houses_risk Deprecated alias for \code{houses_proximity}.
 #' @return Invisibly returns the input object \code{x}.
 #' @examples
 #' \donttest{
@@ -550,13 +554,17 @@ d4h_report <- d4h_executive_summary
 #' }
 #' }
 #' @export
-d4h_export_summary <- function(x, out_xlsx, houses_risk = NULL) {
+d4h_export_summary <- function(x, out_xlsx, houses_proximity = NULL, houses_risk = NULL) {
   if (!inherits(x, "d4h_executive_summary")) {
     stop("'x' must be a 'd4h_executive_summary' object produced by d4h_executive_summary().", call. = FALSE)
   }
 
-  if (is.null(houses_risk) && !is.null(attr(x, "houses_risk"))) {
-    houses_risk <- attr(x, "houses_risk")
+  h_target <- if (!is.null(houses_proximity)) houses_proximity else houses_risk
+  if (is.null(h_target) && !is.null(attr(x, "houses_proximity"))) {
+    h_target <- attr(x, "houses_proximity")
+  }
+  if (is.null(h_target) && !is.null(attr(x, "houses_risk"))) {
+    h_target <- attr(x, "houses_risk")
   }
 
   dir_out <- dirname(out_xlsx)
@@ -564,7 +572,7 @@ d4h_export_summary <- function(x, out_xlsx, houses_risk = NULL) {
     dir.create(dir_out, recursive = TRUE)
   }
 
-  # 1. Hoja 1: Resumen Global
+  # 1. Sheet 1: Global Summary
   global_rows <- lapply(x, function(item) {
     if (!is.null(item$error)) return(NULL)
     sp <- item$spatial
@@ -596,7 +604,7 @@ d4h_export_summary <- function(x, out_xlsx, houses_risk = NULL) {
   })
   df_global <- do.call(rbind, global_rows)
 
-  # 2. Hoja 2: Estratificacion Tematica
+  # 2. Sheet 2: Thematic Stratification
   strata_rows <- list()
   for (item in x) {
     if (!is.null(item$error)) next
@@ -613,7 +621,7 @@ d4h_export_summary <- function(x, out_xlsx, houses_risk = NULL) {
   }
   df_strata <- if (length(strata_rows) > 0) do.call(rbind, strata_rows) else data.frame()
 
-  # 3. Hoja 3: Detalle de Outliers
+  # 3. Sheet 3: Outlier Diagnostics
   outlier_rows <- lapply(x, function(item) {
     if (!is.null(item$error)) return(NULL)
     ot <- item$outliers
@@ -637,16 +645,16 @@ d4h_export_summary <- function(x, out_xlsx, houses_risk = NULL) {
     Outliers_Diagnostics = df_outliers
   )
 
-  # Si houses_risk esta presente, agregar hojas 4 y 5
-  if (!is.null(houses_risk)) {
-    h_sheets <- .build_houses_risk_sheets(houses_risk)
+  # If household proximity data is present, append sheets 4 and 5
+  if (!is.null(h_target)) {
+    h_sheets <- .build_houses_proximity_sheets(h_target)
     if (!is.null(h_sheets)) {
-      sheets[["Casas_Distancia_Riesgo"]] <- h_sheets$Casas_Distancia_Riesgo
-      sheets[["Estratificacion_Riesgo_Casas"]] <- h_sheets$Estratificacion_Riesgo_Casas
+      sheets[["Household_Water_Proximity"]]   <- h_sheets$Household_Water_Proximity
+      sheets[["Household_Proximity_Summary"]] <- h_sheets$Household_Proximity_Summary
     }
   }
 
-  # Escribir con writexl u openxlsx
+  # Export with writexl or openxlsx
   if (requireNamespace("writexl", quietly = TRUE)) {
     writexl::write_xlsx(sheets, path = out_xlsx)
     message(sprintf("Executive summary successfully exported to Excel: %s", out_xlsx))
@@ -715,26 +723,27 @@ print.d4h_executive_summary <- function(x, ...) {
     if (i < length(x)) cat(rep(".", 78), "\n\n", sep = "")
   }
 
-  # 5. Seccion de riesgo en viviendas si fue provisto
-  hr <- attr(x, "houses_risk")
-  if (!is.null(hr)) {
-    h_sheets <- .build_houses_risk_sheets(hr)
+  # 5. Section for household proximity if provided
+  hp <- attr(x, "houses_proximity")
+  if (is.null(hp)) hp <- attr(x, "houses_risk")
+  if (!is.null(hp)) {
+    h_sheets <- .build_houses_proximity_sheets(hp)
     if (!is.null(h_sheets)) {
-      df_c <- h_sheets$Casas_Distancia_Riesgo
-      df_s <- h_sheets$Estratificacion_Riesgo_Casas
+      df_c <- h_sheets$Household_Water_Proximity
+      df_s <- h_sheets$Household_Proximity_Summary
 
       cat(rep("-", 78), "\n", sep = "")
-      cat(" 5. HOUSEHOLD DISTANCE-TO-WATER & VECTOR RISK ASSESSMENT:\n")
+      cat(" 5. HOUSEHOLD WATER PROXIMITY & EXPOSURE ASSESSMENT:\n")
       cat(sprintf("    - Total Households Evaluated : %d dwellings\n", nrow(df_c)))
       if (any(!is.na(df_c$dist_water_m))) {
         d_clean <- df_c$dist_water_m[!is.na(df_c$dist_water_m)]
         cat(sprintf("    - Euclidean Distance to Water: Mean = %.1f m (Min = %.1f m, Max = %.1f m)\n\n",
                     mean(d_clean), min(d_clean), max(d_clean)))
       }
-      cat("    - Proximity & Epidemiological Risk Stratification:\n")
+      cat("    - Proximity Exposure Stratification:\n")
       for (k in seq_len(nrow(df_s))) {
-        cat(sprintf("      * %-26s: %3d houses (%5.1f%%) | Mean dist: %5.1f m\n",
-                    df_s$Nivel_Riesgo[k], df_s$N_Casas[k], df_s$Porcentaje_Casas[k], df_s$Distancia_Media_m[k]))
+        cat(sprintf("      * %-28s: %3d houses (%5.1f%%) | Mean dist: %5.1f m\n",
+                    df_s$Proximity_Tier[k], df_s$Household_Count[k], df_s$Household_Pct[k], df_s$Mean_Distance_m[k]))
       }
       cat("\n")
     }

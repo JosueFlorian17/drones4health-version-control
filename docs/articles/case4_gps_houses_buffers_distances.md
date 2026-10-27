@@ -146,12 +146,12 @@ head(as.data.frame(water_proximity_sf[, c("dist_water_m", "nearest_water_id", "p
 
 ### Proximity Stratification
 
-| Proximity Tier | Proximity to Water | Proximity Score | Recommended Vector Surveillance Action |
-|:---|:---|:---|:---|
-| **Immediate Proximity** | $`< 50\text{ m}`$ | $`> 0.606`$ | Targeted indoor residual spraying and immediate larvicide application. |
-| **High Proximity** | $`50 - 100\text{ m}`$ | $`0.368 - 0.606`$ | Intensive peridomestic inspection, drainage trenching, and water container netting. |
-| **Moderate Proximity** | $`100 - 200\text{ m}`$ | $`0.135 - 0.368`$ | Oviposition trap monitoring and community sensitization campaigns. |
-| **Distal** | $`> 200\text{ m}`$ | $`< 0.135`$ | Routine seasonal surveillance. |
+| Proximity Tier          | Proximity to Water     | Proximity Score   |
+|:------------------------|:-----------------------|:------------------|
+| **Immediate Proximity** | $`< 50\text{ m}`$      | $`> 0.606`$       |
+| **High Proximity**      | $`50 - 100\text{ m}`$  | $`0.368 - 0.606`$ |
+| **Moderate Proximity**  | $`100 - 200\text{ m}`$ | $`0.135 - 0.368`$ |
+| **Distal**              | $`> 200\text{ m}`$     | $`< 0.135`$       |
 
 ------------------------------------------------------------------------
 
@@ -180,25 +180,24 @@ d4h_plot(
 
 ## 4 Results & Executive Reporting
 
-### 4.1 Multi-Tier Household Distance & Vector Risk Assessment
+### 4.1 Household Water Proximity & Exposure Assessment
 
 We generate an integrated executive summary combining focal vegetation
 canopy indicators with individual household Euclidean distance to water
-sources, proximity exposure decay modeling ($`e^{-d/\lambda}`$), and
-priority epidemiological action tiers:
+sources and proximity exposure decay modeling ($`e^{-d/\lambda}`$):
 
 ``` r
 
-# Generate integrated executive summary passing water proximity risk for each household
-resumen_casas <- d4h_executive_summary(
-  raster_in   = res_buffer$raster,
-  houses_risk = water_proximity_sf,
-  by          = "general",
-  out_xlsx    = "salidas/Executive_Summary_Case04_Houses_Risk.xlsx",
-  sample_size = 1000000,
-  digits      = 3
+# Generate integrated executive summary with household water proximity data
+houses_exec_summary <- d4h_executive_summary(
+  raster_in        = res_buffer$raster,
+  houses_proximity = water_proximity_sf,
+  by               = "general",
+  out_xlsx         = "salidas/Executive_Summary_Case04_Houses_Proximity.xlsx",
+  sample_size      = 1000000,
+  digits           = 3
 )
-print(resumen_casas)
+print(houses_exec_summary)
 ```
 
 ``` text
@@ -233,11 +232,11 @@ print(resumen_casas)
     - Dense vegetation / High vigor [>= 0.5)    :  19.2 % ( 10.71 ha)
 
 ------------------------------------------------------------------------------
- 5. HOUSEHOLD DISTANCE-TO-WATER & VECTOR RISK ASSESSMENT:
+ 5. HOUSEHOLD WATER PROXIMITY & EXPOSURE ASSESSMENT:
     - Total Households Evaluated : 55 dwellings
     - Euclidean Distance to Water: Mean = 214.6 m (Min = 34.2 m, Max = 458.0 m)
 
-    - Proximity & Epidemiological Risk Stratification:
+    - Proximity Exposure Stratification:
       * Immediate Proximity (<50m) :   1 houses (  1.8%) | Mean dist:  34.2 m
       * High Proximity (50-100m)   :   3 houses (  5.5%) | Mean dist:  78.4 m
       * Moderate Proximity (100-200m): 24 houses ( 43.6%) | Mean dist: 154.2 m
@@ -249,7 +248,7 @@ print(resumen_casas)
 ### 4.2 Excel Export Structure & Sheet Previews
 
 The workbook exported to
-`salidas/Executive_Summary_Case04_Houses_Risk.xlsx` contains 5
+`salidas/Executive_Summary_Case04_Houses_Proximity.xlsx` contains 5
 comprehensive sheets:
 
 1.  **`Global_Summary`**: Statistical moments and spatial coverage of
@@ -258,31 +257,31 @@ comprehensive sheets:
     percentages inside buffers.
 3.  **`Outliers_Diagnostics`**: Tukey outlier thresholds and anomaly
     rates.
-4.  **`Casas_Distancia_Riesgo`**: Individual record for every
+4.  **`Household_Water_Proximity`**: Individual record for every
     georeferenced house with coordinates, minimum distance to water
-    (`dist_water_m`), nearest water body ID, risk score, risk level, and
-    recommended epidemiological action.
-5.  **`Estratificacion_Riesgo_Casas`**: Consolidated count, percentage,
-    mean distance, and min/max distance stratified by risk tier.
+    (`dist_water_m`), nearest water body ID, proximity score, and
+    proximity tier.
+5.  **`Household_Proximity_Summary`**: Consolidated count, percentage,
+    mean distance, and min/max distance stratified by proximity tier.
 
-#### Sheet 4: `Casas_Distancia_Riesgo` Preview (First 10 Households with Distance & Risk)
+#### Sheet 4: `Household_Water_Proximity` Preview (First 10 Households)
 
-| house_id | coord_x | coord_y | dist_water_m | nearest_water_id | risk_score | risk_level | accion_recomendada |
-|:---|:---|:---|:---|:---|:---|:---|:---|
-| **H001** | 485142.3 | 9582110.5 | **34.2 m** | W004 | **0.710** | **Immediate Proximity (\<50m)** | Rociado residual intradomiciliario y aplicación inmediata de larvicida |
-| **H002** | 485189.6 | 9582155.1 | **68.5 m** | W004 | **0.504** | **High Proximity (50-100m)** | Inspección peridomiciliaria intensiva, zanjas de drenaje y mallas |
-| **H003** | 485210.8 | 9582080.4 | **84.1 m** | W009 | **0.431** | **High Proximity (50-100m)** | Inspección peridomiciliaria intensiva, zanjas de drenaje y mallas |
-| **H004** | 485245.0 | 9582190.2 | **92.6 m** | W004 | **0.396** | **High Proximity (50-100m)** | Inspección peridomiciliaria intensiva, zanjas de drenaje y mallas |
-| **H005** | 485098.2 | 9582045.8 | **112.4 m** | W002 | **0.325** | **Moderate Proximity (100-200m)** | Monitoreo con ovitrampas y sensibilización comunitaria |
-| **H006** | 485130.4 | 9582012.0 | **138.7 m** | W002 | **0.250** | **Moderate Proximity (100-200m)** | Monitoreo con ovitrampas y sensibilización comunitaria |
-| **H007** | 485290.1 | 9582230.5 | **145.2 m** | W004 | **0.234** | **Moderate Proximity (100-200m)** | Monitoreo con ovitrampas y sensibilización comunitaria |
-| **H008** | 485175.0 | 9581985.3 | **162.8 m** | W012 | **0.196** | **Moderate Proximity (100-200m)** | Monitoreo con ovitrampas y sensibilización comunitaria |
-| **H009** | 485320.5 | 9582270.1 | **224.5 m** | W015 | **0.106** | **Distal (\>200m)** | Vigilancia rutinaria estacional de bajo impacto |
-| **H010** | 485360.2 | 9582310.8 | **278.1 m** | W015 | **0.062** | **Distal (\>200m)** | Vigilancia rutinaria estacional de bajo impacto |
+| house_id | coord_x | coord_y | dist_water_m | nearest_water_id | proximity_score | proximity_tier |
+|:---|:---|:---|:---|:---|:---|:---|
+| **H001** | 485142.3 | 9582110.5 | **34.2 m** | W004 | **0.710** | **Immediate Proximity (\<50m)** |
+| **H002** | 485189.6 | 9582155.1 | **68.5 m** | W004 | **0.504** | **High Proximity (50-100m)** |
+| **H003** | 485210.8 | 9582080.4 | **84.1 m** | W009 | **0.431** | **High Proximity (50-100m)** |
+| **H004** | 485245.0 | 9582190.2 | **92.6 m** | W004 | **0.396** | **High Proximity (50-100m)** |
+| **H005** | 485098.2 | 9582045.8 | **112.4 m** | W002 | **0.325** | **Moderate Proximity (100-200m)** |
+| **H006** | 485130.4 | 9582012.0 | **138.7 m** | W002 | **0.250** | **Moderate Proximity (100-200m)** |
+| **H007** | 485290.1 | 9582230.5 | **145.2 m** | W004 | **0.234** | **Moderate Proximity (100-200m)** |
+| **H008** | 485175.0 | 9581985.3 | **162.8 m** | W012 | **0.196** | **Moderate Proximity (100-200m)** |
+| **H009** | 485320.5 | 9582270.1 | **224.5 m** | W015 | **0.106** | **Distal (\>200m)** |
+| **H010** | 485360.2 | 9582310.8 | **278.1 m** | W015 | **0.062** | **Distal (\>200m)** |
 
-#### Sheet 5: `Estratificacion_Riesgo_Casas` Preview
+#### Sheet 5: `Household_Proximity_Summary` Preview
 
-| Nivel_Riesgo | N_Casas | Porcentaje_Casas (%) | Distancia_Media_m | Distancia_Minima_m | Distancia_Maxima_m |
+| Proximity_Tier | Household_Count | Household_Pct (%) | Mean_Distance_m | Min_Distance_m | Max_Distance_m |
 |:---|:---|:---|:---|:---|:---|
 | **Immediate Proximity (\<50m)** | 1 | 1.8% | 34.2 m | 34.2 m | 34.2 m |
 | **High Proximity (50-100m)** | 3 | 5.5% | 78.4 m | 68.5 m | 92.6 m |

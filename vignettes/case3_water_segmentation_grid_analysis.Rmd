@@ -216,11 +216,11 @@ ggplot() +
 
 ### 4.1 Granular Grid Percentage Composition (`d4h_grid_composition`)
 
-To address operational vector planning, `d4h_grid_composition()` computes the exact percentage composition of physical features per operational grid cell: houses/dwellings (`pct_casas`), standing water bodies (`pct_agua`), vegetative canopy (`pct_vegetacion`), and bare soil/terrain (`pct_suelo_desnudo`), identifying the dominant land cover class and assigning priority tiers for environmental health brigades:
+To address operational planning, `d4h_grid_composition()` computes the exact percentage composition of physical features per operational grid cell: houses/dwellings (`pct_houses`), standing water bodies (`pct_water`), vegetative canopy (`pct_vegetation`), and bare soil/terrain (`pct_bare_soil`), identifying the dominant land cover class and assigning priority tiers for environmental surveillance:
 
 ```{r}
 # Compute percentage composition and sectoral priority stratification per grid unit
-composicion_grillas <- d4h_grid_composition(
+grid_composition <- d4h_grid_composition(
   grid           = grid_sf,
   water          = water_sf,
   buildings      = buildings_sf,
@@ -231,7 +231,7 @@ composicion_grillas <- d4h_grid_composition(
 )
 
 # Inspect first grid cells with explicit percentage breakdown
-head(sf::st_drop_geometry(composicion_grillas), 8)
+head(sf::st_drop_geometry(grid_composition), 8)
 ```
 
 ```text
@@ -248,11 +248,11 @@ Average Landscape Composition:
  - Residential Dwellings / Roofs :  8.4 %
 
 Surveillance Priority Stratification:
- - Crítico (Co-ocurrencia Agua + Casas)     :  18 celdas ( 5.6%) -> Intervención inmediata
- - Prioridad Alta (Densidad Residencial)    :  42 celdas (13.0%) -> Control vectorial domiciliario
- - Prioridad Foco Acuático                  :  36 celdas (11.1%) -> Tratamiento larvicida focal
- - Vigilancia Moderada / Peridomicilio      :  86 celdas (26.5%) -> Monitoreo de ovitrampas
- - Línea Base (Cobertura Natural)           : 142 celdas (43.8%) -> Vigilancia pasiva
+ - Critical (Water & Household Co-occurrence): 18 cells ( 5.6%)
+ - High Priority (Residential Density)      : 42 cells (13.0%)
+ - Aquatic Focus Priority                   : 36 cells (11.1%)
+ - Moderate Surveillance / Peridomestic     : 86 cells (26.5%)
+ - Baseline (Natural Canopy Cover)          : 142 cells (43.8%)
 ==============================================================================
 ```
 
@@ -260,38 +260,38 @@ Surveillance Priority Stratification:
 
 The workbook exported to `salidas/Executive_Summary_Case03_Segmentation.xlsx` contains 3 dedicated sheets:
 
-1. **`Composicion_Por_Grilla`**: Granular record of every grid cell with its total area ($m^2$), percentage of houses (`pct_casas`), water bodies (`pct_agua`), vegetation (`pct_vegetacion`), bare soil (`pct_suelo_desnudo`), counts, dominant class, and surveillance priority.
-2. **`Estratificacion_Prioridad`**: Aggregated count and percentage of cells classified by operational intervention tier.
-3. **`Distribucion_Global_Clases`**: Global mean percentage distribution of each land cover class across the flight scene.
+1. **`Grid_Composition`**: Granular record of every grid cell with its total area ($m^2$), percentage of houses (`pct_houses`), water bodies (`pct_water`), vegetation (`pct_vegetation`), bare soil (`pct_bare_soil`), counts, dominant class, and surveillance priority.
+2. **`Priority_Stratification`**: Aggregated count and percentage of cells classified by operational intervention tier.
+3. **`Global_Class_Distribution`**: Global mean percentage distribution of each land cover class across the flight scene.
 
-#### Sheet 1: `Composicion_Por_Grilla` Preview
+#### Sheet 1: `Grid_Composition` Preview
 
-| grid_id | area_m2 | pct_casas | pct_agua | pct_vegetacion | pct_suelo_desnudo | n_casas | n_cuerpos_agua | clase_dominante | prioridad_vigilancia |
+| grid_id | area_m2 | pct_houses | pct_water | pct_vegetation | pct_bare_soil | n_houses | n_water_bodies | dominant_class | surveillance_priority |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **H0001** | 2165.1 | **18.5%** | **24.2%** | **45.3%** | **12.0%** | 3 | 2 | Vegetacion | Crítico (Co-ocurrencia Agua + Casas) |
-| **H0002** | 2165.1 | **0.0%** | **31.8%** | **58.2%** | **10.0%** | 0 | 1 | Vegetacion | Prioridad Foco Acuático |
-| **H0003** | 2165.1 | **22.4%** | **0.0%** | **62.1%** | **15.5%** | 4 | 0 | Vegetacion | Prioridad Alta (Densidad Residencial) |
-| **H0004** | 2165.1 | **0.0%** | **0.0%** | **78.4%** | **21.6%** | 0 | 0 | Vegetacion | Línea Base (Cobertura Natural) |
-| **H0005** | 2165.1 | **12.1%** | **15.4%** | **52.0%** | **20.5%** | 2 | 1 | Vegetacion | Crítico (Co-ocurrencia Agua + Casas) |
-| **H0006** | 2165.1 | **28.6%** | **0.0%** | **44.2%** | **27.2%** | 5 | 0 | Vegetacion | Prioridad Alta (Densidad Residencial) |
-| **H0007** | 2165.1 | **0.0%** | **42.5%** | **41.0%** | **16.5%** | 0 | 3 | Agua | Prioridad Foco Acuático |
-| **H0008** | 2165.1 | **5.4%** | **8.2%** | **61.4%** | **25.0%** | 1 | 1 | Vegetacion | Crítico (Co-ocurrencia Agua + Casas) |
+| **H0001** | 2165.1 | **18.5%** | **24.2%** | **45.3%** | **12.0%** | 3 | 2 | Vegetation | Critical (Water & Household Co-occurrence) |
+| **H0002** | 2165.1 | **0.0%** | **31.8%** | **58.2%** | **10.0%** | 0 | 1 | Vegetation | Aquatic Focus Priority |
+| **H0003** | 2165.1 | **22.4%** | **0.0%** | **62.1%** | **15.5%** | 4 | 0 | Vegetation | High Priority (Residential Density) |
+| **H0004** | 2165.1 | **0.0%** | **0.0%** | **78.4%** | **21.6%** | 0 | 0 | Vegetation | Baseline (Natural Canopy Cover) |
+| **H0005** | 2165.1 | **12.1%** | **15.4%** | **52.0%** | **20.5%** | 2 | 1 | Vegetation | Critical (Water & Household Co-occurrence) |
+| **H0006** | 2165.1 | **28.6%** | **0.0%** | **44.2%** | **27.2%** | 5 | 0 | Vegetation | High Priority (Residential Density) |
+| **H0007** | 2165.1 | **0.0%** | **42.5%** | **41.0%** | **16.5%** | 0 | 3 | Water | Aquatic Focus Priority |
+| **H0008** | 2165.1 | **5.4%** | **8.2%** | **61.4%** | **25.0%** | 1 | 1 | Vegetation | Critical (Water & Household Co-occurrence) |
 
-#### Sheet 2: `Estratificacion_Prioridad` Preview
+#### Sheet 2: `Priority_Stratification` Preview
 
-| prioridad_vigilancia | n_celdas | pct_celdas |
+| surveillance_priority | cell_count | cell_pct |
 | :--- | :--- | :--- |
-| **Crítico (Co-ocurrencia Agua + Casas)** | 18 | 5.6% |
-| **Prioridad Alta (Densidad Residencial)** | 42 | 13.0% |
-| **Prioridad Foco Acuático** | 36 | 11.1% |
-| **Vigilancia Moderada / Peridomicilio** | 86 | 26.5% |
-| **Línea Base (Vegetacion / Cobertura Natural)** | 142 | 43.8% |
+| **Critical (Water & Household Co-occurrence)** | 18 | 5.6% |
+| **High Priority (Residential Density)** | 42 | 13.0% |
+| **Aquatic Focus Priority** | 36 | 11.1% |
+| **Moderate Surveillance / Peridomestic** | 86 | 26.5% |
+| **Baseline (Natural Canopy Cover)** | 142 | 43.8% |
 
-#### Sheet 3: `Distribucion_Global_Clases` Preview
+#### Sheet 3: `Global_Class_Distribution` Preview
 
-| Clase_Cobertura | Porcentaje_Promedio (%) |
+| Land_Cover_Class | Mean_Percentage (%) |
 | :--- | :--- |
-| **Casas / Edificaciones** | 8.4% |
-| **Cuerpos de Agua** | 12.6% |
-| **Vegetacion** | 54.8% |
-| **Suelo Desnudo / Terreno** | 24.2% |
+| **Residential / Buildings** | 8.4% |
+| **Water Bodies** | 12.6% |
+| **Vegetation Canopy** | 54.8% |
+| **Bare Soil / Ground** | 24.2% |

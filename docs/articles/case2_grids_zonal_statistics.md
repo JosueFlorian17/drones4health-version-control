@@ -111,18 +111,18 @@ $`Q_{75} + 1.5 \times \text{IQR}`$), and exporting directly to Excel:
 ``` r
 
 # Multi-moment executive summary aggregated by grid cell
-resumen_grillas <- d4h_executive_summary(
+grid_exec_summary <- d4h_executive_summary(
   raster_in   = r_ndvi,
   by          = "grid",
   cell_size   = 50,
   square      = FALSE,
-  out_xlsx    = "salidas/Executive_Summary_Grids_NDVI.xlsx",
+  out_xlsx    = "salidas/Executive_Summary_Case02_Grids.xlsx",
   sample_size = 1000000,
   digits      = 3
 )
 
 # Inspect report output
-print(resumen_grillas)
+head(grid_exec_summary)
 ```
 
 ``` text
@@ -201,7 +201,7 @@ granular percentage composition across environmental strata:
 ``` r
 
 # Execute zonal grid executive summary per 50m hexagonal cell
-resumen_grillas <- d4h_executive_summary(
+grid_exec_summary <- d4h_executive_summary(
   raster_in   = r_ndvi,
   by          = "grid",
   cell_size   = 50,
@@ -212,7 +212,7 @@ resumen_grillas <- d4h_executive_summary(
 )
 
 # Preview first grid cells
-head(resumen_grillas, 5)
+head(grid_exec_summary, 5)
 ```
 
 ### 4.2 Excel Export Structure & Sheet Previews
@@ -220,16 +220,16 @@ head(resumen_grillas, 5)
 The workbook exported to `salidas/Executive_Summary_Case02_Grids.xlsx`
 contains 2 dedicated sheets:
 
-1.  **`Resumen_Por_Grilla`**: Granular zonal record for every hexagonal
-    cell with descriptive moments, percentage cover composition
-    (`NDVI_pct_agua_degradado`, `NDVI_pct_suelo_desnudo`,
-    `NDVI_pct_vegetacion_densa`), and Tukey anomaly percentages.
-2.  **`Resumen_Global_Grillas`**: Cross-grid aggregated metrics
-    summarizing inter-cell variability across the operational landscape.
+1.  **`Grid_Summary`**: Granular zonal record for every hexagonal cell
+    with descriptive moments, percentage cover composition
+    (`NDVI_pct_water_substrate`, `NDVI_pct_bare_soil`,
+    `NDVI_pct_dense_vegetation`), and Tukey anomaly percentages.
+2.  **`Global_Grid_Summary`**: Cross-grid aggregated metrics summarizing
+    inter-cell variability across the operational landscape.
 
-#### Sheet 1: `Resumen_Por_Grilla` Preview (First 5 Hexagonal Cells)
+#### Sheet 1: `Grid_Summary` Preview (First 5 Hexagonal Cells)
 
-| grid_id | centroid_x | centroid_y | NDVI_pixeles | NDVI_media | NDVI_sd | NDVI_cv_pct | NDVI_mediana | NDVI_pct_agua_degradado | NDVI_pct_suelo_desnudo | NDVI_pct_vegetacion_densa | NDVI_outliers_pct |
+| grid_id | centroid_x | centroid_y | NDVI_pixels | NDVI_mean | NDVI_sd | NDVI_cv_pct | NDVI_median | NDVI_pct_water_substrate | NDVI_pct_bare_soil | NDVI_pct_dense_vegetation | NDVI_outliers_pct |
 |:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|
 | **H0001** | 485125.5 | 9582140.2 | 2,185 | 0.412 | 0.185 | 44.9% | 0.395 | 3.2% | 18.5% | 42.1% | 0.4% |
 | **H0002** | 485175.5 | 9582140.2 | 2,192 | 0.184 | 0.210 | 114.1% | 0.142 | 24.5% | 46.2% | 12.8% | 1.1% |
@@ -237,16 +237,16 @@ contains 2 dedicated sheets:
 | **H0004** | 485100.5 | 9582096.9 | 2,188 | 0.095 | 0.264 | 277.9% | 0.045 | 38.6% | 39.1% | 8.2% | 2.3% |
 | **H0005** | 485150.5 | 9582096.9 | 2,194 | 0.315 | 0.198 | 62.9% | 0.298 | 8.4% | 28.6% | 29.4% | 0.5% |
 
-#### Sheet 2: `Resumen_Global_Grillas` Preview (Summary Across All 324 Grid Cells)
+#### Sheet 2: `Global_Grid_Summary` Preview (Summary Across All 324 Grid Cells)
 
-| Variable                      | Media   | Desv_Estandar | Minimo | Mediana | Maximo |
-|:------------------------------|:--------|:--------------|:-------|:--------|:-------|
-| **NDVI_pixeles**              | 2,026.6 | 312.4         | 148    | 2,189   | 2,196  |
-| **NDVI_media**                | 0.254   | 0.142         | -0.342 | 0.248   | 0.685  |
-| **NDVI_sd**                   | 0.188   | 0.045         | 0.082  | 0.186   | 0.312  |
-| **NDVI_cv_pct**               | 98.4%   | 68.2%         | 21.4%  | 76.5%   | 345.8% |
-| **NDVI_mediana**              | 0.228   | 0.155         | -0.395 | 0.215   | 0.702  |
-| **NDVI_pct_agua_degradado**   | 14.2%   | 12.8%         | 0.0%   | 9.8%    | 68.4%  |
-| **NDVI_pct_suelo_desnudo**    | 36.8%   | 14.1%         | 4.2%   | 35.6%   | 74.2%  |
-| **NDVI_pct_vegetacion_densa** | 19.5%   | 15.6%         | 0.0%   | 16.4%   | 78.5%  |
-| **NDVI_outliers_pct**         | 0.78%   | 0.65%         | 0.0%   | 0.52%   | 3.8%   |
+| Variable                      | Mean    | Std_Dev | Min    | Median | Max    |
+|:------------------------------|:--------|:--------|:-------|:-------|:-------|
+| **NDVI_pixels**               | 2,026.6 | 312.4   | 148    | 2,189  | 2,196  |
+| **NDVI_mean**                 | 0.254   | 0.142   | -0.342 | 0.248  | 0.685  |
+| **NDVI_sd**                   | 0.188   | 0.045   | 0.082  | 0.186  | 0.312  |
+| **NDVI_cv_pct**               | 98.4%   | 68.2%   | 21.4%  | 76.5%  | 345.8% |
+| **NDVI_median**               | 0.228   | 0.155   | -0.395 | 0.215  | 0.702  |
+| **NDVI_pct_water_substrate**  | 14.2%   | 12.8%   | 0.0%   | 9.8%   | 68.4%  |
+| **NDVI_pct_bare_soil**        | 36.8%   | 14.1%   | 4.2%   | 35.6%  | 74.2%  |
+| **NDVI_pct_dense_vegetation** | 19.5%   | 15.6%   | 0.0%   | 16.4%  | 78.5%  |
+| **NDVI_outliers_pct**         | 0.78%   | 0.65%   | 0.0%   | 0.52%  | 3.8%   |

@@ -333,7 +333,7 @@ d4h_grid_distance_to_water <- function(grid, water_bodies, decay_lambda = 100.0,
 #' @description Computes the percentage composition of physical features (houses/buildings, water bodies, vegetation canopy, bare soil) across each operational grid cell, providing granular sectoral profiles for micro-environmental surveillance.
 #' @details Intersects vector feature boundaries or raster masks with square/hexagonal grid cells:
 #' \deqn{\text{Pct}_{\text{class}} = \frac{\text{Area}_{\text{class} \cap \text{Cell}_k}}{\text{Area}_{\text{Cell}_k}} \times 100}
-#' Computes individual coverage metrics (\code{pct_casas}, \code{pct_agua}, \code{pct_vegetacion}, \code{pct_suelo_desnudo}), identifies the dominant land cover class, and assigns intervention priority tiers based on the co-occurrence of dwellings and standing water habitats.
+#' Computes individual coverage metrics (\code{pct_houses}, \code{pct_water}, \code{pct_vegetation}, \code{pct_bare_soil}), identifies the dominant land cover class, and assigns sectoral priority tiers based on the co-occurrence of dwellings and standing water habitats.
 #' @param grid SpatVector, sf, or character path. Operational surveillance grid (e.g. from \code{d4h_hex_grid} or \code{d4h_summarize_grid}).
 #' @param water SpatVector, sf, or SpatRaster (optional). Segmented water body polygons or binary water raster.
 #' @param buildings SpatVector, sf, or SpatRaster (optional). Segmented dwelling/building footprints or binary roof raster.
@@ -341,7 +341,7 @@ d4h_grid_distance_to_water <- function(grid, water_bodies, decay_lambda = 100.0,
 #' @param veg_threshold Numeric. NDVI threshold above which pixels are categorized as vegetation (default: 0.3).
 #' @param soil_threshold Numeric. NDVI upper threshold below which non-water pixels are categorized as bare soil (default: 0.15).
 #' @param out_xlsx Character (optional). File path to export a structured Excel spreadsheet.
-#' @return An \code{sf} object with appended columns: \code{area_m2}, \code{pct_casas}, \code{pct_agua}, \code{pct_vegetacion}, \code{pct_suelo_desnudo}, \code{n_casas}, \code{n_cuerpos_agua}, \code{clase_dominante}, and \code{prioridad_vigilancia}.
+#' @return An \code{sf} object with appended columns: \code{area_m2}, \code{pct_houses}, \code{pct_water}, \code{pct_vegetation}, \code{pct_bare_soil}, \code{n_houses}, \code{n_water_bodies}, \code{dominant_class}, and \code{surveillance_priority}.
 #' @export
 d4h_grid_composition <- function(grid,
                                  water = NULL,
@@ -512,13 +512,13 @@ d4h_grid_composition <- function(grid,
     }
   }
 
-  # 5. Determinar clase dominante
+  # 5. Determine dominant land cover class
   dominant_vec <- character(nrow(grid_sf))
   classes_matrix <- cbind(
-    Casas = pct_bld_vec,
-    Agua = pct_water_vec,
-    Vegetacion = pct_veg_vec,
-    Suelo_Desnudo = pct_soil_vec
+    Houses = pct_bld_vec,
+    Water = pct_water_vec,
+    Vegetation = pct_veg_vec,
+    Bare_Soil = pct_soil_vec
   )
 
   for (idx in seq_len(nrow(grid_sf))) {
@@ -527,7 +527,7 @@ d4h_grid_composition <- function(grid,
     dominant_vec[idx] <- colnames(classes_matrix)[max_idx]
   }
 
-  # 6. Estratificacion de prioridad operativa
+  # 6. Sectoral surveillance priority stratification
   priority_vec <- character(nrow(grid_sf))
   for (idx in seq_len(nrow(grid_sf))) {
     w_p <- pct_water_vec[idx]
@@ -536,19 +536,29 @@ d4h_grid_composition <- function(grid,
     b_c <- n_bld_vec[idx]
 
     priority_vec[idx] <- if ((w_p >= 5.0 && b_p >= 5.0) || (w_c >= 1L && b_c >= 1L)) {
-      "Critico (Co-ocurrencia Agua + Casas)"
+      "Critical (Water & Household Co-occurrence)"
     } else if (b_p >= 15.0 || b_c >= 2L) {
-      "Prioridad Alta (Densidad Residencial)"
+      "High Priority (Residential Density)"
     } else if (w_p >= 15.0 || w_c >= 1L) {
-      "Prioridad Foco Acuatico"
+      "Aquatic Focus Priority"
     } else if (w_p > 0 || b_p > 0) {
-      "Vigilancia Moderada / Peridomicilio"
+      "Moderate Surveillance / Peridomestic"
     } else {
-      "Linea Base (Vegetacion / Cobertura Natural)"
+      "Baseline (Natural Canopy Cover)"
     }
   }
 
-  # 7. Asignar columnas a sf
+  # 7. Assign columns to sf (English standard with backward-compatible aliases)
+  grid_sf$pct_houses            <- pct_bld_vec
+  grid_sf$pct_water             <- pct_water_vec
+  grid_sf$pct_vegetation        <- pct_veg_vec
+  grid_sf$pct_bare_soil         <- pct_soil_vec
+  grid_sf$n_houses              <- n_bld_vec
+  grid_sf$n_water_bodies        <- n_water_vec
+  grid_sf$dominant_class        <- dominant_vec
+  grid_sf$surveillance_priority <- priority_vec
+
+  # Backward compatibility aliases
   grid_sf$pct_casas            <- pct_bld_vec
   grid_sf$pct_agua             <- pct_water_vec
   grid_sf$pct_vegetacion       <- pct_veg_vec
@@ -558,37 +568,50 @@ d4h_grid_composition <- function(grid,
   grid_sf$clase_dominante      <- dominant_vec
   grid_sf$prioridad_vigilancia <- priority_vec
 
-  # 8. Exportar a Excel si se solicita
+  # 8. Export to multi-sheet Excel if requested
   if (!is.null(out_xlsx)) {
     dir_out <- dirname(out_xlsx)
     if (!dir.exists(dir_out) && dir_out != "" && dir_out != ".") {
       dir.create(dir_out, recursive = TRUE)
     }
 
-    df_full <- sf::st_drop_geometry(grid_sf)
+    # Clean English export dataframe
+    df_clean <- data.frame(
+      grid_id               = grid_sf$grid_id,
+      area_m2               = grid_sf$area_m2,
+      pct_houses            = grid_sf$pct_houses,
+      pct_water             = grid_sf$pct_water,
+      pct_vegetation        = grid_sf$pct_vegetation,
+      pct_bare_soil         = grid_sf$pct_bare_soil,
+      n_houses              = grid_sf$n_houses,
+      n_water_bodies        = grid_sf$n_water_bodies,
+      dominant_class        = grid_sf$dominant_class,
+      surveillance_priority = grid_sf$surveillance_priority,
+      stringsAsFactors      = FALSE
+    )
 
     df_prio <- stats::aggregate(
-      cbind(n_celdas = area_m2) ~ prioridad_vigilancia,
-      data = df_full,
+      cbind(cell_count = area_m2) ~ surveillance_priority,
+      data = df_clean,
       FUN = length
     )
-    df_prio$pct_celdas <- round((df_prio$n_celdas / nrow(df_full)) * 100, 1)
+    df_prio$cell_pct <- round((df_prio$cell_count / nrow(df_clean)) * 100, 1)
 
-    df_promedios <- data.frame(
-      Clase_Cobertura = c("Casas / Edificaciones", "Cuerpos de Agua", "Vegetacion", "Suelo Desnudo / Terreno"),
-      Porcentaje_Promedio = c(
-        round(mean(grid_sf$pct_casas), 1),
-        round(mean(grid_sf$pct_agua), 1),
-        round(mean(grid_sf$pct_vegetacion), 1),
-        round(mean(grid_sf$pct_suelo_desnudo), 1)
+    df_means <- data.frame(
+      Land_Cover_Class = c("Residential / Buildings", "Water Bodies", "Vegetation Canopy", "Bare Soil / Ground"),
+      Mean_Percentage = c(
+        round(mean(grid_sf$pct_houses), 1),
+        round(mean(grid_sf$pct_water), 1),
+        round(mean(grid_sf$pct_vegetation), 1),
+        round(mean(grid_sf$pct_bare_soil), 1)
       ),
       stringsAsFactors = FALSE
     )
 
     sheets_comp <- list(
-      Composicion_Por_Grilla = df_full,
-      Estratificacion_Prioridad = df_prio,
-      Distribucion_Global_Clases = df_promedios
+      Grid_Composition           = df_clean,
+      Priority_Stratification    = df_prio,
+      Global_Class_Distribution  = df_means
     )
 
     if (requireNamespace("writexl", quietly = TRUE)) {
@@ -596,7 +619,7 @@ d4h_grid_composition <- function(grid,
     } else if (requireNamespace("openxlsx", quietly = TRUE)) {
       openxlsx::write.xlsx(sheets_comp, file = out_xlsx)
     } else {
-      utils::write.csv(df_full, file = sub("\\.xlsx$", ".csv", out_xlsx), row.names = FALSE)
+      utils::write.csv(df_clean, file = sub("\\.xlsx$", ".csv", out_xlsx), row.names = FALSE)
     }
   }
 
