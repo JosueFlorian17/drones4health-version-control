@@ -339,6 +339,250 @@ interactive modes:</p>
 <span>  title       <span class="op">=</span> <span class="st">"Zonal Surveillance Grid (50m Hexagons)"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">m_grid</span></span></code></pre></div>
+<hr>
+</div>
+</div>
+<div class="section level2">
+<h2 id="results-executive-reporting">4 Results &amp; Executive Reporting<a class="anchor" aria-label="anchor" href="#results-executive-reporting"></a>
+</h2>
+<div class="section level3">
+<h3 id="zonal-grid-executive-summary">4.1 Zonal Grid Executive Summary<a class="anchor" aria-label="anchor" href="#zonal-grid-executive-summary"></a>
+</h3>
+<p>The grid-level executive summary evaluates every operational
+surveillance cell independently, computing descriptive statistical
+moments (mean, standard deviation, coefficient of variation, median,
+IQR), detecting spatial Tukey anomalies per cell, and extracting
+granular percentage composition across environmental strata:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Execute zonal grid executive summary per 50m hexagonal cell</span></span>
+<span><span class="va">resumen_grillas</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_executive_summary.html">d4h_executive_summary</a></span><span class="op">(</span></span>
+<span>  raster_in   <span class="op">=</span> <span class="va">r_ndvi</span>,</span>
+<span>  by          <span class="op">=</span> <span class="st">"grid"</span>,</span>
+<span>  cell_size   <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>  square      <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  out_xlsx    <span class="op">=</span> <span class="st">"salidas/Executive_Summary_Case02_Grids.xlsx"</span>,</span>
+<span>  sample_size <span class="op">=</span> <span class="fl">1000000</span>,</span>
+<span>  digits      <span class="op">=</span> <span class="fl">3</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Preview first grid cells</span></span>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">resumen_grillas</span>, <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="excel-export-structure-sheet-previews">4.2 Excel Export Structure &amp; Sheet Previews<a class="anchor" aria-label="anchor" href="#excel-export-structure-sheet-previews"></a>
+</h3>
+<p>The workbook exported to
+<code>salidas/Executive_Summary_Case02_Grids.xlsx</code> contains 2
+dedicated sheets:</p>
+<ol style="list-style-type: decimal">
+<li>
+<strong><code>Resumen_Por_Grilla</code></strong>: Granular zonal
+record for every hexagonal cell with descriptive moments, percentage
+cover composition (<code>NDVI_pct_agua_degradado</code>,
+<code>NDVI_pct_suelo_desnudo</code>,
+<code>NDVI_pct_vegetacion_densa</code>), and Tukey anomaly
+percentages.</li>
+<li>
+<strong><code>Resumen_Global_Grillas</code></strong>: Cross-grid
+aggregated metrics summarizing inter-cell variability across the
+operational landscape.</li>
+</ol>
+<div class="section level4">
+<h4 id="sheet-1-resumen_por_grilla-preview-first-5-hexagonal-cells">Sheet 1: <code>Resumen_Por_Grilla</code> Preview (First 5 Hexagonal
+Cells)<a class="anchor" aria-label="anchor" href="#sheet-1-resumen_por_grilla-preview-first-5-hexagonal-cells"></a>
+</h4>
+<table class="table">
+<colgroup>
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">grid_id</th>
+<th align="left">centroid_x</th>
+<th align="left">centroid_y</th>
+<th align="left">NDVI_pixeles</th>
+<th align="left">NDVI_media</th>
+<th align="left">NDVI_sd</th>
+<th align="left">NDVI_cv_pct</th>
+<th align="left">NDVI_mediana</th>
+<th align="left">NDVI_pct_agua_degradado</th>
+<th align="left">NDVI_pct_suelo_desnudo</th>
+<th align="left">NDVI_pct_vegetacion_densa</th>
+<th align="left">NDVI_outliers_pct</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left"><strong>H0001</strong></td>
+<td align="left">485125.5</td>
+<td align="left">9582140.2</td>
+<td align="left">2,185</td>
+<td align="left">0.412</td>
+<td align="left">0.185</td>
+<td align="left">44.9%</td>
+<td align="left">0.395</td>
+<td align="left">3.2%</td>
+<td align="left">18.5%</td>
+<td align="left">42.1%</td>
+<td align="left">0.4%</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>H0002</strong></td>
+<td align="left">485175.5</td>
+<td align="left">9582140.2</td>
+<td align="left">2,192</td>
+<td align="left">0.184</td>
+<td align="left">0.210</td>
+<td align="left">114.1%</td>
+<td align="left">0.142</td>
+<td align="left">24.5%</td>
+<td align="left">46.2%</td>
+<td align="left">12.8%</td>
+<td align="left">1.1%</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>H0003</strong></td>
+<td align="left">485225.5</td>
+<td align="left">9582140.2</td>
+<td align="left">2,190</td>
+<td align="left">0.528</td>
+<td align="left">0.142</td>
+<td align="left">26.9%</td>
+<td align="left">0.518</td>
+<td align="left">0.8%</td>
+<td align="left">10.4%</td>
+<td align="left">61.5%</td>
+<td align="left">0.0%</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>H0004</strong></td>
+<td align="left">485100.5</td>
+<td align="left">9582096.9</td>
+<td align="left">2,188</td>
+<td align="left">0.095</td>
+<td align="left">0.264</td>
+<td align="left">277.9%</td>
+<td align="left">0.045</td>
+<td align="left">38.6%</td>
+<td align="left">39.1%</td>
+<td align="left">8.2%</td>
+<td align="left">2.3%</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>H0005</strong></td>
+<td align="left">485150.5</td>
+<td align="left">9582096.9</td>
+<td align="left">2,194</td>
+<td align="left">0.315</td>
+<td align="left">0.198</td>
+<td align="left">62.9%</td>
+<td align="left">0.298</td>
+<td align="left">8.4%</td>
+<td align="left">28.6%</td>
+<td align="left">29.4%</td>
+<td align="left">0.5%</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level4">
+<h4 id="sheet-2-resumen_global_grillas-preview-summary-across-all-324-grid-cells">Sheet 2: <code>Resumen_Global_Grillas</code> Preview (Summary Across
+All 324 Grid Cells)<a class="anchor" aria-label="anchor" href="#sheet-2-resumen_global_grillas-preview-summary-across-all-324-grid-cells"></a>
+</h4>
+<table class="table">
+<thead><tr class="header">
+<th align="left">Variable</th>
+<th align="left">Media</th>
+<th align="left">Desv_Estandar</th>
+<th align="left">Minimo</th>
+<th align="left">Mediana</th>
+<th align="left">Maximo</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left"><strong>NDVI_pixeles</strong></td>
+<td align="left">2,026.6</td>
+<td align="left">312.4</td>
+<td align="left">148</td>
+<td align="left">2,189</td>
+<td align="left">2,196</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>NDVI_media</strong></td>
+<td align="left">0.254</td>
+<td align="left">0.142</td>
+<td align="left">-0.342</td>
+<td align="left">0.248</td>
+<td align="left">0.685</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>NDVI_sd</strong></td>
+<td align="left">0.188</td>
+<td align="left">0.045</td>
+<td align="left">0.082</td>
+<td align="left">0.186</td>
+<td align="left">0.312</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>NDVI_cv_pct</strong></td>
+<td align="left">98.4%</td>
+<td align="left">68.2%</td>
+<td align="left">21.4%</td>
+<td align="left">76.5%</td>
+<td align="left">345.8%</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>NDVI_mediana</strong></td>
+<td align="left">0.228</td>
+<td align="left">0.155</td>
+<td align="left">-0.395</td>
+<td align="left">0.215</td>
+<td align="left">0.702</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>NDVI_pct_agua_degradado</strong></td>
+<td align="left">14.2%</td>
+<td align="left">12.8%</td>
+<td align="left">0.0%</td>
+<td align="left">9.8%</td>
+<td align="left">68.4%</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>NDVI_pct_suelo_desnudo</strong></td>
+<td align="left">36.8%</td>
+<td align="left">14.1%</td>
+<td align="left">4.2%</td>
+<td align="left">35.6%</td>
+<td align="left">74.2%</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>NDVI_pct_vegetacion_densa</strong></td>
+<td align="left">19.5%</td>
+<td align="left">15.6%</td>
+<td align="left">0.0%</td>
+<td align="left">16.4%</td>
+<td align="left">78.5%</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>NDVI_outliers_pct</strong></td>
+<td align="left">0.78%</td>
+<td align="left">0.65%</td>
+<td align="left">0.0%</td>
+<td align="left">0.52%</td>
+<td align="left">3.8%</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

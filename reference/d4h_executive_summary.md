@@ -14,6 +14,7 @@ d4h_executive_summary(
   raster_in,
   by = c("general", "grid"),
   grid = NULL,
+  houses_risk = NULL,
   cell_size = 50,
   square = TRUE,
   out_xlsx = NULL,
@@ -25,6 +26,7 @@ d4h_report(
   raster_in,
   by = c("general", "grid"),
   grid = NULL,
+  houses_risk = NULL,
   cell_size = 50,
   square = TRUE,
   out_xlsx = NULL,
@@ -50,6 +52,13 @@ d4h_report(
   Optional SpatVector, sf, or character path to existing grid polygon
   boundaries when `by = "grid"`. If NULL, automatically generated using
   `cell_size` and `square`.
+
+- houses_risk:
+
+  Optional `sf` or `data.frame` of residential dwellings with calculated
+  distance to water and risk scores (e.g. from `d4h_distance_to_water`
+  or buffer analysis). If provided, appends dedicated household distance
+  and epidemiological risk sheets to the Excel workbook.
 
 - cell_size:
 

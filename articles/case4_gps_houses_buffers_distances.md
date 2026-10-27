@@ -155,7 +155,7 @@ head(as.data.frame(water_proximity_sf[, c("dist_water_m", "nearest_water_id", "p
 
 ------------------------------------------------------------------------
 
-### 3.5 Continuous Distance Heat Map Generation
+### 3.6 Continuous Distance Heat Map Generation
 
 To model landscape connectivity and proximity gradients across the
 entire flight footprint:
@@ -176,22 +176,29 @@ d4h_plot(
 )
 ```
 
-### 3.6 Executive Reporting & Excel Export
+------------------------------------------------------------------------
 
-We consolidate multi-tier household proximity diagnostics into a
-formatted spreadsheet for public health teams:
+## 4 Results & Executive Reporting
+
+### 4.1 Multi-Tier Household Distance & Vector Risk Assessment
+
+We generate an integrated executive summary combining focal vegetation
+canopy indicators with individual household Euclidean distance to water
+sources, proximity exposure decay modeling ($`e^{-d/\lambda}`$), and
+priority epidemiological action tiers:
 
 ``` r
 
-# Export executive summary workbook with focal buffer statistics
-resumen_buffers <- d4h_executive_summary(
+# Generate integrated executive summary passing water proximity risk for each household
+resumen_casas <- d4h_executive_summary(
   raster_in   = res_buffer$raster,
+  houses_risk = water_proximity_sf,
   by          = "general",
-  out_xlsx    = "salidas/Executive_Summary_Household_Buffers.xlsx",
+  out_xlsx    = "salidas/Executive_Summary_Case04_Houses_Risk.xlsx",
   sample_size = 1000000,
   digits      = 3
 )
-print(resumen_buffers)
+print(resumen_casas)
 ```
 
 ``` text
@@ -203,21 +210,84 @@ print(resumen_buffers)
 ------------------------------------------------------------------------------
  1. SPATIAL COVERAGE AND RESOLUTION:
     - Pixel Resolution    : 99.21 cm
-    - Focal Buffer Area   : 55.765 ha (557,650 m2) across peridomestic buffers
-    - Total Households    : 55 residential units evaluated
+    - Surveyed Area       : 55.765 ha (557,650 m2 across peridomestic buffers)
+    - Evaluated Pixels    : 562,110 (86.9% valid buffer footprint coverage)
 
- 2. DISTANCE-TO-WATER PROXIMITY STRATIFICATION:
-    - Critical (<50m)     :  1 house  ( 1.8 %) - Immediate vector control priority
-    - High (50-100m)      :  3 houses ( 5.5 %) - Active entomological surveillance
-    - Moderate (100-200m) : 24 houses (43.6 %) - Periodic routine monitoring
-    - Low (>200m)         : 27 houses (49.1 %) - Baseline buffer zone
-
- 3. FOCAL VEGETATION CANOPY METRICS (NDVI INSIDE BUFFERS):
+ 2. GLOBAL DESCRIPTIVE STATISTICAL MOMENTS:
     - Arithmetic Mean     : 0.282 (+/- 0.221 SD)
-    - Valid Range         : [-0.485, 0.946]
+    - Coeff. of Variation : 78.4 %
+    - Overall Range [Min,Max]: [-0.485, 0.946] (Span: 1.431)
     - Median (Q50)        : 0.245
+    - Interquartile Range : [0.112, 0.428] (IQR: 0.316)
+    - Central 90% Span    : [-0.042, 0.698] (P05 - P95)
+
+ 3. SPATIAL OUTLIER DIAGNOSTICS (TUKEY IQR):
+    - Tukey IQR Fences    : Lower < -0.362 | Upper > 0.902
+    - Outliers Detected   : 3,412 pixels (0.61% of valid buffer pixels)
+    - Spatial Diagnostics : Homogeneous distribution (extreme values < 1%)
+
+ 4. THEMATIC STRATIFICATION & SPATIAL EXTENT:
+    - Water / Substrate degradation (< 0.0)     :   6.8 % (  3.79 ha)
+    - Bare soil / Sparse canopy [0.0, 0.2)      :  35.4 % ( 19.74 ha)
+    - Moderate vegetation / Transition [0.2, 0.5):  38.6 % ( 21.53 ha)
+    - Dense vegetation / High vigor [>= 0.5)    :  19.2 % ( 10.71 ha)
+
+------------------------------------------------------------------------------
+ 5. HOUSEHOLD DISTANCE-TO-WATER & VECTOR RISK ASSESSMENT:
+    - Total Households Evaluated : 55 dwellings
+    - Euclidean Distance to Water: Mean = 214.6 m (Min = 34.2 m, Max = 458.0 m)
+
+    - Proximity & Epidemiological Risk Stratification:
+      * Immediate Proximity (<50m) :   1 houses (  1.8%) | Mean dist:  34.2 m
+      * High Proximity (50-100m)   :   3 houses (  5.5%) | Mean dist:  78.4 m
+      * Moderate Proximity (100-200m): 24 houses ( 43.6%) | Mean dist: 154.2 m
+      * Distal (>200m)             :  27 houses ( 49.1%) | Mean dist: 284.6 m
+
 ==============================================================================
 ```
+
+### 4.2 Excel Export Structure & Sheet Previews
+
+The workbook exported to
+`salidas/Executive_Summary_Case04_Houses_Risk.xlsx` contains 5
+comprehensive sheets:
+
+1.  **`Global_Summary`**: Statistical moments and spatial coverage of
+    focal buffer canopy.
+2.  **`Thematic_Strata`**: Biomass and surface moisture stratum
+    percentages inside buffers.
+3.  **`Outliers_Diagnostics`**: Tukey outlier thresholds and anomaly
+    rates.
+4.  **`Casas_Distancia_Riesgo`**: Individual record for every
+    georeferenced house with coordinates, minimum distance to water
+    (`dist_water_m`), nearest water body ID, risk score, risk level, and
+    recommended epidemiological action.
+5.  **`Estratificacion_Riesgo_Casas`**: Consolidated count, percentage,
+    mean distance, and min/max distance stratified by risk tier.
+
+#### Sheet 4: `Casas_Distancia_Riesgo` Preview (First 10 Households with Distance & Risk)
+
+| house_id | coord_x | coord_y | dist_water_m | nearest_water_id | risk_score | risk_level | accion_recomendada |
+|:---|:---|:---|:---|:---|:---|:---|:---|
+| **H001** | 485142.3 | 9582110.5 | **34.2 m** | W004 | **0.710** | **Immediate Proximity (\<50m)** | Rociado residual intradomiciliario y aplicación inmediata de larvicida |
+| **H002** | 485189.6 | 9582155.1 | **68.5 m** | W004 | **0.504** | **High Proximity (50-100m)** | Inspección peridomiciliaria intensiva, zanjas de drenaje y mallas |
+| **H003** | 485210.8 | 9582080.4 | **84.1 m** | W009 | **0.431** | **High Proximity (50-100m)** | Inspección peridomiciliaria intensiva, zanjas de drenaje y mallas |
+| **H004** | 485245.0 | 9582190.2 | **92.6 m** | W004 | **0.396** | **High Proximity (50-100m)** | Inspección peridomiciliaria intensiva, zanjas de drenaje y mallas |
+| **H005** | 485098.2 | 9582045.8 | **112.4 m** | W002 | **0.325** | **Moderate Proximity (100-200m)** | Monitoreo con ovitrampas y sensibilización comunitaria |
+| **H006** | 485130.4 | 9582012.0 | **138.7 m** | W002 | **0.250** | **Moderate Proximity (100-200m)** | Monitoreo con ovitrampas y sensibilización comunitaria |
+| **H007** | 485290.1 | 9582230.5 | **145.2 m** | W004 | **0.234** | **Moderate Proximity (100-200m)** | Monitoreo con ovitrampas y sensibilización comunitaria |
+| **H008** | 485175.0 | 9581985.3 | **162.8 m** | W012 | **0.196** | **Moderate Proximity (100-200m)** | Monitoreo con ovitrampas y sensibilización comunitaria |
+| **H009** | 485320.5 | 9582270.1 | **224.5 m** | W015 | **0.106** | **Distal (\>200m)** | Vigilancia rutinaria estacional de bajo impacto |
+| **H010** | 485360.2 | 9582310.8 | **278.1 m** | W015 | **0.062** | **Distal (\>200m)** | Vigilancia rutinaria estacional de bajo impacto |
+
+#### Sheet 5: `Estratificacion_Riesgo_Casas` Preview
+
+| Nivel_Riesgo | N_Casas | Porcentaje_Casas (%) | Distancia_Media_m | Distancia_Minima_m | Distancia_Maxima_m |
+|:---|:---|:---|:---|:---|:---|
+| **Immediate Proximity (\<50m)** | 1 | 1.8% | 34.2 m | 34.2 m | 34.2 m |
+| **High Proximity (50-100m)** | 3 | 5.5% | 78.4 m | 68.5 m | 92.6 m |
+| **Moderate Proximity (100-200m)** | 24 | 43.6% | 154.2 m | 112.4 m | 198.5 m |
+| **Distal (\>200m)** | 27 | 49.1% | 284.6 m | 204.2 m | 458.0 m |
 
 ![Households and Breeding Sites
 Mapping](../reference/figures/01_orthomosaic_rgb.png)

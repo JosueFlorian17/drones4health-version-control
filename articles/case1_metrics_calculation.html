@@ -258,6 +258,281 @@ renders an interactive <code>mapview</code> web map:</p>
 <div class="text-center my-3">
 <p><img src="../reference/figures/01_mapview_basemap.png" class="img-fluid rounded border shadow-sm" alt="Interactive Mapview Web Map with Basemap Background" width="85%"></p>
 </div>
+<hr>
+</div>
+</div>
+<div class="section level2">
+<h2 id="results-executive-reporting">4 Results &amp; Executive Reporting<a class="anchor" aria-label="anchor" href="#results-executive-reporting"></a>
+</h2>
+<div class="section level3">
+<h3 id="multi-moment-executive-summary">4.1 Multi-Moment Executive Summary<a class="anchor" aria-label="anchor" href="#multi-moment-executive-summary"></a>
+</h3>
+<p>We generate an automated executive summary evaluating spatial moments
+(mean, standard deviation, coefficient of variation, median,
+interquartile range), Tukey outlier fences, and thematic stratum
+distributions for both NDVI and NDWI:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Generate multi-moment executive summary with direct multi-sheet Excel export</span></span>
+<span><span class="va">resumen_caso01</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_executive_summary.html">d4h_executive_summary</a></span><span class="op">(</span></span>
+<span>  raster_in   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">r_ndvi</span>, <span class="va">r_ndwi</span><span class="op">)</span>,</span>
+<span>  by          <span class="op">=</span> <span class="st">"general"</span>,</span>
+<span>  out_xlsx    <span class="op">=</span> <span class="st">"salidas/Executive_Summary_Case01_Metrics.xlsx"</span>,</span>
+<span>  sample_size <span class="op">=</span> <span class="fl">1000000</span>,</span>
+<span>  digits      <span class="op">=</span> <span class="fl">3</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">resumen_caso01</span><span class="op">)</span></span></code></pre></div>
+<pre class="text"><code>==============================================================================
+             DRONES4HEALTH - EXECUTIVE SUMMARY REPORT
+==============================================================================
+
+ INDICATOR: NDVI
+------------------------------------------------------------------------------
+ 1. SPATIAL COVERAGE AND RESOLUTION:
+    - Pixel Resolution    : 99.21 cm
+    - Surveyed Area       : 64.628 ha (646,276 m2)
+    - Evaluated Pixels    : 656,624 (36.5% valid footprint coverage)
+
+ 2. GLOBAL DESCRIPTIVE STATISTICAL MOMENTS:
+    - Arithmetic Mean     : 0.238 (+/- 0.255 SD)
+    - Coeff. of Variation : 106.9 %
+    - Overall Range [Min,Max]: [-0.954, 0.99] (Span: 1.944)
+    - Median (Q50)        : 0.182
+    - Interquartile Range : [0.052, 0.399] (IQR: 0.347)
+    - Central 90% Span    : [-0.083, 0.716] (P05 - P95)
+
+ 3. SPATIAL OUTLIER DIAGNOSTICS (TUKEY IQR):
+    - Tukey IQR Fences    : Lower &lt; -0.469 | Upper &gt; 0.92
+    - Outliers Detected   : 5,388 pixels (0.82% of valid pixels)
+    - Spatial Diagnostics : Homogeneous distribution (extreme values &lt; 1%)
+
+ 4. THEMATIC STRATIFICATION &amp; SPATIAL EXTENT:
+    - Water / Substrate degradation (&lt; 0.0)     :  14.7 % (  9.53 ha)
+    - Bare soil / Sparse canopy [0.0, 0.2)      :  38.2 % ( 24.67 ha)
+    - Moderate vegetation / Transition [0.2, 0.5):  29.4 % ( 18.99 ha)
+    - Dense vegetation / High vigor [&gt;= 0.5)    :  17.7 % ( 11.44 ha)
+
+..............................................................................
+
+ INDICATOR: NDWI
+------------------------------------------------------------------------------
+ 1. SPATIAL COVERAGE AND RESOLUTION:
+    - Pixel Resolution    : 99.21 cm
+    - Surveyed Area       : 64.628 ha (646,276 m2)
+    - Evaluated Pixels    : 656,624 (36.5% valid footprint coverage)
+
+ 2. GLOBAL DESCRIPTIVE STATISTICAL MOMENTS:
+    - Arithmetic Mean     : -0.194 (+/- 0.241 SD)
+    - Coeff. of Variation : 124.2 %
+    - Overall Range [Min,Max]: [-0.985, 0.923] (Span: 1.908)
+    - Median (Q50)        : -0.158
+    - Interquartile Range : [-0.342, -0.041] (IQR: 0.301)
+    - Central 90% Span    : [-0.641, 0.185] (P05 - P95)
+
+ 3. SPATIAL OUTLIER DIAGNOSTICS (TUKEY IQR):
+    - Tukey IQR Fences    : Lower &lt; -0.794 | Upper &gt; 0.410
+    - Outliers Detected   : 4,112 pixels (0.63% of valid pixels)
+    - Spatial Diagnostics : Homogeneous distribution (extreme values &lt; 1%)
+
+ 4. THEMATIC STRATIFICATION &amp; SPATIAL EXTENT:
+    - Water bodies / Saturated soil (&gt; 0.0)     :  18.6 % ( 12.02 ha)
+    - Unsaturated terrestrial surface (&lt;= 0.0)  :  81.4 % ( 52.61 ha)
+
+==============================================================================</code></pre>
+</div>
+<div class="section level3">
+<h3 id="excel-export-structure-sheet-previews">4.2 Excel Export Structure &amp; Sheet Previews<a class="anchor" aria-label="anchor" href="#excel-export-structure-sheet-previews"></a>
+</h3>
+<p>The workbook exported to
+<code>salidas/Executive_Summary_Case01_Metrics.xlsx</code> contains 3
+dedicated sheets:</p>
+<ol style="list-style-type: decimal">
+<li>
+<strong><code>Global_Summary</code></strong>: Statistical moments,
+spatial extent, pixel counts, and coefficient of variation.</li>
+<li>
+<strong><code>Thematic_Strata</code></strong>: Percentage and
+surface area in hectares partitioned by biophysical threshold
+ranges.</li>
+<li>
+<strong><code>Outliers_Diagnostics</code></strong>: Tukey
+lower/upper fences, outlier counts, and distribution diagnoses.</li>
+</ol>
+<div class="section level4">
+<h4 id="sheet-1-global_summary-preview">Sheet 1: <code>Global_Summary</code> Preview<a class="anchor" aria-label="anchor" href="#sheet-1-global_summary-preview"></a>
+</h4>
+<table style="width:100%;" class="table">
+<colgroup>
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Indicator</th>
+<th align="left">Resolution</th>
+<th align="left">Valid_Pixels</th>
+<th align="left">Coverage_Pct</th>
+<th align="left">Area_ha</th>
+<th align="left">Mean</th>
+<th align="left">Std_Dev</th>
+<th align="left">CV_Pct</th>
+<th align="left">Min</th>
+<th align="left">Median_Q50</th>
+<th align="left">Max</th>
+<th align="left">IQR</th>
+<th align="left">Outliers_Pct</th>
+<th align="left">Outlier_Diagnostics</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left"><strong>NDVI</strong></td>
+<td align="left">99.21 cm</td>
+<td align="left">656,624</td>
+<td align="left">36.5%</td>
+<td align="left">64.628</td>
+<td align="left">0.238</td>
+<td align="left">0.255</td>
+<td align="left">106.9%</td>
+<td align="left">-0.954</td>
+<td align="left">0.182</td>
+<td align="left">0.990</td>
+<td align="left">0.347</td>
+<td align="left">0.82%</td>
+<td align="left">Homogeneous (&lt; 1%)</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>NDWI</strong></td>
+<td align="left">99.21 cm</td>
+<td align="left">656,624</td>
+<td align="left">36.5%</td>
+<td align="left">64.628</td>
+<td align="left">-0.194</td>
+<td align="left">0.241</td>
+<td align="left">124.2%</td>
+<td align="left">-0.985</td>
+<td align="left">-0.158</td>
+<td align="left">0.923</td>
+<td align="left">0.301</td>
+<td align="left">0.63%</td>
+<td align="left">Homogeneous (&lt; 1%)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level4">
+<h4 id="sheet-2-thematic_strata-preview">Sheet 2: <code>Thematic_Strata</code> Preview<a class="anchor" aria-label="anchor" href="#sheet-2-thematic_strata-preview"></a>
+</h4>
+<table class="table">
+<colgroup>
+<col width="25%">
+<col width="25%">
+<col width="25%">
+<col width="25%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Indicator</th>
+<th align="left">Stratum</th>
+<th align="left">Percentage (%)</th>
+<th align="left">Surface (ha)</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left"><strong>NDVI</strong></td>
+<td align="left">Water / Substrate degradation (&lt; 0.0)</td>
+<td align="left">14.7%</td>
+<td align="left">9.53 ha</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>NDVI</strong></td>
+<td align="left">Bare soil / Sparse canopy [0.0, 0.2)</td>
+<td align="left">38.2%</td>
+<td align="left">24.67 ha</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>NDVI</strong></td>
+<td align="left">Moderate vegetation / Transition [0.2, 0.5)</td>
+<td align="left">29.4%</td>
+<td align="left">18.99 ha</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>NDVI</strong></td>
+<td align="left">Dense vegetation / High vigor [&gt;= 0.5)</td>
+<td align="left">17.7%</td>
+<td align="left">11.44 ha</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>NDWI</strong></td>
+<td align="left">Water bodies / Saturated soil (&gt; 0.0)</td>
+<td align="left">18.6%</td>
+<td align="left">12.02 ha</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>NDWI</strong></td>
+<td align="left">Unsaturated terrestrial surface (&lt;= 0.0)</td>
+<td align="left">81.4%</td>
+<td align="left">52.61 ha</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level4">
+<h4 id="sheet-3-outliers_diagnostics-preview">Sheet 3: <code>Outliers_Diagnostics</code> Preview<a class="anchor" aria-label="anchor" href="#sheet-3-outliers_diagnostics-preview"></a>
+</h4>
+<table class="table">
+<colgroup>
+<col width="12%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Indicator</th>
+<th align="left">Lower_Fence</th>
+<th align="left">Upper_Fence</th>
+<th align="left">Low_Outliers</th>
+<th align="left">High_Outliers</th>
+<th align="left">Total_Outliers</th>
+<th align="left">Outlier_Pct</th>
+<th align="left">Diagnosis</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left"><strong>NDVI</strong></td>
+<td align="left">-0.469</td>
+<td align="left">0.920</td>
+<td align="left">2,140</td>
+<td align="left">3,248</td>
+<td align="left">5,388</td>
+<td align="left">0.82%</td>
+<td align="left">Homogeneous distribution</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>NDWI</strong></td>
+<td align="left">-0.794</td>
+<td align="left">0.410</td>
+<td align="left">1,820</td>
+<td align="left">2,292</td>
+<td align="left">4,112</td>
+<td align="left">0.63%</td>
+<td align="left">Homogeneous distribution</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
