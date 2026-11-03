@@ -75,5 +75,10 @@ d4h_read_stack <- function(file_path, required_bands = NULL, band_names = NULL) 
     }
   }
 
+  # Ingest raster metadata internally
+  tryCatch({
+    attr(r, "metadata") <- .d4h_raster_metadata(r, quiet = TRUE)
+  }, error = function(e) NULL)
+
   r
 }

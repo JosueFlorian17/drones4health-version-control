@@ -170,9 +170,8 @@ reference:
       - d4h_export_summary
 
   - title: "Preprocessing, Calibration & Utilities"
-    desc: "Raster metadata inspection, surface reflectance scaling, thermal calibration to Celsius Land Surface Temperature, raster cleaning, and multi-band stack ingestion workflows."
+    desc: "Surface reflectance scaling, thermal calibration to Celsius Land Surface Temperature, raster cleaning, and multi-band stack ingestion workflows with automated spatial metadata handling."
     contents:
-      - d4h_raster_metadata
       - d4h_read_stack
       - d4h_normalize_reflectance
       - d4h_thermal_to_celsius

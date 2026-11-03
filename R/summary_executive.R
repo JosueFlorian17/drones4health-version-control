@@ -383,11 +383,13 @@ d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = N
     lyr <- raster_layers[[i]]
     var_name <- layer_names[i]
 
+    # Ingest spatial and raster metadata internally
+    meta <- .d4h_raster_metadata(lyr, quiet = TRUE)
+
     # 1. Metricas espaciales y resolucion
-    res_xy <- terra::res(lyr)
-    is_lonlat_val <- suppressWarnings(terra::is.lonlat(lyr))
-    is_projected <- if (is.na(is_lonlat_val)) TRUE else !is_lonlat_val
-    total_cells <- terra::ncell(lyr)
+    res_xy <- c(meta$res_x, meta$res_y)
+    is_projected <- meta$is_projected
+    total_cells <- meta$total_pixels
 
     # Extraer pixeles validos
     is_sampled <- total_cells > sample_size
@@ -408,7 +410,7 @@ d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = N
     }
 
     valid_fraction <- if (n_sample_total > 0) n_valid / n_sample_total else 0
-    total_valid_est <- if (is_sampled) round(valid_fraction * total_cells) else n_valid_sample
+    total_valid_est <- if (is_sampled) round(valid_fraction * total_cells) else n_valid
 
     # Calculo de area de pixel y huella espacial
     pixel_area_m2 <- if (is_projected) res_xy[1] * res_xy[2] else (res_xy[1] * 111320) * (res_xy[2] * 110540)
@@ -416,11 +418,10 @@ d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = N
     area_ha <- area_m2 / 10000
 
     # Metadatos del recuadro de la escena (matching metadatos.py)
-    e <- terra::ext(lyr)
-    ancho_m <- if (is_projected) (e$xmax - e$xmin) else (e$xmax - e$xmin) * 111320
-    alto_m  <- if (is_projected) (e$ymax - e$ymin) else (e$ymax - e$ymin) * 110540
-    bbox_area_m2 <- ancho_m * alto_m
-    bbox_area_ha <- bbox_area_m2 / 10000
+    ancho_m <- meta$width_m
+    alto_m  <- meta$height_m
+    bbox_area_m2 <- meta$area_m2
+    bbox_area_ha <- meta$area_ha
 
     # 2. Estadisticas descriptivas y momentos
     mean_val <- mean(vals)
@@ -486,9 +487,18 @@ d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = N
 
     list(
       indicator = var_name,
+      metadata  = meta,
       spatial = list(
-        res_x = round(res_xy[1] * if (is_projected && res_xy[1] < 1) 100 else 1, 2),
-        res_unit = if (is_projected && res_xy[1] < 1) "cm" else if (is_projected) "m" else "deg",
+        res_x = meta$gsd_cm,
+        res_unit = "cm",
+        pixel_size_desc = meta$pixel_size_desc,
+        crs = meta$crs,
+        crs_epsg = meta$epsg,
+        width_px = meta$width,
+        height_px = meta$height,
+        total_pixels = meta$total_pixels,
+        dtype = meta$dtype,
+        nodata = meta$nodata,
         n_valid = total_valid_est,
         n_sampled = if (is_sampled) n_valid else total_cells,
         is_sampled = is_sampled,
@@ -535,7 +545,10 @@ d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = N
   df_general <- if (length(valid_items) > 0) {
     data.frame(
       indicator         = vapply(valid_items, function(x) x$indicator, character(1)),
-      resolution        = vapply(valid_items, function(x) paste(x$spatial$res_x, x$spatial$res_unit), character(1)),
+      resolution        = vapply(valid_items, function(x) if (!is.null(x$spatial$pixel_size_desc)) x$spatial$pixel_size_desc else paste(x$spatial$res_x, x$spatial$res_unit), character(1)),
+      scene_dimensions  = vapply(valid_items, function(x) if (!is.null(x$spatial$width_px)) paste0(format(x$spatial$width_px, big.mark = ","), " x ", format(x$spatial$height_px, big.mark = ","), " px") else NA_character_, character(1)),
+      scene_bbox_ha     = vapply(valid_items, function(x) if (!is.null(x$spatial$bbox_area_ha)) x$spatial$bbox_area_ha else NA_real_, numeric(1)),
+      crs_epsg          = vapply(valid_items, function(x) if (!is.null(x$spatial$crs_epsg) && !is.na(x$spatial$crs_epsg)) paste0("EPSG:", x$spatial$crs_epsg) else "N/A", character(1)),
       area_ha           = vapply(valid_items, function(x) x$spatial$area_ha, numeric(1)),
       valid_pixels      = vapply(valid_items, function(x) x$spatial$n_valid, numeric(1)),
       coverage_pct      = vapply(valid_items, function(x) x$spatial$coverage_pct, numeric(1)),
@@ -582,6 +595,9 @@ d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = N
   attr(df_general, "strata")      <- df_strata
   attr(df_general, "spatial")     <- lapply(summaries, `[[`, "spatial")
   attr(df_general, "outliers")    <- lapply(summaries, `[[`, "outliers")
+  if (length(valid_items) > 0) {
+    attr(df_general, "metadata")  <- do.call(rbind, lapply(valid_items, function(x) as.data.frame(x$metadata)))
+  }
 
   h_target <- if (!is.null(houses_proximity)) houses_proximity else houses_risk
   if (!is.null(h_target)) {
@@ -817,6 +833,11 @@ d4h_export_summary <- function(x, out_xlsx, houses_proximity = NULL, houses_risk
     Outliers_Diagnostics = df_outliers
   )
 
+  # Include Raster_Metadata sheet if ingested metadata exists
+  if (!is.null(attr(x, "metadata"))) {
+    sheets[["Raster_Metadata"]] <- as.data.frame(attr(x, "metadata"))
+  }
+
   # If household proximity data is present, append sheets 4 and 5
   if (!is.null(h_target)) {
     h_sheets <- .build_houses_proximity_sheets(h_target)
@@ -871,11 +892,23 @@ print.d4h_executive_summary <- function(x, ...) {
     cat(rep("-", 78), "\n", sep = "")
 
     cat(" 1. SPATIAL COVERAGE AND RESOLUTION:\n")
-    cat(sprintf("    - Pixel Resolution    : %s %s\n", sp$res_x, sp$res_unit))
+    if (!is.null(sp$pixel_size_desc)) {
+      cat(sprintf("    - Pixel Resolution    : %s\n", sp$pixel_size_desc))
+    } else {
+      cat(sprintf("    - Pixel Resolution    : %s %s\n", sp$res_x, sp$res_unit))
+    }
+    if (!is.null(sp$width_px)) {
+      cat(sprintf("    - Scene Dimensions    : %s px x %s px (%s total pixels, %s)\n",
+                  format(sp$width_px, big.mark = ","), format(sp$height_px, big.mark = ","),
+                  format(sp$total_pixels, big.mark = ","), sp$dtype))
+    }
     if (!is.null(sp$bbox_area_ha)) {
       cat(sprintf("    - Scene Bounding Box  : %s ha (%s m2 | %s m x %s m)\n",
                   format(sp$bbox_area_ha, big.mark = ","), format(sp$bbox_area_m2, big.mark = ","),
                   format(sp$field_width_m, big.mark = ","), format(sp$field_height_m, big.mark = ",")))
+    }
+    if (!is.null(sp$crs_epsg) && !is.na(sp$crs_epsg) && sp$crs_epsg != "N/A") {
+      cat(sprintf("    - Coordinate System   : EPSG:%s (%s)\n", sp$crs_epsg, sp$crs))
     }
     cat(sprintf("    - Surveyed Area       : %s ha (%s m2)\n", format(sp$area_ha, big.mark = ","), format(sp$area_m2, big.mark = ",")))
     if (isTRUE(sp$is_sampled)) {

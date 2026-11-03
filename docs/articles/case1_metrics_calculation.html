@@ -197,54 +197,24 @@ remote sensing analysis:</p>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="spatial-data-preparation-multi-band-metadata-inspection">3.2 Spatial Data Preparation &amp; Multi-Band Metadata
-Inspection<a class="anchor" aria-label="anchor" href="#spatial-data-preparation-multi-band-metadata-inspection"></a>
+<h3 id="spatial-data-preparation-automated-metadata-ingestion">3.2 Spatial Data Preparation &amp; Automated Metadata Ingestion<a class="anchor" aria-label="anchor" href="#spatial-data-preparation-automated-metadata-ingestion"></a>
 </h3>
-<p>Before computing biophysical indices, inspecting the physical raster
-dimensions, Ground Sampling Distance (GSD), georeferencing, and scene
-bounding box is critical. We use <code><a href="../reference/d4h_raster_metadata.html">d4h_raster_metadata()</a></code> (or
-alias <code><a href="../reference/d4h_raster_metadata.html">d4h_metadata()</a></code>) to extract structured spatial
-metadata directly:</p>
+<p>In operational drone processing pipelines, manual inspection and
+coordinate extraction of individual bands is unneeded. In
+<code>drones4health</code>, all physical dimensions (column/row widths,
+total pixel counts), Ground Sampling Distance (GSD, e.g. 9.92 cm/px),
+coordinate systems (EPSG:32718 / WGS 84 UTM 18S), and bounding boxes
+(177.014 ha | 1,609.5 m x 1,099.8 m) are automatically ingested
+internally by <code><a href="../reference/d4h_read_stack.html">d4h_read_stack()</a></code> and reported in downstream
+functions like <code><a href="../reference/d4h_executive_summary.html">d4h_executive_summary()</a></code>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># 1. Ingest and inspect drone orthomosaic metadata</span></span>
-<span><span class="va">path_nir</span> <span class="op">&lt;-</span> <span class="st">"img/Ohuay_NIR.tif"</span></span>
-<span><span class="va">path_r</span>   <span class="op">&lt;-</span> <span class="st">"img/Ohuay_R.tif"</span></span>
-<span><span class="va">path_g</span>   <span class="op">&lt;-</span> <span class="st">"img/Ohuay_G.tif"</span></span>
-<span></span>
-<span><span class="co"># Inspect structured metadata for all drone channels</span></span>
-<span><span class="va">meta</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_raster_metadata.html">d4h_raster_metadata</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">path_nir</span>, <span class="va">path_r</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre class="text"><code>====================================================================
- RASTER METADATA SUMMARY: Ohuay_NIR.tif
-====================================================================
-
-[+] DIMENSIONS AND STRUCTURE:
-  - Width (Columns)      : 16,223 px
-  - Height (Rows)        : 11,086 px
-  - Total Pixels         : 179,848,178 px
-  - Number of Bands      : 1
-  - Data Type (dtype)    : uint16
-  - NoData Value         : None
-
-[+] SPATIAL RESOLUTION (PIXEL SIZE / GSD):
-  - Resolution X         : 0.099209 m
-  - Resolution Y         : 0.099209 m
-  - Pixel Size (GSD)     : 9.92 cm x 9.92 cm (or 0.0992 m)
-
-[+] GEO-REFERENCING AND COORDINATE SYSTEM:
-  - CRS                  : WGS 84 / UTM zone 18S
-  - EPSG Code            : EPSG:32718
-  - Projected (Meters)   : Yes
-
-[+] SPATIAL BOUNDS (BOUNDING BOX):
-  - X Min (West)         : 857,987.45
-  - X Max (East)         : 859,596.91
-  - Y Min (South)        : 8,505,398.13
-  - Y Max (North)        : 8,506,497.96
-  - Field Dimensions     : 1,609.5 m x 1,099.8 m
-  - Bounding Box Area    : 177.014 ha (1,770,138.8 m2)
-====================================================================</code></pre>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Option B: Ingest a multi-band stacked raster with automated band validation</span></span>
+<code class="sourceCode R"><span><span class="co"># 1. Define paths to drone orthomosaic channels</span></span>
+<span><span class="va">path_rgb</span> <span class="op">&lt;-</span> <span class="st">"img/Ohuay_D.tif"</span>    <span class="co"># High-resolution RGB orthomosaic</span></span>
+<span><span class="va">path_nir</span> <span class="op">&lt;-</span> <span class="st">"img/Ohuay_NIR.tif"</span>  <span class="co"># Dedicated 16-bit Near-Infrared channel</span></span>
+<span><span class="va">path_r</span>   <span class="op">&lt;-</span> <span class="st">"img/Ohuay_R.tif"</span>    <span class="co"># Dedicated 16-bit Red channel</span></span>
+<span><span class="va">path_g</span>   <span class="op">&lt;-</span> <span class="st">"img/Ohuay_G.tif"</span>    <span class="co"># Dedicated 16-bit Green channel</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Option B: Ingest a multi-band stacked raster with automated band and metadata validation</span></span>
 <span><span class="co"># If any required band is missing, d4h_read_stack halts with an informative error</span></span>
 <span><span class="co"># r_stack &lt;- d4h_read_stack(</span></span>
 <span><span class="co">#   file_path      = "img/Ohuay_Stack.tif",</span></span>
@@ -256,7 +226,7 @@ metadata directly:</p>
 </h3>
 <p>We compute the two environmental indices directly from the raster
 bands:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 1. Normalized Difference Vegetation Index (NDVI)</span></span>
 <span><span class="co"># Formula: (NIR - Red) / (NIR + Red)</span></span>
 <span><span class="va">r_ndvi</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_ndvi.html">d4h_ndvi</a></span><span class="op">(</span>nir <span class="op">=</span> <span class="va">path_nir</span>, red <span class="op">=</span> <span class="va">path_r</span><span class="op">)</span></span>
@@ -272,7 +242,7 @@ bands:</p>
 <code>interactive = FALSE</code> outputs a publication-ready
 <code>ggplot2</code> figure, while <code>interactive = TRUE</code>
 renders an interactive <code>mapview</code> web map:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 1. Static publication-ready cartography via ggplot2 (interactive = FALSE)</span></span>
 <span><span class="va">p_static</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_plot.html">d4h_plot</a></span><span class="op">(</span></span>
 <span>  x           <span class="op">=</span> <span class="va">r_ndvi</span>,</span>
@@ -307,7 +277,7 @@ renders an interactive <code>mapview</code> web map:</p>
 (mean, standard deviation, coefficient of variation, median,
 interquartile range), Tukey outlier fences, and thematic stratum
 distributions for both NDVI and NDWI:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Generate multi-moment executive summary with direct multi-sheet Excel export</span></span>
 <span><span class="va">exec_summary_case01</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_executive_summary.html">d4h_executive_summary</a></span><span class="op">(</span></span>
 <span>  raster_in   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">r_ndvi</span>, <span class="va">r_ndwi</span><span class="op">)</span>,</span>
@@ -374,14 +344,6 @@ distributions for both NDVI and NDWI:</p>
  4. THEMATIC STRATIFICATION &amp; SPATIAL EXTENT:
     - Water bodies / Saturated soil (&gt; 0.0)     :   8.4 % ( 10.28 ha)
     - Unsaturated terrestrial surface (&lt;= 0.0)  :  91.6 % (112.07 ha)
-==============================================================================
-    - Tukey IQR Fences    : Lower &lt; -0.794 | Upper &gt; 0.410
-    - Outliers Detected   : 4,112 pixels (0.63% of valid pixels)
-    - Spatial Diagnostics : Homogeneous distribution (extreme values &lt; 1%)
-
- 4. THEMATIC STRATIFICATION &amp; SPATIAL EXTENT:
-    - Water bodies / Saturated soil (&gt; 0.0)     :  18.6 % ( 12.02 ha)
-    - Unsaturated terrestrial surface (&lt;= 0.0)  :  81.4 % ( 52.61 ha)
 
 ==============================================================================</code></pre>
 </div>

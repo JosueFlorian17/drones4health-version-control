@@ -378,13 +378,10 @@ summaries, Tukey outlier diagnostics, and direct multi-sheet Excel
 
 ## Preprocessing, Calibration & Utilities
 
-Raster metadata inspection, surface reflectance scaling, thermal
-calibration to Celsius Land Surface Temperature, raster cleaning, and
-multi-band stack ingestion workflows.
+Surface reflectance scaling, thermal calibration to Celsius Land Surface
+Temperature, raster cleaning, and multi-band stack ingestion workflows
+with automated spatial metadata handling.
 
-- [`d4h_raster_metadata()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_raster_metadata.md)
-  [`d4h_metadata()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_raster_metadata.md)
-  : Extract and Display Structured Raster Metadata
 - [`d4h_read_stack()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_read_stack.md)
   : Read and Validate Multi-Band Stack Raster
 - [`d4h_normalize_reflectance()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_normalize_reflectance.md)

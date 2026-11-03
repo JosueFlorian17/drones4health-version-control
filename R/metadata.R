@@ -1,47 +1,14 @@
-#' @title Extract and Display Structured Raster Metadata
+# Internal Raster Metadata Extraction Utility
+# Ingested internally by existing analytical functions (e.g., d4h_executive_summary, d4h_read_stack)
+
+#' Extract and Display Structured Raster Metadata (Internal)
 #' @description Inspects one or more drone orthomosaics or raster layers and extracts comprehensive spatial metadata, including dimensions, data type, spatial resolution (GSD), georeferencing, bounding box, physical scene dimensions, and coordinate reference systems.
-#' @details Drone remote sensing workflows require exact spatial validation before index computation.
-#' \code{d4h_raster_metadata} (alias \code{d4h_metadata}) inspects GeoTIFF files or \code{terra::SpatRaster} objects, translating coordinate extents and pixel resolutions into human-readable metric dimensions (e.g., cm/pixel GSD, scene area in hectares, affine transformation coefficients).
 #' @param x Character file path, \code{terra::SpatRaster}, or list of file paths/SpatRasters.
-#' @param quiet Logical. If \code{FALSE} (default), prints a structured executive summary block to the console. If \code{TRUE}, suppresses printing.
-#' @return A data frame (tibble) of S3 class \code{c("d4h_raster_metadata", "tbl_df", "tbl", "data.frame")} containing metadata attributes per raster layer or file:
-#' \describe{
-#'   \item{file}{Base filename or layer name}
-#'   \item{width}{Number of columns in pixels}
-#'   \item{height}{Number of rows in pixels}
-#'   \item{total_pixels}{Total pixel count (width * height)}
-#'   \item{nbands}{Number of raster channels/bands}
-#'   \item{dtype}{Storage data type (e.g. uint8, uint16, float32)}
-#'   \item{nodata}{Configured NoData value}
-#'   \item{res_x}{Spatial resolution in X dimension}
-#'   \item{res_y}{Spatial resolution in Y dimension}
-#'   \item{gsd_cm}{Ground Sampling Distance in centimeters (if projected)}
-#'   \item{pixel_size_desc}{Human-readable GSD description string}
-#'   \item{crs}{Coordinate reference system description}
-#'   \item{epsg}{EPSG code as integer}
-#'   \item{is_projected}{Logical indicating whether CRS is projected in meters}
-#'   \item{xmin}{Western boundary coordinate}
-#'   \item{xmax}{Eastern boundary coordinate}
-#'   \item{ymin}{Southern boundary coordinate}
-#'   \item{ymax}{Northern boundary coordinate}
-#'   \item{width_m}{Field horizontal width in meters}
-#'   \item{height_m}{Field vertical height in meters}
-#'   \item{area_m2}{Bounding box total surface area in square meters}
-#'   \item{area_ha}{Bounding box total surface area in hectares}
-#' }
-#' @examples
-#' \donttest{
-#' if (interactive()) {
-#'   library(drones4health)
-#'
-#'   # Inspect metadata for a drone orthomosaic band
-#'   path_r <- system.file("extdata", "ndvi.tif", package = "drones4health")
-#'   meta <- d4h_raster_metadata(path_r)
-#'   head(meta)
-#' }
-#' }
-#' @export
-d4h_raster_metadata <- function(x, quiet = FALSE) {
+#' @param quiet Logical. If \code{FALSE}, prints a structured executive summary block to the console. If \code{TRUE} (default), suppresses printing.
+#' @return A data frame containing metadata attributes per raster layer or file.
+#' @keywords internal
+#' @noRd
+.d4h_raster_metadata <- function(x, quiet = TRUE) {
   # Normalize input into a list of targets
   items <- if (is.character(x)) {
     as.list(x)
@@ -70,7 +37,7 @@ d4h_raster_metadata <- function(x, quiet = FALSE) {
         src_name <- basename(src_name)
       }
     } else {
-      warning("Unsupported item type in d4h_raster_metadata; skipping.", call. = FALSE)
+      warning("Unsupported item type in .d4h_raster_metadata; skipping.", call. = FALSE)
       return(NULL)
     }
 
@@ -153,9 +120,8 @@ d4h_raster_metadata <- function(x, quiet = FALSE) {
   invisible(df_meta)
 }
 
-#' @rdname d4h_raster_metadata
-#' @export
-d4h_metadata <- d4h_raster_metadata
+# Internal alias
+.get_raster_metadata <- .d4h_raster_metadata
 
 #' @export
 print.d4h_raster_metadata <- function(x, ...) {
