@@ -101,11 +101,11 @@ d4h_executive_summary(
 
 When `by = "grid"`, returns an object of class `d4h_grid_summary`
 containing both `$sf` (spatial polygons with geometry) and `$df` (clean
-tabular tibble without geometry), including micro-environmental
+tabular pure data.frame without geometry), including micro-environmental
 composition (`pct_bare_soil`, `pct_houses`, `pct_water`,
 `pct_vegetation`, `dominant_class`, `surveillance_priority`) and
 descriptive moments. When `by = "general"`, returns an object of class
-`d4h_executive_summary` (`tibble` / `data.frame`).
+`d4h_executive_summary` (pure `data.frame`).
 
 ## Details
 

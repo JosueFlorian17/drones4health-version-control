@@ -104,7 +104,7 @@
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A <code>tibble</code> containing the metric names, corresponding package functions, formulas, and epidemiological applications.</p>
+    <p>A pure <code>data.frame</code> containing the metric names, corresponding package functions, formulas, and epidemiological applications.</p>
     </div>
 
     <div class="section level2">
@@ -114,35 +114,103 @@
 <span class="r-in"><span><span class="co"># Display all available spatial health metrics</span></span></span>
 <span class="r-in"><span><span class="va">metrics_table</span> <span class="op">&lt;-</span> <span class="fu">d4h_list_metrics</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">metrics_table</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 21 × 6</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    category metric function_name resolution_cm formula               application</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> Spectral NDVI   d4h_ndvi                  5 (NIR - Red) / (NIR +… Vegetation…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> Spectral DVI    d4h_dvi                   5 NIR - Red             Linear can…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> Spectral SAVI   d4h_savi                  5 ((NIR - Red) / (NIR … Soil-adjus…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> Spectral MSAVI2 d4h_msavi2                5 (2*NIR + 1 - sqrt((2… Self-adjus…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> Spectral VARI   d4h_vari                  5 (Green - Red) / (Gre… RGB-only v…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> Spectral EVI    d4h_evi                   5 G * ((NIR - Red) / (… Enhanced v…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> Spectral NDWI   d4h_ndwi                  5 (Green - NIR) / (Gre… Open surfa…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> Spectral NDRE   d4h_ndre                  5 (NIR - RedEdge) / (N… Chlorophyl…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> Spectral GNDVI  d4h_gndvi                 5 (NIR - Green) / (NIR… Photosynth…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> Spectral CTVI   d4h_ctvi                  5 (NDVI + 0.5) / sqrt(… Corrected …</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 11 more rows</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           category    metric function_name resolution_cm</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1         Spectral      NDVI      d4h_ndvi             5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2         Spectral       DVI       d4h_dvi             5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3         Spectral      SAVI      d4h_savi             5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4         Spectral    MSAVI2    d4h_msavi2             5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5         Spectral      VARI      d4h_vari             5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6         Spectral       EVI       d4h_evi             5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7         Spectral      NDWI      d4h_ndwi             5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8         Spectral      NDRE      d4h_ndre             5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9         Spectral     GNDVI     d4h_gndvi             5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10        Spectral      CTVI      d4h_ctvi             5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11        Spectral Bare_Soil d4h_bare_soil             5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12     Topographic     Slope     d4h_slope            10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13     Topographic       TWI       d4h_twi            10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14 Epidemiological      IMSR      d4h_imsr             5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15 Epidemiological      IRTS      d4h_irts            10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16 Epidemiological       IEV       d4h_iev            10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17 Epidemiological       IEC       d4h_iec            10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18 Epidemiological      IEAD      d4h_iead            10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19 Epidemiological      IRHE      d4h_irhe            10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20 Epidemiological      IFEB      d4h_ifeb            10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21 Epidemiological      IRIH      d4h_irih            10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                              formula</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                          (NIR - Red) / (NIR + Red)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                                          NIR - Red</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3          ((NIR - Red) / (NIR + Red + L)) * (1 + L)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  (2*NIR + 1 - sqrt((2*NIR+1)^2 - 8*(NIR-Red))) / 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5         (Green - Red) / (Green + Red - Blue + eps)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6   G * ((NIR - Red) / (NIR + C1*Red - C2*Blue + L))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7                      (Green - NIR) / (Green + NIR)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8                  (NIR - RedEdge) / (NIR + RedEdge)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9                      (NIR - Green) / (NIR + Green)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10              (NDVI + 0.5) / sqrt(abs(NDVI + 0.5))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11                      ifel(NDVI &lt; threshold, 1, 0)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12               arctan(sqrt((dz/dx)^2 + (dz/dy)^2))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13           ln((flow_acc + 1) / (tan(slope) + eps))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14              |NDRE_approx - theta_veg| * NIR_norm</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15     (NDRE * (LST_surr - LST_local)) / (NIR + eps)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16                        NDWI * (1 / (Slope + eps))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17       GNDVI_water * (1 - (|LST - T_opt| / T_opt))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18          grad(delta_NDVI) * Depressions * RedEdge</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19                          NDWI * (1 / (LST + eps))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20             |grad(RedEdge)| * (Red / (NIR + eps))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21        Var(RedEdge / NIR) * (Red / (Green + eps))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                         application</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                  Vegetation vigor, biomass density &amp; canopy cover</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                Linear canopy biomass &amp; leaf area index variations</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3        Soil-adjusted vegetation index for sparse canopies (L=0.5)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4         Self-adjusting vegetation index for arid &amp; degraded soils</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5       RGB-only visible atmospherically resistant vegetation index</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6               Enhanced vegetation index for high-biomass canopies</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7       Open surface water bodies &amp; localized moisture accumulation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8  Chlorophyll content in dense vegetation avoiding NDVI saturation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9           Photosynthetic activity &amp; micro-algae in standing water</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10      Corrected transformed vegetation index normalizing skewness</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11                    Binary mask of bare, exposed or degraded soil</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12      Micro-terrain slope derived from DSM/DEM in degrees/radians</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13           Topographic wetness index &amp; micro-pooling accumulation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14  Solid waste, plastics &amp; artificial Aedes aegypti breeding sites</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15   Thermal refuge &amp; cool shaded resting microhabitats for vectors</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16          Vulnerability to water stagnation &amp; larval colonization</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17       Larval incubation &amp; thermal stratification in water bodies</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18     Water pooling in cleared, excavated &amp; deforested micro-zones</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19      Persistent cold water retention &amp; dry-season vector refugia</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20           Forest-edge ecotone borders &amp; ecological fragmentation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21         Canopy structural roughness in forest-dwelling interface</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Filter only eco-epidemiological indices</span></span></span>
 <span class="r-in"><span><span class="va">epi_metrics</span> <span class="op">&lt;-</span> <span class="fu">d4h_list_metrics</span><span class="op">(</span>category <span class="op">=</span> <span class="st">"Epidemiological"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">epi_metrics</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 8 × 6</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   category        metric function_name resolution_cm formula         application</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Epidemiological IMSR   d4h_imsr                  5 |NDRE_approx -… Solid wast…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> Epidemiological IRTS   d4h_irts                 10 (NDRE * (LST_s… Thermal re…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> Epidemiological IEV    d4h_iev                  10 NDWI * (1 / (S… Vulnerabil…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> Epidemiological IEC    d4h_iec                  10 GNDVI_water * … Larval inc…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> Epidemiological IEAD   d4h_iead                 10 grad(delta_NDV… Water pool…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> Epidemiological IRHE   d4h_irhe                 10 NDWI * (1 / (L… Persistent…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">7</span> Epidemiological IFEB   d4h_ifeb                 10 |grad(RedEdge)… Forest-edg…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">8</span> Epidemiological IRIH   d4h_irih                 10 Var(RedEdge / … Canopy str…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           category metric function_name resolution_cm</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14 Epidemiological   IMSR      d4h_imsr             5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15 Epidemiological   IRTS      d4h_irts            10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16 Epidemiological    IEV       d4h_iev            10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17 Epidemiological    IEC       d4h_iec            10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18 Epidemiological   IEAD      d4h_iead            10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19 Epidemiological   IRHE      d4h_irhe            10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20 Epidemiological   IFEB      d4h_ifeb            10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21 Epidemiological   IRIH      d4h_irih            10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                          formula</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14          |NDRE_approx - theta_veg| * NIR_norm</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15 (NDRE * (LST_surr - LST_local)) / (NIR + eps)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16                    NDWI * (1 / (Slope + eps))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17   GNDVI_water * (1 - (|LST - T_opt| / T_opt))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18      grad(delta_NDVI) * Depressions * RedEdge</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19                      NDWI * (1 / (LST + eps))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20         |grad(RedEdge)| * (Red / (NIR + eps))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21    Var(RedEdge / NIR) * (Red / (Green + eps))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                        application</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14 Solid waste, plastics &amp; artificial Aedes aegypti breeding sites</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15  Thermal refuge &amp; cool shaded resting microhabitats for vectors</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16         Vulnerability to water stagnation &amp; larval colonization</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17      Larval incubation &amp; thermal stratification in water bodies</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18    Water pooling in cleared, excavated &amp; deforested micro-zones</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19     Persistent cold water retention &amp; dry-season vector refugia</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20          Forest-edge ecotone borders &amp; ecological fragmentation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21        Canopy structural roughness in forest-dwelling interface</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
