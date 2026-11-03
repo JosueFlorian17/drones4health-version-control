@@ -101,7 +101,7 @@ head(grid_summary_ndvi)
 
 ### 3.5 Multi-Indicator Extraction (`d4h_extract_indicators`)
 
-Modeled after `land4health`, `d4h_extract_indicators()` allows extracting multiple environmental indicators simultaneously:
+The `d4h_extract_indicators()` function provides a unified interface to compute and extract multiple environmental indicators simultaneously across the flight scene:
 
 ```r
 # Extract NDVI and NDWI in a single pipe call

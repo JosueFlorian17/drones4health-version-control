@@ -262,9 +262,9 @@ grid and returns a complete <code>sf</code> object:</p>
 <h3 id="multi-indicator-extraction-d4h_extract_indicators">3.5 Multi-Indicator Extraction
 (<code>d4h_extract_indicators</code>)<a class="anchor" aria-label="anchor" href="#multi-indicator-extraction-d4h_extract_indicators"></a>
 </h3>
-<p>Modeled after <code>land4health</code>,
-<code><a href="../reference/d4h_extract_indicators.html">d4h_extract_indicators()</a></code> allows extracting multiple
-environmental indicators simultaneously:</p>
+<p>The <code><a href="../reference/d4h_extract_indicators.html">d4h_extract_indicators()</a></code> function provides a unified
+interface to compute and extract multiple environmental indicators
+simultaneously across the flight scene:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Extract NDVI and NDWI in a single pipe call</span></span>
 <span><span class="va">indicators_sf</span> <span class="op">&lt;-</span> <span class="va">grid_hex</span> <span class="op">|&gt;</span></span>

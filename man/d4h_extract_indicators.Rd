@@ -107,7 +107,7 @@ Simultaneously computes, extracts, and summarizes multiple biophysical, vegetati
 Always provides both a spatial representation (\code{$sf}) with polygons and a clean tabular data frame (\code{$df}) without geometry, including micro-environmental land cover composition (\code{pct_bare_soil}, \code{pct_houses}, \code{pct_water}, \code{pct_vegetation}, \code{dominant_class}, \code{surveillance_priority}).
 }
 \details{
-Modeled after the \code{land4health} multi-indicator extraction framework.
+Provides a flexible, unified pipeline for automated batch extraction of biophysical indices.
 The function operates directly on drone orthomosaics or multispectral bands without requiring a manual region input.
 If an operational grid is not provided via \code{grid}, an operative surveillance grid is automatically generated across the valid flight footprint
 using \code{cell_size} (default: 50 m), \code{area_m2}, or \code{n_cells}.
