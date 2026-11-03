@@ -1,12 +1,24 @@
-# Summarize Raster Indicator by Spatial Grid
+# Summarize Raster Indicator by Spatial Grid or General Footprint (Deprecated)
 
-Generates a square or hexagonal spatial grid and extracts zonal summary
-statistics (mean, quantiles) of raster indicators per grid cell.
+This function is deprecated in favor of
+[`d4h_executive_summary`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_executive_summary.md)
+with `grid = ...` or `by = "grid"`. Generates a square or hexagonal
+spatial grid and extracts zonal summary statistics of raster indicators
+per grid cell.
 
 ## Usage
 
 ``` r
-d4h_summarize_grid(raster_in, cell_size = 20, square = TRUE, discard_na = TRUE)
+d4h_summarize_grid(
+  raster_in,
+  cell_size = 20,
+  square = TRUE,
+  discard_na = TRUE,
+  general = FALSE,
+  exact_boundary = TRUE
+)
+
+d4h_summarize_general(raster_in, exact_boundary = TRUE)
 ```
 
 ## Arguments
@@ -17,55 +29,32 @@ d4h_summarize_grid(raster_in, cell_size = 20, square = TRUE, discard_na = TRUE)
 
 - cell_size:
 
-  Numeric. Grid cell size / diameter in meters (default: 20).
+  Numeric. Grid cell size / diameter in meters (default: 20). Ignored
+  when `general = TRUE`.
 
 - square:
 
   Logical. If TRUE, creates square cells; if FALSE, hexagonal cells
-  (default: TRUE).
+  (default: TRUE). Ignored when `general = TRUE`.
 
 - discard_na:
 
   Logical. If TRUE, removes grid cells outside the valid raster data
-  area (default: TRUE).
+  area (default: TRUE). Ignored when `general = TRUE`.
+
+- general:
+
+  Logical. If TRUE, computes the overall mean value of raster layers
+  across the entire area of interest as a single spatial vector polygon
+  (SpatVector) with `grid_id = "GENERAL"` (default: FALSE).
+
+- exact_boundary:
+
+  Logical. When `general = TRUE`, if TRUE, traces the exact outer
+  boundary of valid non-NA flight data; if FALSE, uses the bounding box
+  extent (default: TRUE).
 
 ## Value
 
-A SpatVector containing the grid cells with extracted mean values.
-
-## Details
-
-Zonal extraction aggregates high-resolution pixel values into
-operational territorial units: \$\$\bar{x}\_k = \frac{1}{N_k} \sum\_{i
-\in \text{Cell}\_k} x_i\$\$ Empty grid cells outside the valid flight
-footprint are automatically pruned when `discard_na = TRUE`.
-
-## References
-
-Birch, C. P., Oom, S. P., & Beecham, J. A. (2007). Rectangular and
-hexagonal grids used for observation, experiment and simulation in
-ecology. *Ecological Modelling*, 206(3-4), 347-359.
-[doi:10.1016/j.ecolmodel.2007.03.041](https://doi.org/10.1016/j.ecolmodel.2007.03.041)
-
-## Examples
-
-``` r
-# \donttest{
-if (interactive()) {
-  library(drones4health)
-  library(terra)
-
-  # Load continuous indicator raster
-  ndvi_file <- system.file("extdata", "ndvi.tif", package = "drones4health")
-
-  # Aggregate NDVI values into a 50m hexagonal surveillance grid
-  grid_summary <- d4h_summarize_grid(
-    raster_in = ndvi_file,
-    cell_size = 50,
-    square = FALSE,
-    discard_na = TRUE
-  )
-  head(grid_summary)
-}
-# }
-```
+A SpatVector or sf containing the grid cells (or single general
+footprint polygon) with extracted values.

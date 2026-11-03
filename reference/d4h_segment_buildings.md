@@ -54,11 +54,15 @@ d4h_segment_buildings(
 - method:
 
   Character. Segmentation method: `"spectral"` (default, fast native R)
-  or `"sam"` (Meta Segment Anything Model).
+  or `"sam"` (Meta Segment Anything Model). When `method = "sam"`,
+  delineation is driven by SAM on RGB imagery and filtered by
+  `min_area_m2` and `max_area_m2`.
 
 - sam_checkpoint:
 
   Character path (optional). Model weights path when `method = "sam"`.
+  If `NULL` (default), automatically checks the internal package cache
+  and downloads Meta's official ViT-B model (~375 MB) on first use.
 
 ## Value
 
@@ -67,14 +71,28 @@ An `sf` POLYGON object with columns: `building_id`, `area_m2`,
 
 ## Details
 
-Buildings are extracted by combining high surface brightness / spectral
-contrast in visible RGB bands with non-vegetated constraints
-(\\\text{NDVI} \< \theta\_{\text{ndvi}}\\): \$\$\text{BuildingCandidate}
-= \begin{cases} 1 & \text{if } \text{RGB}\_{\text{mean}} \ge
-\theta\_{\text{bright}} \text{ and } \text{NDVI} \<
-\theta\_{\text{ndvi}} \\ 0 & \text{otherwise} \end{cases}\$\$ Vectorized
-candidates are filtered by residential building footprints (\\10\text{
-m}^2 \le \text{Area} \le 500\text{ m}^2\\).
+Buildings are extracted using two alternative methodologies:
+
+- **Spectral OBIA (`method = "spectral"`):** Combines high surface
+  brightness (corrugated metal/calamina roofs,
+  \\\text{RGB}\_{\text{mean}} \ge \theta\_{\text{bright}}\\) and
+  red-clay tile chromatic signatures with vegetation exclusion
+  constraints (\\\text{NDVI} \< \theta\_{\text{ndvi}}\\):
+  \$\$\text{BuildingCandidate} = \begin{cases} 1 & \text{if }
+  (\text{Brightness} \ge \theta\_{\text{bright}} \lor \text{RedTile})
+  \text{ and } \text{NDVI} \< \theta\_{\text{ndvi}} \\ 0 &
+  \text{otherwise} \end{cases}\$\$
+
+- **Deep Learning (`method = "sam"`):** Utilizes Meta's Segment Anything
+  Model (SAM) via `reticulate`. Delineates geometric regular roof
+  boundaries directly from the 3-band visible RGB orthomosaic. Spectral
+  thresholds (`brightness_min`, `ndvi_max`) are bypassed, filtering
+  candidates exclusively by `min_area_m2` and `max_area_m2`. Model
+  weights are automatically managed in the internal package cache.
+
+Vectorized candidates are filtered by residential building footprints
+(\\12\text{ m}^2 \le \text{Area} \le 600\text{ m}^2\\), with centroid
+coordinates computed.
 
 ## References
 

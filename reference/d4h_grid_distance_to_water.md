@@ -2,8 +2,8 @@
 
 Computes the minimum Euclidean distance from each operational grid cell
 (square or hexagonal) to the nearest water body or aquatic habitat,
-calculates exponential proximity exposure scores in 0, 1, and stratifies
-grid units into operational priority tiers.
+calculates exponential proximity exposure scores in `[0, 1]`, and
+stratifies grid units into operational priority tiers.
 
 ## Usage
 

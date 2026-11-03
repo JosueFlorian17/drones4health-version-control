@@ -8,8 +8,6 @@ informative error if any required band is missing.
 
 ``` r
 d4h_read_stack(file_path, required_bands = NULL, band_names = NULL)
-
-d4h_load_stack(file_path, required_bands = NULL, band_names = NULL)
 ```
 
 ## Arguments

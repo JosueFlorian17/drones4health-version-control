@@ -14,19 +14,10 @@ d4h_executive_summary(
   raster_in,
   by = c("general", "grid"),
   grid = NULL,
-  houses_proximity = NULL,
-  houses_risk = NULL,
-  cell_size = 50,
-  square = TRUE,
-  out_xlsx = NULL,
-  sample_size = 1e+06,
-  digits = 3
-)
-
-d4h_report(
-  raster_in,
-  by = c("general", "grid"),
-  grid = NULL,
+  water = NULL,
+  buildings = NULL,
+  houses = NULL,
+  features = NULL,
   houses_proximity = NULL,
   houses_risk = NULL,
   cell_size = 50,
@@ -54,6 +45,20 @@ d4h_report(
   Optional SpatVector, sf, or character path to existing grid polygon
   boundaries when `by = "grid"`. If NULL, automatically generated using
   `cell_size` and `square`.
+
+- water:
+
+  SpatVector, sf, or SpatRaster (optional). Segmented water bodies or
+  binary water mask to compute grid water coverage (`pct_water`).
+
+- buildings:
+
+  SpatVector, sf, or SpatRaster (optional). Segmented building/roof
+  footprints to compute grid dwelling coverage (`pct_houses`).
+
+- houses:
+
+  Deprecated alias for `buildings`.
 
 - houses_proximity:
 
@@ -94,10 +99,13 @@ d4h_report(
 
 ## Value
 
-An object of class `d4h_executive_summary` (for `by = "general"`) or
-`d4h_grid_summary` / `data.frame` (for `by = "grid"`) containing
-structured metrics, spatial coverage metadata, outlier diagnostics, and
-thematic stratum distributions.
+When `by = "grid"`, returns an object of class `d4h_grid_summary`
+containing both `$sf` (spatial polygons with geometry) and `$df` (clean
+tabular tibble without geometry), including micro-environmental
+composition (`pct_bare_soil`, `pct_houses`, `pct_water`,
+`pct_vegetation`, `dominant_class`, `surveillance_priority`) and
+descriptive moments. When `by = "general"`, returns an object of class
+`d4h_executive_summary` (`tibble` / `data.frame`).
 
 ## Details
 
@@ -146,7 +154,9 @@ if (interactive()) {
     sample_size = 1000000,
     digits      = 3
   )
-  head(exec_grid)
+  # Always provides both $sf and $df:
+  head(exec_grid$df)
+  plot(exec_grid$sf)
 }
 # }
 ```

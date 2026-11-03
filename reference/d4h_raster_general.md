@@ -2,7 +2,8 @@
 
 Creates a continuous SpatRaster matching the exact spatial footprint of
 the input raster where all valid pixels are assigned the overall global
-mean value.
+mean value. Note: `d4h_plot(..., general = TRUE)` can plot this baseline
+directly without manual raster creation.
 
 ## Usage
 

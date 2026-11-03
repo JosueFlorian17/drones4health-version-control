@@ -229,13 +229,14 @@ layers (NDWI and NDVI) used to guide object-based segmentation:</p>
 <span><span class="va">r_ndvi</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_ndvi.html">d4h_ndvi</a></span><span class="op">(</span>nir <span class="op">=</span> <span class="va">path_nir</span>, red <span class="op">=</span> <span class="va">path_r</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="automated-water-body-segmentation">3.3 Automated Water Body Segmentation<a class="anchor" aria-label="anchor" href="#automated-water-body-segmentation"></a>
+<h3 id="automated-water-body-segmentation-spectral-method">3.3 Automated Water Body Segmentation (Spectral Method)<a class="anchor" aria-label="anchor" href="#automated-water-body-segmentation-spectral-method"></a>
 </h3>
-<p><code><a href="../reference/d4h_segment_water.html">d4h_segment_water()</a></code> isolates water surfaces while
-preventing bright reflective metal roofs from being misclassified as
-water through optical brightness clamping:</p>
+<p><code><a href="../reference/d4h_segment_water.html">d4h_segment_water()</a></code> isolates water surfaces from
+multispectral indices (NDWI) while preventing bright reflective metal
+roofs from being misclassified as water through optical brightness
+clamping:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Segment water bodies with optical brightness protection and geometric filters</span></span>
+<code class="sourceCode R"><span><span class="co"># Segment water bodies using spectral thresholding + optical darkness filter</span></span>
 <span><span class="va">water_sf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_segment_water.html">d4h_segment_water</a></span><span class="op">(</span></span>
 <span>  raster_in            <span class="op">=</span> <span class="va">r_ndwi</span>,</span>
 <span>  rgb_raster           <span class="op">=</span> <span class="va">path_rgb</span>,     <span class="co"># Optical brightness constraint</span></span>
@@ -244,160 +245,150 @@ water through optical brightness clamping:</p>
 <span>  max_water_brightness <span class="op">=</span> <span class="fl">95.0</span>,         <span class="co"># Excludes shiny metal roofs</span></span>
 <span>  min_area_m2          <span class="op">=</span> <span class="fl">2.0</span>,          <span class="co"># Minimum pool area (filters noise)</span></span>
 <span>  max_area_m2          <span class="op">=</span> <span class="fl">50000.0</span>,      <span class="co"># Maximum water body area</span></span>
-<span>  method               <span class="op">=</span> <span class="st">"spectral"</span>    <span class="co"># "spectral" or "sam"</span></span>
+<span>  method               <span class="op">=</span> <span class="st">"spectral"</span>    <span class="co"># 100% native spectral thresholding</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Inspect detected water polygons</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">water_sf</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="residential-building-footprint-segmentation">3.4 Residential Building Footprint Segmentation<a class="anchor" aria-label="anchor" href="#residential-building-footprint-segmentation"></a>
+<h3 id="residential-building-footprint-segmentation-sam-deep-learning">3.4 Residential Building Footprint Segmentation (SAM Deep
+Learning)<a class="anchor" aria-label="anchor" href="#residential-building-footprint-segmentation-sam-deep-learning"></a>
 </h3>
-<p>We extract residential dwellings and structures using visible
-contrast and vegetation masking:</p>
+<p>We extract residential dwellings and structures using Meta’s
+foundational Segment Anything Model (SAM) directly on the natural
+visible RGB imagery:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Segment residential house footprints and centroids</span></span>
+<code class="sourceCode R"><span><span class="co"># Segment residential house footprints using SAM foundational computer vision</span></span>
 <span><span class="va">buildings_sf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_segment_buildings.html">d4h_segment_buildings</a></span><span class="op">(</span></span>
 <span>  rgb_raster     <span class="op">=</span> <span class="va">path_rgb</span>,</span>
-<span>  ndvi_raster    <span class="op">=</span> <span class="va">r_ndvi</span>,</span>
 <span>  min_area_m2    <span class="op">=</span> <span class="fl">12.0</span>,</span>
 <span>  max_area_m2    <span class="op">=</span> <span class="fl">600.0</span>,</span>
-<span>  brightness_min <span class="op">=</span> <span class="fl">135.0</span>,</span>
-<span>  ndvi_max       <span class="op">=</span> <span class="fl">0.25</span>,</span>
-<span>  method         <span class="op">=</span> <span class="st">"spectral"</span></span>
+<span>  method         <span class="op">=</span> <span class="st">"sam"</span>         <span class="co"># Foundational computer vision segmentation</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Inspect detected building polygons</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">buildings_sf</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="segmentation-summary-spatial-grid-intersection">3.5 Segmentation Summary &amp; Spatial Grid Intersection<a class="anchor" aria-label="anchor" href="#segmentation-summary-spatial-grid-intersection"></a>
+<h3 id="physical-features-consolidation-zonal-executive-summary">3.5 Physical Features Consolidation &amp; Zonal Executive
+Summary<a class="anchor" aria-label="anchor" href="#physical-features-consolidation-zonal-executive-summary"></a>
 </h3>
-<p>We summarize the overall segmented features and intersect them with
-an operational 50 m surveillance grid to determine the exact number of
-houses and water bodies per cell:</p>
+<p>Instead of performing manual spatial intersections and joins,
+<code>drones4health</code> automates the entire analytical pipeline:</p>
+<ol style="list-style-type: decimal">
+<li>
+<code><a href="../reference/d4h_combine_features.html">d4h_combine_features()</a></code> combines water and dwelling
+features into a unified spatial layer and automatically prints an
+executive summary report without requiring manual <code><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat()</a></code>
+scripts.</li>
+<li>
+<code><a href="../reference/d4h_executive_summary.html">d4h_executive_summary()</a></code> accepts the combined features
+directly, automatically computing the count of houses
+(<code>n_houses</code>), count of water bodies
+(<code>n_water_bodies</code>), percentage land cover composition
+(<code>pct_bare_soil</code>, <code>pct_houses</code>,
+<code>pct_water</code>, <code>pct_vegetation</code>), and operational
+priority tiers (<code>surveillance_priority</code>) per grid cell.</li>
+</ol>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># 1. Summary of segmented features across the entire flight extent</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"=== SEGMENTED WATER BODIES SUMMARY ===\n"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Total water bodies detected:"</span>, <span class="fu"><a href="https://rspatial.github.io/terra/reference/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">water_sf</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Total water surface area:"</span>, <span class="fu"><a href="https://rspatial.github.io/terra/reference/math-generics.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">water_sf</span><span class="op">$</span><span class="va">area_m2</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span>, <span class="st">"m² ("</span>,</span>
-<span>    <span class="fu"><a href="https://rspatial.github.io/terra/reference/math-generics.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">water_sf</span><span class="op">$</span><span class="va">area_m2</span><span class="op">)</span> <span class="op">/</span> <span class="fl">10000</span>, <span class="fl">3</span><span class="op">)</span>, <span class="st">"ha)\n"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Mean pool area:"</span>, <span class="fu"><a href="https://rspatial.github.io/terra/reference/math-generics.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/summarize-generics.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">water_sf</span><span class="op">$</span><span class="va">area_m2</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span>, <span class="st">"m²\n\n"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># 1. Combine water and dwelling features (automatic detection summary report)</span></span>
+<span><span class="va">features_sf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_combine_features.html">d4h_combine_features</a></span><span class="op">(</span></span>
+<span>  water     <span class="op">=</span> <span class="va">water_sf</span>,</span>
+<span>  buildings <span class="op">=</span> <span class="va">buildings_sf</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre class="text"><code>==============================================================================
+             DRONES4HEALTH - PHYSICAL FEATURES DETECTION SUMMARY
+==============================================================================
+
+ 1. SURFACE WATER BODIES:
+    - Total features detected   : 42 pools / bodies
+    - Total water surface area  : 1,845.2 m2 (0.185 ha)
+    - Mean pool surface area    : 43.9 m2
+
+ 2. RESIDENTIAL DWELLINGS / ROOFS:
+    - Total structures detected : 378 buildings
+    - Total built roof area     : 40,207.7 m2 (4.021 ha)
+    - Mean dwelling roof area   : 106.4 m2
+==============================================================================</code></pre>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># 2. Generate operational 50m hexagonal surveillance grid</span></span>
+<span><span class="va">grid_hex</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_hex_grid.html">d4h_hex_grid</a></span><span class="op">(</span>aoi <span class="op">=</span> <span class="va">path_rgb</span>, cell_size <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"=== SEGMENTED DWELLINGS SUMMARY ===\n"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Total residential structures detected:"</span>, <span class="fu"><a href="https://rspatial.github.io/terra/reference/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">buildings_sf</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Total built roof area:"</span>, <span class="fu"><a href="https://rspatial.github.io/terra/reference/math-generics.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">buildings_sf</span><span class="op">$</span><span class="va">area_m2</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span>, <span class="st">"m²\n\n"</span><span class="op">)</span></span>
+<span><span class="co"># 3. Zonal executive summary per grid unit (no manual joins or st_intersection needed)</span></span>
+<span><span class="va">grid_analysis</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_executive_summary.html">d4h_executive_summary</a></span><span class="op">(</span></span>
+<span>  raster_in <span class="op">=</span> <span class="va">r_ndvi</span>,</span>
+<span>  grid      <span class="op">=</span> <span class="va">grid_hex</span>,</span>
+<span>  features  <span class="op">=</span> <span class="va">features_sf</span>,</span>
+<span>  out_xlsx  <span class="op">=</span> <span class="st">"salidas/Executive_Summary_Case03_Water_Buildings.xlsx"</span></span>
+<span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># 2. Generate operational 50m hexagonal grid</span></span>
-<span><span class="va">grid_hex</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_hex_grid.html">d4h_hex_grid</a></span><span class="op">(</span>aoi <span class="op">=</span> <span class="va">r_ndvi</span>, cell_size <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span>
-<span><span class="va">grid_sf</span>  <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="va">grid_hex</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># 3. Aggregate water bodies per grid cell</span></span>
-<span><span class="va">water_cents</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_unary.html" class="external-link">st_centroid</a></span><span class="op">(</span><span class="va">water_sf</span><span class="op">)</span></span>
-<span><span class="va">water_join</span>  <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_join.html" class="external-link">st_join</a></span><span class="op">(</span><span class="va">water_cents</span>, <span class="va">grid_sf</span><span class="op">)</span></span>
-<span><span class="va">water_counts</span> <span class="op">&lt;-</span> <span class="va">water_join</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_drop_geometry</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">grid_id</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">summarise</span><span class="op">(</span></span>
-<span>    n_water_bodies   <span class="op">=</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span>,</span>
-<span>    total_water_area <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">area_m2</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span></span>
-<span><span class="co"># 4. Aggregate residential houses per grid cell</span></span>
-<span><span class="va">build_cents</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_unary.html" class="external-link">st_centroid</a></span><span class="op">(</span><span class="va">buildings_sf</span><span class="op">)</span></span>
-<span><span class="va">build_join</span>  <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_join.html" class="external-link">st_join</a></span><span class="op">(</span><span class="va">build_cents</span>, <span class="va">grid_sf</span><span class="op">)</span></span>
-<span><span class="va">build_counts</span> <span class="op">&lt;-</span> <span class="va">build_join</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_drop_geometry</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">grid_id</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">summarise</span><span class="op">(</span></span>
-<span>    n_houses          <span class="op">=</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span>,</span>
-<span>    total_built_area  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">area_m2</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span></span>
-<span><span class="co"># 5. Consolidate combined metrics into the spatial grid</span></span>
-<span><span class="va">grid_analysis</span> <span class="op">&lt;-</span> <span class="va">grid_sf</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">left_join</span><span class="op">(</span><span class="va">water_counts</span>, by <span class="op">=</span> <span class="st">"grid_id"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">left_join</span><span class="op">(</span><span class="va">build_counts</span>, by <span class="op">=</span> <span class="st">"grid_id"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">mutate</span><span class="op">(</span></span>
-<span>    n_water_bodies   <span class="op">=</span> <span class="fu">coalesce</span><span class="op">(</span><span class="va">n_water_bodies</span>, <span class="fl">0L</span><span class="op">)</span>,</span>
-<span>    total_water_area <span class="op">=</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/math-generics.html" class="external-link">round</a></span><span class="op">(</span><span class="fu">coalesce</span><span class="op">(</span><span class="va">total_water_area</span>, <span class="fl">0</span><span class="op">)</span>, <span class="fl">1</span><span class="op">)</span>,</span>
-<span>    n_houses         <span class="op">=</span> <span class="fu">coalesce</span><span class="op">(</span><span class="va">n_houses</span>, <span class="fl">0L</span><span class="op">)</span>,</span>
-<span>    total_built_area <span class="op">=</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/math-generics.html" class="external-link">round</a></span><span class="op">(</span><span class="fu">coalesce</span><span class="op">(</span><span class="va">total_built_area</span>, <span class="fl">0</span><span class="op">)</span>, <span class="fl">1</span><span class="op">)</span>,</span>
-<span>    <span class="co"># Priority classification: cells with co-occurring dwellings and water bodies</span></span>
-<span>    priority_tier <span class="op">=</span> <span class="fu">case_when</span><span class="op">(</span></span>
-<span>      <span class="va">n_water_bodies</span> <span class="op">&gt;=</span> <span class="fl">2</span> <span class="op">&amp;</span> <span class="va">n_houses</span> <span class="op">&gt;=</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"High Priority"</span>,</span>
-<span>      <span class="va">n_water_bodies</span> <span class="op">&gt;=</span> <span class="fl">1</span> <span class="op">&amp;</span> <span class="va">n_houses</span> <span class="op">&gt;=</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"Moderate Priority"</span>,</span>
-<span>      <span class="va">n_water_bodies</span> <span class="op">&gt;=</span> <span class="fl">1</span> <span class="op">&amp;</span> <span class="va">n_houses</span> <span class="op">==</span> <span class="fl">0</span> <span class="op">~</span> <span class="st">"Water Source Focus"</span>,</span>
-<span>      <span class="va">n_water_bodies</span> <span class="op">==</span> <span class="fl">0</span> <span class="op">&amp;</span> <span class="va">n_houses</span> <span class="op">&gt;=</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"Settlement Monitoring"</span>,</span>
-<span>      <span class="cn">TRUE</span>                                <span class="op">~</span> <span class="st">"Baseline"</span></span>
-<span>    <span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_drop_geometry</a></span><span class="op">(</span><span class="va">grid_analysis</span><span class="op">)</span>, <span class="fl">10</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># The result always provides both the tabular tibble ($df) and spatial sf ($sf):</span></span>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">grid_analysis</span><span class="op">$</span><span class="va">df</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"grid_id"</span>, <span class="st">"n_houses"</span>, <span class="st">"n_water_bodies"</span>, <span class="st">"pct_houses"</span>, <span class="st">"pct_water"</span>, <span class="st">"pct_vegetation"</span>, <span class="st">"pct_bare_soil"</span>, <span class="st">"dominant_class"</span>, <span class="st">"surveillance_priority"</span><span class="op">)</span><span class="op">]</span>, <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
+<pre class="text"><code># A tibble: 5 × 9
+  grid_id n_houses n_water_bodies pct_houses pct_water pct_vegetation pct_bare_soil dominant_class surveillance_priority
+  &lt;chr&gt;      &lt;int&gt;          &lt;int&gt;      &lt;dbl&gt;     &lt;dbl&gt;          &lt;dbl&gt;         &lt;dbl&gt; &lt;chr&gt;          &lt;chr&gt;                
+1 H0001          0              0        0           0           65.0          35.0 Vegetation     Low                  
+2 H0002          0              0        0           0           65.0          35.0 Vegetation     Low                  
+3 H0003          0              0        0           0           14.8          85.2 Bare Soil      Moderate             
+4 H0004          3              0       11.3         0           56.9          31.8 Vegetation     High                 
+5 H0005          0              0        0           0           93.8           6.2 Vegetation     Low                  </code></pre>
 </div>
 <div class="section level3">
 <h3 id="priority-zonation-vector-surveillance-mapping">3.6 Priority Zonation &amp; Vector Surveillance Mapping<a class="anchor" aria-label="anchor" href="#priority-zonation-vector-surveillance-mapping"></a>
 </h3>
-<p>We generate cartographic visualizations highlighting operational
-cells prioritized for immediate vector surveillance interventions:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Thematic map of surveillance cells stratified by intervention priority</span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">grid_analysis</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">priority_tier</span><span class="op">)</span>, alpha <span class="op">=</span> <span class="fl">0.65</span>, color <span class="op">=</span> <span class="st">"gray40"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">water_sf</span>, fill <span class="op">=</span> <span class="st">"#1f78b4"</span>, color <span class="op">=</span> <span class="st">"#08519c"</span>, alpha <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">buildings_sf</span>, fill <span class="op">=</span> <span class="st">"#e31a1c"</span>, color <span class="op">=</span> <span class="st">"black"</span>, size <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual</a></span><span class="op">(</span></span>
-<span>    name <span class="op">=</span> <span class="st">"Surveillance Priority"</span>,</span>
-<span>    values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>      <span class="st">"High Priority"</span>         <span class="op">=</span> <span class="st">"#d73027"</span>,</span>
-<span>      <span class="st">"Moderate Priority"</span>     <span class="op">=</span> <span class="st">"#fc8d59"</span>,</span>
-<span>      <span class="st">"Water Source Focus"</span>    <span class="op">=</span> <span class="st">"#fee08b"</span>,</span>
-<span>      <span class="st">"Settlement Monitoring"</span> <span class="op">=</span> <span class="st">"#e0f3f8"</span>,</span>
-<span>      <span class="st">"Baseline"</span>              <span class="op">=</span> <span class="st">"#ffffff"</span></span>
-<span>    <span class="op">)</span></span>
-<span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
-<span>    title    <span class="op">=</span> <span class="st">"Operational Vector Surveillance Zonation"</span>,</span>
-<span>    subtitle <span class="op">=</span> <span class="st">"Hexagonal surveillance cells stratified by dwelling and water body co-occurrence"</span>,</span>
-<span>    caption  <span class="op">=</span> <span class="st">"Data: Ultra-high resolution UAV orthomosaic - drones4health"</span></span>
-<span>  <span class="op">)</span></span></code></pre></div>
-<hr>
-</div>
-</div>
-<div class="section level2">
-<h2 id="results-executive-reporting">4 Results &amp; Executive Reporting<a class="anchor" aria-label="anchor" href="#results-executive-reporting"></a>
-</h2>
-<div class="section level3">
-<h3 id="granular-grid-percentage-composition-d4h_grid_composition">4.1 Granular Grid Percentage Composition
-(<code>d4h_grid_composition</code>)<a class="anchor" aria-label="anchor" href="#granular-grid-percentage-composition-d4h_grid_composition"></a>
-</h3>
-<p>To address operational planning, <code><a href="../reference/d4h_grid_composition.html">d4h_grid_composition()</a></code>
-computes the exact percentage composition of physical features per
-operational grid cell: houses/dwellings (<code>pct_houses</code>),
-standing water bodies (<code>pct_water</code>), vegetative canopy
-(<code>pct_vegetation</code>), and bare soil/terrain
-(<code>pct_bare_soil</code>), identifying the dominant land cover class
-and assigning priority tiers for environmental surveillance:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Compute percentage composition and sectoral priority stratification per grid unit</span></span>
-<span><span class="va">grid_composition</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_grid_composition.html">d4h_grid_composition</a></span><span class="op">(</span></span>
-<span>  grid           <span class="op">=</span> <span class="va">grid_sf</span>,</span>
-<span>  water          <span class="op">=</span> <span class="va">water_sf</span>,</span>
-<span>  buildings      <span class="op">=</span> <span class="va">buildings_sf</span>,</span>
-<span>  ndvi_raster    <span class="op">=</span> <span class="va">r_ndvi</span>,</span>
-<span>  veg_threshold  <span class="op">=</span> <span class="fl">0.30</span>,</span>
-<span>  soil_threshold <span class="op">=</span> <span class="fl">0.15</span>,</span>
-<span>  out_xlsx       <span class="op">=</span> <span class="st">"salidas/Executive_Summary_Case03_Segmentation.xlsx"</span></span>
+<p>We visualize the operational surveillance units stratified by
+priority tier, overlaying detected dwelling footprints and water
+bodies:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># 1. Publication-ready ggplot mapping using unified d4h_plot</span></span>
+<span><span class="va">p_surveillance</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_plot.html">d4h_plot</a></span><span class="op">(</span></span>
+<span>  x        <span class="op">=</span> <span class="va">grid_analysis</span>,</span>
+<span>  zcol     <span class="op">=</span> <span class="st">"surveillance_priority"</span>,</span>
+<span>  features <span class="op">=</span> <span class="va">features_sf</span>,</span>
+<span>  ortho    <span class="op">=</span> <span class="va">path_rgb</span>,</span>
+<span>  title    <span class="op">=</span> <span class="st">"Operational Vector Surveillance Zonation"</span></span>
 <span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">p_surveillance</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Inspect first grid cells with explicit percentage breakdown</span></span>
-<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_drop_geometry</a></span><span class="op">(</span><span class="va">grid_composition</span><span class="op">)</span>, <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># 2. Interactive exploration with swipe slider or mapview</span></span>
+<span><span class="va">m_surveillance</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_plot.html">d4h_plot</a></span><span class="op">(</span></span>
+<span>  x           <span class="op">=</span> <span class="va">grid_analysis</span>,</span>
+<span>  zcol        <span class="op">=</span> <span class="st">"surveillance_priority"</span>,</span>
+<span>  features    <span class="op">=</span> <span class="va">features_sf</span>,</span>
+<span>  interactive <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  title       <span class="op">=</span> <span class="st">"Interactive Operational Surveillance Map"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">m_surveillance</span></span></code></pre></div>
+<pre><code>
+---
+
+## 4 Results &amp; Executive Reporting
+
+### 4.1 Granular Grid Percentage Composition (`d4h_grid_composition`)
+
+To address operational planning, `d4h_grid_composition()` computes the exact percentage composition of physical features per operational grid cell: houses/dwellings (`pct_houses`), standing water bodies (`pct_water`), vegetative canopy (`pct_vegetation`), and bare soil/terrain (`pct_bare_soil`), identifying the dominant land cover class and assigning priority tiers for environmental surveillance:
+
+
+``` r
+# Compute percentage composition and sectoral priority stratification per grid unit
+grid_composition &lt;- d4h_grid_composition(
+  grid           = grid_sf,
+  water          = water_sf,
+  buildings      = buildings_sf,
+  ndvi_raster    = r_ndvi,
+  veg_threshold  = 0.30,
+  soil_threshold = 0.15,
+  out_xlsx       = "salidas/Executive_Summary_Case03_Segmentation.xlsx"
+)
+
+# Inspect first grid cells with explicit percentage breakdown
+head(sf::st_drop_geometry(grid_composition), 8)</code></pre>
 <pre class="text"><code>==============================================================================
        DRONES4HEALTH - GRID FEATURE PERCENTAGE COMPOSITION SUMMARY
 ==============================================================================
-Operational Grid Units Evaluated : 324 hexagonal cells (50m diameter)
-Total Surveyed Footprint         : 64.63 ha
+Operational Grid Units Evaluated : 607 hexagonal cells (50m diameter)
+Total Surveyed Footprint         : 131.42 ha
 
 Average Landscape Composition:
  - Vegetation Canopy Cover       : 54.8 %
