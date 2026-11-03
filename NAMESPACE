@@ -106,8 +106,3 @@ importFrom(terra,
   vect,
   writeRaster
 )
-importFrom(tibble,
-  as_tibble,
-  tibble,
-  tribble
-)

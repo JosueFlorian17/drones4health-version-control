@@ -20,7 +20,7 @@ Orthomosaic](../reference/figures/03_hexagonal_grid_zonal_ndvi.png)
 | Variable / Target | Function | Description |
 |:---|:---|:---|
 | **Operational Grid** | [`d4h_make_grid()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_make_grid.md) / [`d4h_hex_grid()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_hex_grid.md) | Generates regular hexagonal or square surveillance partitions using 3 mutually exclusive sizing modes (`cell_size`, `area_m2`, or `n_cells`). |
-| **Executive Summary (DF / SF)** | [`d4h_executive_summary()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_executive_summary.md) | Extracts multi-moment statistics and outlier diagnostics, returning an `sf` object when summarizing by grid or a `tibble` when summarizing globally. |
+| **Executive Summary (DF / SF)** | [`d4h_executive_summary()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_executive_summary.md) | Extracts multi-moment statistics and outlier diagnostics, returning both a spatial `sf` object and a clean tabular `data.frame`. |
 | **Multi-Indicator Extraction** | [`d4h_extract_indicators()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_extract_indicators.md) | Simultaneously calculates and extracts multiple biophysical/terrain indicators (`ndvi`, `ndwi`, `savi`, `vari`, `slope`, etc.) per region. |
 | **Unified Visualization** | [`d4h_plot()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_plot.md) | Unified static and interactive maps with continuous, discrete, or homogeneous baselines. |
 
@@ -144,14 +144,12 @@ head(grid_exec_summary$df[, c("grid_id", "area_m2", "pct_vegetation", "pct_bare_
 ```
 
 ``` text
-# A tibble: 5 × 9
   grid_id area_m2 pct_vegetation pct_bare_soil NDVI_mean NDVI_sd NDVI_median dominant_class surveillance_priority
-  <chr>     <dbl>          <dbl>         <dbl>     <dbl>   <dbl>       <dbl> <chr>          <chr>                
-1 H0001     2165.           65.0          35.0    NA      NA          NA     Vegetation     Low                  
-2 H0002     2165.           65.0          35.0    NA      NA          NA     Vegetation     Low                  
-3 H0003     2165.           14.8          85.2     0.028   0.187       0.002 Bare Soil      Moderate             
-4 H0004     2165.           64.2          35.8     0.234   0.379       0.151 Vegetation     Low                  
-5 H0005     2165.           93.8           6.2     0.679   0.297       0.865 Vegetation     Low                  
+1   H0001 2165.06          65.00         35.00        NA      NA          NA     Vegetation                   Low
+2   H0002 2165.06          65.00         35.00        NA      NA          NA     Vegetation                   Low
+3   H0003 2165.06          14.80         85.20     0.028   0.187       0.002      Bare Soil              Moderate
+4   H0004 2165.06          64.20         35.80     0.234   0.379       0.151     Vegetation                   Low
+5   H0005 2165.06          93.80          6.20     0.679   0.297       0.865     Vegetation                   Low
 ```
 
 ### 3.6 Cartographic Visualization & Interactive Grid Mapping

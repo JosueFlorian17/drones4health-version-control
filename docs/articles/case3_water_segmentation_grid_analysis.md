@@ -172,19 +172,17 @@ grid_analysis <- d4h_executive_summary(
   out_xlsx  = "salidas/Executive_Summary_Case03_Water_Buildings.xlsx"
 )
 
-# The result always provides both the tabular tibble ($df) and spatial sf ($sf):
+# The result always provides both the tabular data.frame ($df) and spatial sf ($sf):
 head(grid_analysis$df[, c("grid_id", "n_houses", "n_water_bodies", "pct_houses", "pct_water", "pct_vegetation", "pct_bare_soil", "dominant_class", "surveillance_priority")], 5)
 ```
 
 ``` text
-# A tibble: 5 × 9
   grid_id n_houses n_water_bodies pct_houses pct_water pct_vegetation pct_bare_soil dominant_class surveillance_priority
-  <chr>      <int>          <int>      <dbl>     <dbl>          <dbl>         <dbl> <chr>          <chr>                
-1 H0001          0              0        0           0           65.0          35.0 Vegetation     Low                  
-2 H0002          0              0        0           0           65.0          35.0 Vegetation     Low                  
-3 H0003          0              0        0           0           14.8          85.2 Bare Soil      Moderate             
-4 H0004          3              0       11.3         0           56.9          31.8 Vegetation     High                 
-5 H0005          0              0        0           0           93.8           6.2 Vegetation     Low                  
+1   H0001        0              0       0.00      0.00          65.00         35.00     Vegetation                   Low
+2   H0002        0              0       0.00      0.00          65.00         35.00     Vegetation                   Low
+3   H0003        0              0       0.00      0.00          14.80         85.20      Bare Soil              Moderate
+4   H0004        3              0      11.30      0.00          56.90         31.80     Vegetation                  High
+5   H0005        0              0       0.00      0.00          93.80          6.20     Vegetation                   Low
 ```
 
 ### 3.6 Priority Zonation & Vector Surveillance Mapping

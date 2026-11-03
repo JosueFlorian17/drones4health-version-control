@@ -108,10 +108,8 @@
   })
 
   df_meta <- do.call(rbind, meta_rows[!vapply(meta_rows, is.null, logical(1))])
-  if (requireNamespace("tibble", quietly = TRUE)) {
-    df_meta <- tibble::as_tibble(df_meta)
-  }
-  class(df_meta) <- c("d4h_raster_metadata", class(df_meta))
+  df_meta <- as.data.frame(df_meta, stringsAsFactors = FALSE)
+  class(df_meta) <- c("d4h_raster_metadata", "data.frame")
 
   if (!quiet) {
     print(df_meta)

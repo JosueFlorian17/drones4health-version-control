@@ -49,7 +49,7 @@ d4h_executive_summary(
 \item{digits}{Integer. Number of decimal places to format numerical metrics (default: 3).}
 }
 \value{
-When \code{by = "grid"}, returns an object of class \code{d4h_grid_summary} containing both \code{$sf} (spatial polygons with geometry) and \code{$df} (clean tabular tibble without geometry), including micro-environmental composition (\code{pct_bare_soil}, \code{pct_houses}, \code{pct_water}, \code{pct_vegetation}, \code{dominant_class}, \code{surveillance_priority}) and descriptive moments. When \code{by = "general"}, returns an object of class \code{d4h_executive_summary} (\code{tibble} / \code{data.frame}).
+When \code{by = "grid"}, returns an object of class \code{d4h_grid_summary} containing both \code{$sf} (spatial polygons with geometry) and \code{$df} (clean tabular pure data.frame without geometry), including micro-environmental composition (\code{pct_bare_soil}, \code{pct_houses}, \code{pct_water}, \code{pct_vegetation}, \code{dominant_class}, \code{surveillance_priority}) and descriptive moments. When \code{by = "general"}, returns an object of class \code{d4h_executive_summary} (pure \code{data.frame}).
 }
 \description{
 Generates a comprehensive executive report for a given raster layer or multi-band mosaic. It extracts key statistical moments, spatial extent and resolution metrics, Tukey outlier diagnostics, domain-specific bio-physical/epidemiological stratum interpretations, either globally (\code{by = "general"}) or per territorial grid cell (\code{by = "grid"}), and optionally exports a formatted multi-sheet Excel spreadsheet.

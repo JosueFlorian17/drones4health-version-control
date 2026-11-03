@@ -323,16 +323,14 @@ priority tiers (<code>surveillance_priority</code>) per grid cell.</li>
 <span>  out_xlsx  <span class="op">=</span> <span class="st">"salidas/Executive_Summary_Case03_Water_Buildings.xlsx"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># The result always provides both the tabular tibble ($df) and spatial sf ($sf):</span></span>
+<span><span class="co"># The result always provides both the tabular data.frame ($df) and spatial sf ($sf):</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">grid_analysis</span><span class="op">$</span><span class="va">df</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"grid_id"</span>, <span class="st">"n_houses"</span>, <span class="st">"n_water_bodies"</span>, <span class="st">"pct_houses"</span>, <span class="st">"pct_water"</span>, <span class="st">"pct_vegetation"</span>, <span class="st">"pct_bare_soil"</span>, <span class="st">"dominant_class"</span>, <span class="st">"surveillance_priority"</span><span class="op">)</span><span class="op">]</span>, <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
-<pre class="text"><code># A tibble: 5 × 9
-  grid_id n_houses n_water_bodies pct_houses pct_water pct_vegetation pct_bare_soil dominant_class surveillance_priority
-  &lt;chr&gt;      &lt;int&gt;          &lt;int&gt;      &lt;dbl&gt;     &lt;dbl&gt;          &lt;dbl&gt;         &lt;dbl&gt; &lt;chr&gt;          &lt;chr&gt;                
-1 H0001          0              0        0           0           65.0          35.0 Vegetation     Low                  
-2 H0002          0              0        0           0           65.0          35.0 Vegetation     Low                  
-3 H0003          0              0        0           0           14.8          85.2 Bare Soil      Moderate             
-4 H0004          3              0       11.3         0           56.9          31.8 Vegetation     High                 
-5 H0005          0              0        0           0           93.8           6.2 Vegetation     Low                  </code></pre>
+<pre class="text"><code>  grid_id n_houses n_water_bodies pct_houses pct_water pct_vegetation pct_bare_soil dominant_class surveillance_priority
+1   H0001        0              0       0.00      0.00          65.00         35.00     Vegetation                   Low
+2   H0002        0              0       0.00      0.00          65.00         35.00     Vegetation                   Low
+3   H0003        0              0       0.00      0.00          14.80         85.20      Bare Soil              Moderate
+4   H0004        3              0      11.30      0.00          56.90         31.80     Vegetation                  High
+5   H0005        0              0       0.00      0.00          93.80          6.20     Vegetation                   Low</code></pre>
 </div>
 <div class="section level3">
 <h3 id="priority-zonation-vector-surveillance-mapping">3.6 Priority Zonation &amp; Vector Surveillance Mapping<a class="anchor" aria-label="anchor" href="#priority-zonation-vector-surveillance-mapping"></a>

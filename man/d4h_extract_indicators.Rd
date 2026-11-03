@@ -99,7 +99,7 @@ Supported codes include:
 An object of class \code{d4h_indicators_summary} and \code{d4h_grid_summary} containing:
 \itemize{
 \item \code{$sf}: Spatial \code{sf} polygons with geometry, indicator statistics, and land cover composition.
-\item \code{$df}: Tabular \code{tibble} data frame without geometry, containing all zonal metrics and land cover percentages (\code{pct_bare_soil}, \code{pct_houses}, \code{pct_water}, \code{pct_vegetation}, \code{dominant_class}, \code{surveillance_priority}).
+\item \code{$df}: Tabular pure \code{data.frame} without geometry, containing all zonal metrics and land cover percentages (\code{pct_bare_soil}, \code{pct_houses}, \code{pct_water}, \code{pct_vegetation}, \code{dominant_class}, \code{surveillance_priority}).
 }
 }
 \description{

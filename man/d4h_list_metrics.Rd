@@ -10,7 +10,7 @@ d4h_list_metrics(category = NULL)
 \item{category}{Character (optional). Filter metrics by category: "Spectral", "Topographic", "Epidemiological", or NULL to list all.}
 }
 \value{
-A \code{tibble} containing the metric names, corresponding package functions, formulas, and epidemiological applications.
+A pure \code{data.frame} containing the metric names, corresponding package functions, formulas, and epidemiological applications.
 }
 \description{
 Dynamically retrieves all available remote sensing indices, terrain metrics, and eco-epidemiological indicators supported by the package, detailing their mathematical formulas, typical spatial resolutions, and vector surveillance applications.

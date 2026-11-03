@@ -183,7 +183,7 @@ containing:
 - `$sf`: Spatial `sf` polygons with geometry, indicator statistics, and
   land cover composition.
 
-- `$df`: Tabular `tibble` data frame without geometry, containing all
+- `$df`: Tabular pure `data.frame` without geometry, containing all
   zonal metrics and land cover percentages (`pct_bare_soil`,
   `pct_houses`, `pct_water`, `pct_vegetation`, `dominant_class`,
   `surveillance_priority`).

@@ -18,7 +18,7 @@
 #' @param out_xlsx Character (optional). File path to export a structured multi-sheet Excel workbook (.xlsx). Default: NULL.
 #' @param sample_size Integer. Maximum number of sampled pixels for quantile and outlier analysis on large rasters (default: 1000000).
 #' @param digits Integer. Number of decimal places to format numerical metrics (default: 3).
-#' @return When \code{by = "grid"}, returns an object of class \code{d4h_grid_summary} containing both \code{$sf} (spatial polygons with geometry) and \code{$df} (clean tabular tibble without geometry), including micro-environmental composition (\code{pct_bare_soil}, \code{pct_houses}, \code{pct_water}, \code{pct_vegetation}, \code{dominant_class}, \code{surveillance_priority}) and descriptive moments. When \code{by = "general"}, returns an object of class \code{d4h_executive_summary} (\code{tibble} / \code{data.frame}).
+#' @return When \code{by = "grid"}, returns an object of class \code{d4h_grid_summary} containing both \code{$sf} (spatial polygons with geometry) and \code{$df} (clean tabular pure data.frame without geometry), including micro-environmental composition (\code{pct_bare_soil}, \code{pct_houses}, \code{pct_water}, \code{pct_vegetation}, \code{dominant_class}, \code{surveillance_priority}) and descriptive moments. When \code{by = "general"}, returns an object of class \code{d4h_executive_summary} (pure \code{data.frame}).
 #' @references
 #' Tukey, J. W. (1977). \emph{Exploratory Data Analysis}. Addison-Wesley.
 #' @examples
@@ -303,10 +303,7 @@ d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = N
 
     # Build both spatial (sf) and tabular (df) representations
     res_sf <- df_grid_merged
-    res_df <- sf::st_drop_geometry(df_grid_merged)
-    if (requireNamespace("tibble", quietly = TRUE)) {
-      res_df <- tibble::as_tibble(res_df)
-    }
+    res_df <- as.data.frame(sf::st_drop_geometry(df_grid_merged), stringsAsFactors = FALSE)
 
     # Compound result containing BOTH $sf and $df
     res_grid <- list(
@@ -539,7 +536,7 @@ d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = N
 
   names(summaries) <- layer_names
 
-  # Construct clean data.frame / tibble for executive summary
+  # Construct clean pure data.frame for executive summary
   valid_items <- summaries[!vapply(summaries, function(x) !is.null(x$error), logical(1))]
 
   df_general <- if (length(valid_items) > 0) {
@@ -570,9 +567,7 @@ d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = N
     data.frame(indicator = layer_names, stringsAsFactors = FALSE)
   }
 
-  if (requireNamespace("tibble", quietly = TRUE)) {
-    df_general <- tibble::as_tibble(df_general)
-  }
+  df_general <- as.data.frame(df_general, stringsAsFactors = FALSE)
 
   # Build strata dataframe
   strata_rows <- list()
@@ -1048,7 +1043,7 @@ print.d4h_grid_summary <- function(x, ...) {
   cat("==============================================================================\n")
   cat(sprintf(" Evaluated Units : %d grid cells | Attributes: %d\n", nrow(x$df), ncol(x$df)))
   cat(" Structure       : Both spatial ($sf) and tabular ($df) representations provided.\n")
-  cat(" Available parts : $sf (sf polygons with geometry) | $df (clean tibble/data.frame)\n")
+  cat(" Available parts : $sf (sf polygons with geometry) | $df (clean tabular data.frame)\n")
   cat(" Included fields : Micro-environmental composition (pct_bare_soil, pct_houses,\n")
   cat("                   pct_water, pct_vegetation, dominant_class, surveillance_priority)\n")
   cat("                   and descriptive indicator moments (mean, sd, median, outliers).\n")

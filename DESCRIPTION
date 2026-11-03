@@ -12,8 +12,7 @@ Roxygen: list(markdown = TRUE)
 Imports: 
     ggplot2,
     sf,
-    terra,
-    tibble
+    terra
 Suggests: 
     leafsync,
     leaflet,

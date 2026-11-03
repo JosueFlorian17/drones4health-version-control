@@ -167,8 +167,8 @@ partitions using 3 mutually exclusive sizing modes
 <td align="left"><strong>Executive Summary (DF / SF)</strong></td>
 <td align="left"><code><a href="../reference/d4h_executive_summary.html">d4h_executive_summary()</a></code></td>
 <td align="left">Extracts multi-moment statistics and outlier
-diagnostics, returning an <code>sf</code> object when summarizing by
-grid or a <code>tibble</code> when summarizing globally.</td>
+diagnostics, returning both a spatial <code>sf</code> object and a clean
+tabular <code>data.frame</code>.</td>
 </tr>
 <tr class="odd">
 <td align="left"><strong>Multi-Indicator Extraction</strong></td>
@@ -299,14 +299,12 @@ exporting directly to Excel:</p>
 <span></span>
 <span><span class="co"># Inspect clean tabular data frame ($df)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">grid_exec_summary</span><span class="op">$</span><span class="va">df</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"grid_id"</span>, <span class="st">"area_m2"</span>, <span class="st">"pct_vegetation"</span>, <span class="st">"pct_bare_soil"</span>, <span class="st">"NDVI_mean"</span>, <span class="st">"NDVI_sd"</span>, <span class="st">"NDVI_median"</span>, <span class="st">"dominant_class"</span>, <span class="st">"surveillance_priority"</span><span class="op">)</span><span class="op">]</span>, <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
-<pre class="text"><code># A tibble: 5 × 9
-  grid_id area_m2 pct_vegetation pct_bare_soil NDVI_mean NDVI_sd NDVI_median dominant_class surveillance_priority
-  &lt;chr&gt;     &lt;dbl&gt;          &lt;dbl&gt;         &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;       &lt;dbl&gt; &lt;chr&gt;          &lt;chr&gt;                
-1 H0001     2165.           65.0          35.0    NA      NA          NA     Vegetation     Low                  
-2 H0002     2165.           65.0          35.0    NA      NA          NA     Vegetation     Low                  
-3 H0003     2165.           14.8          85.2     0.028   0.187       0.002 Bare Soil      Moderate             
-4 H0004     2165.           64.2          35.8     0.234   0.379       0.151 Vegetation     Low                  
-5 H0005     2165.           93.8           6.2     0.679   0.297       0.865 Vegetation     Low                  </code></pre>
+<pre class="text"><code>  grid_id area_m2 pct_vegetation pct_bare_soil NDVI_mean NDVI_sd NDVI_median dominant_class surveillance_priority
+1   H0001 2165.06          65.00         35.00        NA      NA          NA     Vegetation                   Low
+2   H0002 2165.06          65.00         35.00        NA      NA          NA     Vegetation                   Low
+3   H0003 2165.06          14.80         85.20     0.028   0.187       0.002      Bare Soil              Moderate
+4   H0004 2165.06          64.20         35.80     0.234   0.379       0.151     Vegetation                   Low
+5   H0005 2165.06          93.80          6.20     0.679   0.297       0.865     Vegetation                   Low</code></pre>
 </div>
 <div class="section level3">
 <h3 id="cartographic-visualization-interactive-grid-mapping">3.6 Cartographic Visualization &amp; Interactive Grid Mapping<a class="anchor" aria-label="anchor" href="#cartographic-visualization-interactive-grid-mapping"></a>

@@ -48,7 +48,7 @@
 #' @return An object of class \code{d4h_indicators_summary} and \code{d4h_grid_summary} containing:
 #' \itemize{
 #'   \item \code{$sf}: Spatial \code{sf} polygons with geometry, indicator statistics, and land cover composition.
-#'   \item \code{$df}: Tabular \code{tibble} data frame without geometry, containing all zonal metrics and land cover percentages (\code{pct_bare_soil}, \code{pct_houses}, \code{pct_water}, \code{pct_vegetation}, \code{dominant_class}, \code{surveillance_priority}).
+#'   \item \code{$df}: Tabular pure \code{data.frame} without geometry, containing all zonal metrics and land cover percentages (\code{pct_bare_soil}, \code{pct_houses}, \code{pct_water}, \code{pct_vegetation}, \code{dominant_class}, \code{surveillance_priority}).
 #' }
 #' @examples
 #' \donttest{
@@ -353,10 +353,7 @@ d4h_extract_indicators <- function(raster = NULL,
 
   # 7. Build both spatial (sf) and tabular (df) representations
   res_sf <- grid_sf
-  res_df <- sf::st_drop_geometry(grid_sf)
-  if (requireNamespace("tibble", quietly = TRUE)) {
-    res_df <- tibble::as_tibble(res_df)
-  }
+  res_df <- as.data.frame(sf::st_drop_geometry(grid_sf))
 
   if (!quiet) {
     message(sprintf("✔ Extracted %d indicators across %d grid units | Both $sf and $df available",
@@ -415,7 +412,7 @@ print.d4h_indicators_summary <- function(x, ...) {
   cat("==============================================================================\n")
   cat(sprintf(" Evaluated Units : %d grid cells | Total attributes: %d\n", nrow(x$df), ncol(x$df)))
   cat(" Structure       : Both spatial ($sf) and tabular ($df) representations provided.\n")
-  cat(" Available parts : $sf (sf polygons with geometry) | $df (clean tibble/data.frame)\n")
+  cat(" Available parts : $sf (sf polygons with geometry) | $df (clean tabular data.frame)\n")
   cat(" Included fields : Micro-environmental composition (pct_bare_soil, pct_houses,\n")
   cat("                   pct_water, pct_vegetation, dominant_class, surveillance_priority)\n")
   cat("                   and extracted indicator values.\n")
