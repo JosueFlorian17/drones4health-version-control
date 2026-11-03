@@ -124,8 +124,7 @@ Instead of performing manual spatial intersections and joins,
 
 1.  [`d4h_combine_features()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_combine_features.md)
     combines water and dwelling features into a unified spatial layer
-    and automatically prints an executive summary report without
-    requiring manual [`cat()`](https://rdrr.io/r/base/cat.html) scripts.
+    and automatically prints an executive summary report.
 2.  [`d4h_executive_summary()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_executive_summary.md)
     accepts the combined features directly, automatically computing the
     count of houses (`n_houses`), count of water bodies
@@ -213,30 +212,36 @@ m_surveillance <- d4h_plot(
 m_surveillance
 ```
 
+------------------------------------------------------------------------
 
-    ---
+## 4 Results & Executive Reporting
 
-    ## 4 Results & Executive Reporting
+### 4.1 Granular Grid Percentage Composition (`d4h_grid_composition`)
 
-    ### 4.1 Granular Grid Percentage Composition (`d4h_grid_composition`)
+To address operational planning,
+[`d4h_grid_composition()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_grid_composition.md)
+computes the exact percentage composition of physical features per
+operational grid cell: houses/dwellings (`pct_houses`), standing water
+bodies (`pct_water`), vegetative canopy (`pct_vegetation`), and bare
+soil/terrain (`pct_bare_soil`), identifying the dominant land cover
+class and assigning priority tiers for environmental surveillance:
 
-    To address operational planning, `d4h_grid_composition()` computes the exact percentage composition of physical features per operational grid cell: houses/dwellings (`pct_houses`), standing water bodies (`pct_water`), vegetative canopy (`pct_vegetation`), and bare soil/terrain (`pct_bare_soil`), identifying the dominant land cover class and assigning priority tiers for environmental surveillance:
+``` r
 
+# Compute percentage composition and sectoral priority stratification per grid unit
+grid_composition <- d4h_grid_composition(
+  grid           = grid_sf,
+  water          = water_sf,
+  buildings      = buildings_sf,
+  ndvi_raster    = r_ndvi,
+  veg_threshold  = 0.30,
+  soil_threshold = 0.15,
+  out_xlsx       = "salidas/Executive_Summary_Case03_Segmentation.xlsx"
+)
 
-    ``` r
-    # Compute percentage composition and sectoral priority stratification per grid unit
-    grid_composition <- d4h_grid_composition(
-      grid           = grid_sf,
-      water          = water_sf,
-      buildings      = buildings_sf,
-      ndvi_raster    = r_ndvi,
-      veg_threshold  = 0.30,
-      soil_threshold = 0.15,
-      out_xlsx       = "salidas/Executive_Summary_Case03_Segmentation.xlsx"
-    )
-
-    # Inspect first grid cells with explicit percentage breakdown
-    head(sf::st_drop_geometry(grid_composition), 8)
+# Inspect first grid cells with explicit percentage breakdown
+head(sf::st_drop_geometry(grid_composition), 8)
+```
 
 ``` text
 ==============================================================================
