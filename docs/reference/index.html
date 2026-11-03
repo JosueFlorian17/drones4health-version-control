@@ -260,7 +260,7 @@
       </dl></div><div class="section level2">
       <h2 id="feature-segmentation-spatial-proximity-to-water">Feature Segmentation &amp; Spatial Proximity to Water<a class="anchor" aria-label="anchor" href="#feature-segmentation-spatial-proximity-to-water"></a></h2>
 
-      <div class="section-desc"><p>Automated object segmentation of water bodies and residential building footprints from ultra-high resolution RGB imagery, with Euclidean distance to water modeling.</p></div>
+      <div class="section-desc"><p>Automated object segmentation of water bodies and residential building footprints from ultra-high resolution RGB imagery, feature aggregation, and Euclidean distance to water modeling.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -283,14 +283,14 @@
 
         <dt>
 
-          <code><a href="d4h_distance_to_water.html">d4h_distance_to_water()</a></code>
+          <code><a href="d4h_combine_features.html">d4h_combine_features()</a></code> <code><a href="d4h_combine_features.html">d4h_add_features()</a></code>
 
         </dt>
-        <dd>Calculate Distance and Proximity to Water Sources</dd>
+        <dd>Combine and Summarize Physical Water and Building Features</dd>
 
         <dt>
 
-          <code><a href="d4h_distance_to_risk.html">d4h_distance_to_risk()</a></code>
+          <code><a href="d4h_distance_to_water.html">d4h_distance_to_water()</a></code>
 
         </dt>
         <dd>Calculate Distance and Vulnerability Risk to Water Sources</dd>
@@ -313,6 +313,13 @@
 
       <dl><dt>
 
+          <code><a href="d4h_make_grid.html">d4h_make_grid()</a></code>
+
+        </dt>
+        <dd>Generate Operational Spatial Surveillance Grid (Square or Hexagonal)</dd>
+
+        <dt>
+
           <code><a href="d4h_hex_grid.html">d4h_hex_grid()</a></code>
 
         </dt>
@@ -334,17 +341,10 @@
 
         <dt>
 
-          <code><a href="d4h_summarize_grid.html">d4h_summarize_grid()</a></code>
+          <code><a href="d4h_summarize_grid.html">d4h_summarize_grid()</a></code> <code><a href="d4h_summarize_grid.html">d4h_summarize_general()</a></code>
 
         </dt>
-        <dd>Summarize Raster Indicator by Spatial Grid</dd>
-
-        <dt>
-
-          <code><a href="d4h_summarize_general.html">d4h_summarize_general()</a></code>
-
-        </dt>
-        <dd>Summarize Raster Indicator for the General Mosaic Footprint</dd>
+        <dd>Summarize Raster Indicator by Spatial Grid or General Footprint (Deprecated)</dd>
 
         <dt>
 
@@ -352,13 +352,6 @@
 
         </dt>
         <dd>Convert Raster Indicator to General Homogeneous Mosaic</dd>
-
-        <dt>
-
-          <code><a href="d4h_summarize_global.html">d4h_summarize_global()</a></code> <code><a href="d4h_summarize_global.html">d4h_global_summary()</a></code>
-
-        </dt>
-        <dd>Global Statistical Summary of Raster Indicators</dd>
       </dl></div><div class="section level2">
       <h2 id="interactive-mapping-cartography">Interactive Mapping &amp; Cartography<a class="anchor" aria-label="anchor" href="#interactive-mapping-cartography"></a></h2>
 
@@ -390,9 +383,9 @@
         </dt>
         <dd>Unified Cartographic and Interactive Visualization</dd>
       </dl></div><div class="section level2">
-      <h2 id="executive-reporting-excel-export">Executive Reporting &amp; Excel Export<a class="anchor" aria-label="anchor" href="#executive-reporting-excel-export"></a></h2>
+      <h2 id="indicator-extraction-executive-reporting-excel-export">Indicator Extraction, Executive Reporting &amp; Excel Export<a class="anchor" aria-label="anchor" href="#indicator-extraction-executive-reporting-excel-export"></a></h2>
 
-      <div class="section-desc"><p>Multi-moment statistical summaries, Tukey outlier diagnostics, and direct multi-sheet Excel (.xlsx) workbook export.</p></div>
+      <div class="section-desc"><p>Multi-indicator automated extraction, multi-moment statistical summaries, Tukey outlier diagnostics, and direct multi-sheet Excel (.xlsx) workbook export.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -401,7 +394,14 @@
 
       <dl><dt>
 
-          <code><a href="d4h_executive_summary.html">d4h_executive_summary()</a></code> <code><a href="d4h_executive_summary.html">d4h_report()</a></code>
+          <code><a href="d4h_extract_indicators.html">d4h_extract_indicators()</a></code>
+
+        </dt>
+        <dd>Extract Multiple Biophysical and Environmental Indicators</dd>
+
+        <dt>
+
+          <code><a href="d4h_executive_summary.html">d4h_executive_summary()</a></code>
 
         </dt>
         <dd>Executive Summary of Micro-Environmental and Epidemiological Indicators</dd>
@@ -415,7 +415,7 @@
       </dl></div><div class="section level2">
       <h2 id="preprocessing-calibration-utilities">Preprocessing, Calibration &amp; Utilities<a class="anchor" aria-label="anchor" href="#preprocessing-calibration-utilities"></a></h2>
 
-      <div class="section-desc"><p>Surface reflectance scaling, thermal calibration to Celsius Land Surface Temperature, raster cleaning, and multi-band stack ingestion workflows.</p></div>
+      <div class="section-desc"><p>Raster metadata inspection, surface reflectance scaling, thermal calibration to Celsius Land Surface Temperature, raster cleaning, and multi-band stack ingestion workflows.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -424,7 +424,14 @@
 
       <dl><dt>
 
-          <code><a href="d4h_read_stack.html">d4h_read_stack()</a></code> <code><a href="d4h_read_stack.html">d4h_load_stack()</a></code>
+          <code><a href="d4h_raster_metadata.html">d4h_raster_metadata()</a></code> <code><a href="d4h_raster_metadata.html">d4h_metadata()</a></code>
+
+        </dt>
+        <dd>Extract and Display Structured Raster Metadata</dd>
+
+        <dt>
+
+          <code><a href="d4h_read_stack.html">d4h_read_stack()</a></code>
 
         </dt>
         <dd>Read and Validate Multi-Band Stack Raster</dd>
@@ -442,20 +449,6 @@
 
         </dt>
         <dd>Convert Thermal Band to Celsius</dd>
-
-        <dt>
-
-          <code><a href="d4h_clean_band.html">d4h_clean_band()</a></code>
-
-        </dt>
-        <dd>Clean Raster Band Artefacts</dd>
-
-        <dt>
-
-          <code><a href="d4h_process_mosaic.html">d4h_process_mosaic()</a></code>
-
-        </dt>
-        <dd>End-to-End Drone Mosaic Processing Pipeline</dd>
 
         <dt>
 

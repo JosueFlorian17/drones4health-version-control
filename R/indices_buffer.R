@@ -108,12 +108,12 @@ d4h_indicator_buffer <- function(indicator = "NDVI",
   } else if (!is.null(green)) {
     .ensure_raster(green, mask_zeros = FALSE)
   } else {
-    stop("Debes proporcionar al menos una capa raster (nir, red, dem, green o raster_in) para georreferenciacion.", call. = FALSE)
+    stop("You must provide at least one raster layer (nir, red, dem, green or raster_in) for georeferencing.", call. = FALSE)
   }
 
   target_crs <- sf::st_crs(terra::crs(r_ref))
 
-  # 3. Parsear y reproyectar las casas
+  # 3. Parse and reproject houses
   sf_houses <- if (is.character(houses) && length(houses) == 1L) {
     if (grepl("\\.(xlsx|xls)$", houses, ignore.case = TRUE)) {
       df_h <- if (requireNamespace("readxl", quietly = TRUE)) {
@@ -121,12 +121,12 @@ d4h_indicator_buffer <- function(indicator = "NDVI",
       } else if (requireNamespace("openxlsx", quietly = TRUE)) {
         openxlsx::read.xlsx(houses)
       } else {
-        stop("Para leer archivos Excel (.xlsx/.xls) instala 'readxl': install.packages('readxl')", call. = FALSE)
+        stop("To read Excel files (.xlsx/.xls) install 'readxl': install.packages('readxl')", call. = FALSE)
       }
       lon_col <- grep("^(lon|lng|long|longitude|x|utm_x|easting)$", names(df_h), ignore.case = TRUE, value = TRUE)[1]
       lat_col <- grep("^(lat|latitude|y|utm_y|northing)$", names(df_h), ignore.case = TRUE, value = TRUE)[1]
       if (is.na(lon_col) || is.na(lat_col)) {
-        stop("El archivo Excel no contiene columnas reconocibles de coordenadas (lon/lat, x/y o utm_x/utm_y).", call. = FALSE)
+        stop("The Excel file does not contain recognizable coordinate columns (lon/lat, x/y or utm_x/utm_y).", call. = FALSE)
       }
       is_ll <- all(abs(df_h[[lon_col]]) <= 180, na.rm = TRUE) && all(abs(df_h[[lat_col]]) <= 90, na.rm = TRUE)
       init_crs <- if (is_ll) 4326 else target_crs
@@ -136,7 +136,7 @@ d4h_indicator_buffer <- function(indicator = "NDVI",
       lon_col <- grep("^(lon|lng|long|longitude|x|utm_x|easting)$", names(df_h), ignore.case = TRUE, value = TRUE)[1]
       lat_col <- grep("^(lat|latitude|y|utm_y|northing)$", names(df_h), ignore.case = TRUE, value = TRUE)[1]
       if (is.na(lon_col) || is.na(lat_col)) {
-        stop("El archivo CSV no contiene columnas reconocibles de coordenadas (lon/lat, x/y o utm_x/utm_y).", call. = FALSE)
+        stop("The CSV file does not contain recognizable coordinate columns (lon/lat, x/y or utm_x/utm_y).", call. = FALSE)
       }
       is_ll <- all(abs(df_h[[lon_col]]) <= 180, na.rm = TRUE) && all(abs(df_h[[lat_col]]) <= 90, na.rm = TRUE)
       init_crs <- if (is_ll) 4326 else target_crs
@@ -148,7 +148,7 @@ d4h_indicator_buffer <- function(indicator = "NDVI",
     lon_col <- grep("^(lon|lng|long|longitude|x|utm_x|easting)$", names(houses), ignore.case = TRUE, value = TRUE)[1]
     lat_col <- grep("^(lat|latitude|y|utm_y|northing)$", names(houses), ignore.case = TRUE, value = TRUE)[1]
     if (is.na(lon_col) || is.na(lat_col)) {
-      stop("El data.frame no contiene columnas reconocibles de coordenadas (lon/lat, x/y o utm_x/utm_y).", call. = FALSE)
+      stop("The data.frame does not contain recognizable coordinate columns (lon/lat, x/y or utm_x/utm_y).", call. = FALSE)
     }
     is_ll <- all(abs(houses[[lon_col]]) <= 180, na.rm = TRUE) && all(abs(houses[[lat_col]]) <= 90, na.rm = TRUE)
     init_crs <- if (is_ll) 4326 else target_crs
@@ -158,7 +158,7 @@ d4h_indicator_buffer <- function(indicator = "NDVI",
   } else if (inherits(houses, "sf")) {
     houses
   } else {
-    stop("'houses' debe ser un objeto sf, SpatVector, data.frame o ruta a un archivo CSV.", call. = FALSE)
+    stop("'houses' must be an sf object, SpatVector, data.frame, or valid file path (.csv, .xlsx, .shp, .gpkg).", call. = FALSE)
   }
 
   if (sf::st_crs(sf_houses) != target_crs) {
@@ -228,10 +228,10 @@ d4h_indicator_buffer <- function(indicator = "NDVI",
       "TWI"    = d4h_twi(dem_raster = dem_c),
       "DSM"    = dem_c,
       "DEM"    = dem_c,
-      stop(sprintf("Indicador '%s' no reconocido. Opciones: NDVI, NDWI, SAVI, DVI, GNDVI, NDRE, EVI, VARI, TVI, MSAVI2, IRHE, IMSR, IRTS, SLOPE, TWI, DSM.", indicator), call. = FALSE)
+      stop(sprintf("Indicator '%s' not recognized. Supported options: NDVI, NDWI, SAVI, DVI, GNDVI, NDRE, EVI, VARI, TVI, MSAVI2, IRHE, IMSR, IRTS, SLOPE, TWI, DSM.", indicator), call. = FALSE)
     )
   } else {
-    stop("'indicator' debe ser un nombre de indice (string), funcion de calculo o SpatRaster.", call. = FALSE)
+    stop("'indicator' must be an index name (string), calculation function, or SpatRaster.", call. = FALSE)
   }
 
   # 8. Enmascarar exterior del buffer si mask_outside = TRUE
@@ -249,11 +249,11 @@ d4h_indicator_buffer <- function(indicator = "NDVI",
     title_str <- if (!is.null(title)) {
       title
     } else {
-      ind_name <- if (is.character(indicator)) toupper(indicator) else "Indicador"
-      sprintf("%s en Área de Influencia de Casas (Radio: %g grillas / %g m)", ind_name, radius, round(buffer_dist_m))
+      ind_name <- if (is.character(indicator)) toupper(indicator) else "Indicator"
+      sprintf("%s in Household Catchment Area (Radius: %g grids / %g m)", ind_name, radius, round(buffer_dist_m))
     }
 
-    # Renderizar el indicador focal
+    # Render focal indicator
     p_out <- d4h_plot(
       x           = r_res,
       palette     = palette,
@@ -264,7 +264,7 @@ d4h_indicator_buffer <- function(indicator = "NDVI",
       title       = title_str
     )
 
-    # Agregar borde del buffer delineado
+    # Add buffer boundary
     p_out <- p_out +
       ggplot2::geom_sf(data = buf_sf, fill = NA, color = "black", linetype = "dashed", linewidth = 0.5)
   }
@@ -283,13 +283,13 @@ d4h_indicator_buffer <- function(indicator = "NDVI",
 
 #' @export
 print.d4h_buffer_analysis <- function(x, ...) {
-  cat("\n=== DRONES4HEALTH: ANALISIS FOCAL POR BUFFER ===\n")
-  cat(sprintf("Casas analizadas en el foco : %d viviendas\n", nrow(x$houses)))
-  cat(sprintf("Celdas de grilla cubiertas  : %d celdas\n", nrow(x$grid)))
-  cat(sprintf("Capa resultante             : %s\n", names(x$raster)[1]))
+  cat("\n=== DRONES4HEALTH: FOCAL BUFFER ANALYSIS ===\n")
+  cat(sprintf("Houses analyzed in focus area : %d buildings\n", nrow(x$houses)))
+  cat(sprintf("Grid cells covered            : %d cells\n", nrow(x$grid)))
+  cat(sprintf("Resulting raster layer        : %s\n", names(x$raster)[1]))
   print(x$raster)
   if (!is.null(x$plot)) {
-    cat("Grafico disponible en $plot (ejecuta print(obj$plot))\n")
+    cat("Plot available in $plot (run print(obj$plot))\n")
   }
   invisible(x)
 }

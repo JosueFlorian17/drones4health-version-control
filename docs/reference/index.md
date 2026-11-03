@@ -64,16 +64,17 @@ solid waste micro-accumulation, and hydric breeding suitability.
 ## Feature Segmentation & Spatial Proximity to Water
 
 Automated object segmentation of water bodies and residential building
-footprints from ultra-high resolution RGB imagery, with Euclidean
-distance to water modeling.
+footprints from ultra-high resolution RGB imagery, feature aggregation,
+and Euclidean distance to water modeling.
 
 - [`d4h_segment_water()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_segment_water.md)
   : Segment Water Bodies and Surface Moisture Pools
 - [`d4h_segment_buildings()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_segment_buildings.md)
   : Segment House Roofs and Building Footprints
+- [`d4h_combine_features()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_combine_features.md)
+  [`d4h_add_features()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_combine_features.md)
+  : Combine and Summarize Physical Water and Building Features
 - [`d4h_distance_to_water()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_distance_to_water.md)
-  : Calculate Distance and Proximity to Water Sources
-- [`d4h_distance_to_risk()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_distance_to_risk.md)
   : Calculate Distance and Vulnerability Risk to Water Sources
 - [`d4h_raster_distance()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_raster_distance.md)
   : Continuous Euclidean Distance Raster from Risk Sources
@@ -84,6 +85,8 @@ Operational surveillance grids (hexagons/squares), grid-level
 distance-to-water proximity exposure modeling, land cover percentage
 composition, and zonal summary statistics extraction.
 
+- [`d4h_make_grid()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_make_grid.md)
+  : Generate Operational Spatial Surveillance Grid (Square or Hexagonal)
 - [`d4h_hex_grid()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_hex_grid.md)
   : Generate Hexagonal Surveillance Grid
 - [`d4h_grid_distance_to_water()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_grid_distance_to_water.md)
@@ -92,14 +95,11 @@ composition, and zonal summary statistics extraction.
   : Grid-Level Land Cover Percentage Composition and Feature
   Segmentation
 - [`d4h_summarize_grid()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_summarize_grid.md)
-  : Summarize Raster Indicator by Spatial Grid
-- [`d4h_summarize_general()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_summarize_general.md)
-  : Summarize Raster Indicator for the General Mosaic Footprint
+  [`d4h_summarize_general()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_summarize_grid.md)
+  : Summarize Raster Indicator by Spatial Grid or General Footprint
+  (Deprecated)
 - [`d4h_raster_general()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_raster_general.md)
   : Convert Raster Indicator to General Homogeneous Mosaic
-- [`d4h_summarize_global()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_summarize_global.md)
-  [`d4h_global_summary()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_summarize_global.md)
-  : Global Statistical Summary of Raster Indicators
 
 ## Interactive Mapping & Cartography
 
@@ -114,13 +114,15 @@ publication-quality ggplot2 cartography.
 - [`d4h_plot()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_plot.md)
   : Unified Cartographic and Interactive Visualization
 
-## Executive Reporting & Excel Export
+## Indicator Extraction, Executive Reporting & Excel Export
 
-Multi-moment statistical summaries, Tukey outlier diagnostics, and
-direct multi-sheet Excel (.xlsx) workbook export.
+Multi-indicator automated extraction, multi-moment statistical
+summaries, Tukey outlier diagnostics, and direct multi-sheet Excel
+(.xlsx) workbook export.
 
+- [`d4h_extract_indicators()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_extract_indicators.md)
+  : Extract Multiple Biophysical and Environmental Indicators
 - [`d4h_executive_summary()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_executive_summary.md)
-  [`d4h_report()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_executive_summary.md)
   : Executive Summary of Micro-Environmental and Epidemiological
   Indicators
 - [`d4h_export_summary()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_export_summary.md)
@@ -128,19 +130,18 @@ direct multi-sheet Excel (.xlsx) workbook export.
 
 ## Preprocessing, Calibration & Utilities
 
-Surface reflectance scaling, thermal calibration to Celsius Land Surface
-Temperature, raster cleaning, and multi-band stack ingestion workflows.
+Raster metadata inspection, surface reflectance scaling, thermal
+calibration to Celsius Land Surface Temperature, raster cleaning, and
+multi-band stack ingestion workflows.
 
+- [`d4h_raster_metadata()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_raster_metadata.md)
+  [`d4h_metadata()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_raster_metadata.md)
+  : Extract and Display Structured Raster Metadata
 - [`d4h_read_stack()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_read_stack.md)
-  [`d4h_load_stack()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_read_stack.md)
   : Read and Validate Multi-Band Stack Raster
 - [`d4h_normalize_reflectance()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_normalize_reflectance.md)
   : Normalize Digital Numbers to Surface Reflectance
 - [`d4h_thermal_to_celsius()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_thermal_to_celsius.md)
   : Convert Thermal Band to Celsius
-- [`d4h_clean_band()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_clean_band.md)
-  : Clean Raster Band Artefacts
-- [`d4h_process_mosaic()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_process_mosaic.md)
-  : End-to-End Drone Mosaic Processing Pipeline
 - [`d4h_list_metrics()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_list_metrics.md)
   : List Available Micro-Environmental and Epidemiological Metrics

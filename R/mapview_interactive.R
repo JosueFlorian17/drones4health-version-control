@@ -37,26 +37,33 @@
 #' }
 #' @export
 d4h_mapview_swipe <- function(x, y, grid = NULL, basemap = TRUE, col_x = "viridis", col_y = "magma", limits_x = NULL, limits_y = NULL, max_pixels = 500000) {
-  # 1. Validar dependencias requeridas
+  # 1. Validate required dependencies
   if (!requireNamespace("leaflet", quietly = TRUE) || !requireNamespace("leaflet.extras2", quietly = TRUE) || !requireNamespace("raster", quietly = TRUE)) {
-    stop("Para la visualizacion swipe interactiva se requiere instalar: install.packages(c('leaflet', 'leaflet.extras2', 'raster'))", call. = FALSE)
+    stop("For interactive swipe slider, please install: install.packages(c('leaflet', 'leaflet.extras2', 'raster'))", call. = FALSE)
   }
 
-  # 2. Funcion auxiliar interna para procesar, optimizar y reproyectar cada capa
+  # 2. Internal helper function to process, optimize and reproject layers
   .prep_swipe_layer <- function(r_in, max_px, label) {
+    if (inherits(r_in, c("sf", "SpatVector"))) {
+      ext_b <- terra::ext(terra::vect(r_in))
+      crs_b <- if (inherits(r_in, "sf")) sf::st_crs(r_in)$wkt else terra::crs(r_in)
+      r_temp <- terra::rast(ext_b, nrows = 600, ncols = 600, crs = crs_b)
+      r_in <- terra::rasterize(terra::vect(r_in), r_temp, field = 1, background = NA)
+      names(r_in) <- label
+    }
     r <- .ensure_raster(r_in, mask_zeros = FALSE)
 
-    # Enmascarar infinitos y NaNs a NA estructural
+    # Mask infinite and NaN to NA
     r[is.nan(r) | is.infinite(r)] <- NA
 
-    # Validar que existan pixeles con datos
+    # Validate valid pixels
     vals_raw <- terra::values(r, mat = FALSE)
     vals_raw_fin <- vals_raw[!is.na(vals_raw) & is.finite(vals_raw)]
     if (length(vals_raw_fin) == 0L) {
-      stop(sprintf("La capa '%s' no contiene datos validos (todos los pixeles son NA o no coinciden en extension).", label), call. = FALSE)
+      stop(sprintf("Layer '%s' does not contain valid data (all pixels are NA or extent mismatch).", label), call. = FALSE)
     }
 
-    # Agregacion/downsampling espacial eficiente si excede max_pixels
+    # Efficient aggregation/downsampling if exceeding max_pixels
     total_cells <- terra::ncell(r)
     if (total_cells > max_px) {
       agg_fact <- ceiling(sqrt(total_cells / max_px))
@@ -71,20 +78,20 @@ d4h_mapview_swipe <- function(x, y, grid = NULL, basemap = TRUE, col_x = "viridi
       r <- r_agg
     }
 
-    # Reproyectar explicitamente a Web Mercator (EPSG:3857)
+    # Explicitly reproject to Web Mercator (EPSG:3857)
     if (!is.na(terra::crs(r)) && terra::crs(r) != "") {
       proj_str <- terra::crs(r, proj = TRUE)
       if (!is.na(proj_str) && !grepl("3857", proj_str)) {
         r <- terra::project(r, "EPSG:3857", method = "bilinear")
       }
     } else {
-      warning(sprintf("La capa '%s' no tiene CRS definido; asumiendo EPSG:3857.", label), call. = FALSE)
+      warning(sprintf("Layer '%s' has no defined CRS; assuming EPSG:3857.", label), call. = FALSE)
     }
 
     r
   }
 
-  # 3. Funcion auxiliar para resolver paletas de colores
+  # 3. Helper to resolve color palettes
   .resolve_palette <- function(pal_def) {
     if (is.character(pal_def) && length(pal_def) == 1L) {
       if (pal_def == "viridis") {

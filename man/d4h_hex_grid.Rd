@@ -4,24 +4,39 @@
 \alias{d4h_hex_grid}
 \title{Generate Hexagonal Surveillance Grid}
 \usage{
-d4h_hex_grid(aoi, cell_size = 50, clip_to_footprint = TRUE)
+d4h_hex_grid(
+  aoi,
+  cell_size = NULL,
+  area_m2 = NULL,
+  n_cells = NULL,
+  clip_to_footprint = TRUE,
+  as_sf = TRUE
+)
 }
 \arguments{
 \item{aoi}{SpatRaster, SpatVector, sf, or character path defining the spatial bounds or mosaic.}
 
-\item{cell_size}{Numeric. Hexagon diameter in meters (default: 50).}
+\item{cell_size}{Numeric (optional). Hexagon diameter in meters (default: 50 if all size options are NULL).}
+
+\item{area_m2}{Numeric (optional). Target cell area in square meters.}
+
+\item{n_cells}{Numeric / Integer (optional). Desired total number of grid cells across the AOI.}
 
 \item{clip_to_footprint}{Logical. If TRUE (default), restricts grid cells strictly to the valid non-NA flight footprint of the input raster or polygon boundaries.}
+
+\item{as_sf}{Logical. If TRUE (default), returns an \code{sf} object; if FALSE, returns a \code{terra::SpatVector}.}
 }
 \value{
-A SpatVector containing the hexagonal grid polygons with unique IDs.
+An \code{sf} or \code{SpatVector} containing the hexagonal grid polygons with unique IDs (\code{grid_id}).
 }
 \description{
 Creates an operative hexagonal surveillance grid with unique alphanumeric identifiers over an Area of Interest (AOI).
+Sizing can be strictly configured using exactly one of three mutually exclusive parameters: \code{cell_size} (diameter in meters),
+\code{area_m2} (individual cell area in square meters), or \code{n_cells} (target total number of cells over the AOI).
 }
 \details{
 Hexagonal spatial partitions minimize perimeter-to-area ratio and provide equidistant neighborhood connectivity:
-\deqn{A_{\text{hex}} = \frac{3\sqrt{3}}{2} r^2}
+\deqn{A_{\text{hex}} = \frac{\sqrt{3}}{2} D^2 \approx 0.866 \times D^2}
 Ideal for vector control teams, larviciding deployments, and spatial health sampling.
 By default, cells are clipped strictly to the valid non-NA flight footprint of the raster or polygon boundaries (\code{clip_to_footprint = TRUE})
 to prevent artificial bounding-box grid padding outside the surveyed area.

@@ -4,18 +4,25 @@
 \alias{d4h_list_metrics}
 \title{List Available Micro-Environmental and Epidemiological Metrics}
 \usage{
-d4h_list_metrics()
+d4h_list_metrics(category = NULL)
+}
+\arguments{
+\item{category}{Character (optional). Filter metrics by category: "Spectral", "Topographic", "Epidemiological", or NULL to list all.}
 }
 \value{
-A tibble with metric descriptions.
+A \code{tibble} containing the metric names, corresponding package functions, formulas, and epidemiological applications.
 }
 \description{
-Returns a tibble listing the curated drone metrics, resolutions, and typical applications.
+Dynamically retrieves all available remote sensing indices, terrain metrics, and eco-epidemiological indicators supported by the package, detailing their mathematical formulas, typical spatial resolutions, and vector surveillance applications.
 }
 \examples{
 library(drones4health)
 
-# Display the table of available spatial health metrics
+# Display all available spatial health metrics
 metrics_table <- d4h_list_metrics()
 print(metrics_table)
+
+# Filter only eco-epidemiological indices
+epi_metrics <- d4h_list_metrics(category = "Epidemiological")
+print(epi_metrics)
 }

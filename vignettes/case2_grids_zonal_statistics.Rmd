@@ -31,11 +31,10 @@ Partition the continuous flight mosaic into regular spatial grids (hexagonal or 
 
 | Variable / Target | Function | Description |
 | :--- | :--- | :--- |
-| **Hexagonal Grid** | `d4h_hex_grid()` | Generates regular hexagonal surveillance partitions with unique alphanumeric identifiers (H0001, H0002). |
-| **Zonal Summary Grid** | `d4h_summarize_grid()` | Extracts zonal summary statistics (mean, quantiles) per square or hexagonal cell with automated NoData background pruning. |
-| **Scene General Polygon** | `d4h_summarize_general()` | Computes global mean indicators across the exact valid flight footprint as a single reference spatial vector. |
-| **Homogeneous Mosaic** | `d4h_raster_general()` | Generates a continuous raster matching the flight extent filled with overall global mean values. |
-| **Executive Reporting** | `d4h_executive_summary()` | Extracts multi-moment descriptive statistics, Tukey IQR outlier fences, and exports multi-sheet Excel reports. |
+| **Operational Grid** | `d4h_make_grid()` / `d4h_hex_grid()` | Generates regular hexagonal or square surveillance partitions using 3 mutually exclusive sizing modes (`cell_size`, `area_m2`, or `n_cells`). |
+| **Executive Summary (DF / SF)** | `d4h_executive_summary()` | Extracts multi-moment statistics and outlier diagnostics, returning an `sf` object when summarizing by grid or a `tibble` when summarizing globally. |
+| **Multi-Indicator Extraction** | `d4h_extract_indicators()` | Simultaneously calculates and extracts multiple biophysical/terrain indicators (`ndvi`, `ndwi`, `savi`, `vari`, `slope`, etc.) per region. |
+| **Unified Visualization** | `d4h_plot()` | Unified static and interactive maps with continuous, discrete, or homogeneous baselines. |
 
 ---
 
@@ -62,98 +61,90 @@ r_ndvi <- d4h_ndvi(nir = "img/Ohuay_NIR.tif", red = "img/Ohuay_R.tif")
 r_ndwi <- d4h_ndwi(green = "img/Ohuay_G.tif", nir = "img/Ohuay_NIR.tif")
 ```
 
-### 3.3 Parametric Grid Generation (Hexagonal vs Square)
+### 3.3 Parametric Grid Generation (3-Way Sizing)
 
-`drones4health` provides flexible spatial partitioning parameters:
+`drones4health` allows configuring grid cell size using exactly one of three mutually exclusive parameters:
 
-- `cell_size`: Resolution or diameter of each grid cell in meters (e.g., 20 m for household peridomestic inspections, 50 m for rural blocks, 100 m for regional transects).
-- `square`: Set `FALSE` for regular hexagonal partitions or `TRUE` for square grids. Hexagonal tessellations minimize perimeter-to-area ratio and provide equidistant neighborhood connectivity.
-- `discard_na`: Automatically removes peripheral cells falling outside the valid flight footprint.
+- `cell_size`: Distance from side-to-side or diameter in meters (e.g., `cell_size = 50`).
+- `area_m2`: Target surface area of each individual grid cell in square meters (e.g., `area_m2 = 2500`).
+- `n_cells`: Total number of grid units desired over the surveyed flight footprint (e.g., `n_cells = 100`).
 
-```{r}
-# Generate 50-meter hexagonal surveillance grid
-grid_hex <- d4h_hex_grid(
-  aoi       = r_ndvi,
-  cell_size = 50
-)
+```r
+# Option 1: By diameter/cell_size (50 meters)
+grid_hex <- d4h_hex_grid(aoi = r_ndvi, cell_size = 50)
 
-# Inspect grid structure
+# Option 2: By target cell area (2,500 m2)
+grid_area <- d4h_hex_grid(aoi = r_ndvi, area_m2 = 2500)
+
+# Option 3: By target total number of cells (50 cells)
+grid_n <- d4h_hex_grid(aoi = r_ndvi, n_cells = 50)
+
+# Inspect generated sf object
 head(grid_hex)
 ```
 
-### 3.4 Zonal Statistical Extraction
+### 3.4 Pipe-Friendly Zonal Statistical Extraction & Summaries
 
-We aggregate continuous pixel values across each operational grid cell:
+The generated grid directly feeds into `d4h_executive_summary()`, which automatically detects the grid and returns a complete `sf` object:
 
-```{r}
-# Extract zonal mean NDVI per 50m hexagonal cell
-grid_summary_ndvi <- d4h_summarize_grid(
-  raster_in  = r_ndvi,
-  cell_size  = 50,
-  square     = FALSE,     # Hexagonal geometry
-  discard_na = TRUE       # Prune empty peripheral cells
+```r
+# Seamless pipe from grid to executive summary
+grid_summary_ndvi <- d4h_executive_summary(
+  raster_in = r_ndvi,
+  grid      = grid_hex,
+  out_xlsx  = "salidas/Executive_Summary_Case02_Grids.xlsx"
 )
 
-# Inspect extracted values per grid unit
-head(as.data.frame(grid_summary_ndvi))
-
-# Compute overall scene reference baseline
-gen_summary <- d4h_summarize_general(raster_in = r_ndvi, exact_boundary = TRUE)
-r_homo      <- d4h_raster_general(raster_in = r_ndvi)
+# Returns an sf data frame ready for spatial analysis and plotting
+head(grid_summary_ndvi)
 ```
 
-### 3.5 Tukey Spatial Outlier Diagnostics & Excel Export
+### 3.5 Multi-Indicator Extraction (`d4h_extract_indicators`)
 
-We execute a comprehensive statistical report evaluating descriptive moments (mean, standard deviation, coefficient of variation, median, IQR), detecting spatial anomalies with Tukey fences ($Q_{25} - 1.5 \times \text{IQR}$, $Q_{75} + 1.5 \times \text{IQR}$), and exporting directly to Excel:
+Modeled after `land4health`, `d4h_extract_indicators()` allows extracting multiple environmental indicators simultaneously:
+
+```r
+# Extract NDVI and NDWI in a single pipe call
+indicators_sf <- grid_hex |>
+  d4h_extract_indicators(
+    bands = c("ndvi", "ndwi"),
+    nir   = "img/Ohuay_NIR.tif",
+    red   = "img/Ohuay_R.tif",
+    green = "img/Ohuay_G.tif",
+    stat  = "mean"
+  )
+
+head(indicators_sf)
+```
+
+### 3.6 Spatial Grid Executive Reporting & Excel Export
+
+We execute a comprehensive statistical report evaluating descriptive moments (mean, standard deviation, coefficient of variation, median, IQR), micro-environmental composition (`pct_vegetation`, `pct_bare_soil`), and surveillance priorities per grid unit, exporting directly to Excel:
 
 ```{r}
-# Multi-moment executive summary aggregated by grid cell
+# Multi-moment executive summary aggregated by grid cell (returns both $df and $sf)
 grid_exec_summary <- d4h_executive_summary(
   raster_in   = r_ndvi,
   by          = "grid",
   cell_size   = 50,
   square      = FALSE,
   out_xlsx    = "salidas/Executive_Summary_Case02_Grids.xlsx",
-  sample_size = 1000000,
   digits      = 3
 )
 
-# Inspect report output
-head(grid_exec_summary)
+# Inspect clean tabular data frame ($df)
+head(grid_exec_summary$df[, c("grid_id", "area_m2", "pct_vegetation", "pct_bare_soil", "NDVI_mean", "NDVI_sd", "NDVI_median", "dominant_class", "surveillance_priority")], 5)
 ```
 
 ```text
-==============================================================================
-             DRONES4HEALTH - EXECUTIVE SUMMARY REPORT
-==============================================================================
-
- INDICATOR: NDVI
-------------------------------------------------------------------------------
- 1. SPATIAL COVERAGE AND RESOLUTION:
-    - Pixel Resolution    : 99.21 cm
-    - Surveyed Area       : 64.628 ha (646,276 m2)
-    - Evaluated Pixels    : 656,624 (36.5% valid footprint coverage)
-
- 2. GLOBAL DESCRIPTIVE STATISTICAL MOMENTS:
-    - Arithmetic Mean     : 0.238 (+/- 0.255 SD)
-    - Coeff. of Variation : 106.9 %
-    - Overall Range [Min,Max]: [-0.954, 0.99] (Span: 1.944)
-    - Median (Q50)        : 0.182
-    - Interquartile Range : [0.052, 0.399] (IQR: 0.347)
-    - Central 90% Span    : [-0.083, 0.716] (P05 - P95)
-
- 3. SPATIAL OUTLIER DIAGNOSTICS (TUKEY IQR):
-    - Tukey IQR Fences    : Lower < -0.469 | Upper > 0.92
-    - Outliers Detected   : 5,388 pixels (0.82% of valid pixels)
-    - Spatial Diagnostics : Homogeneous distribution (extreme values < 1%)
-
- 4. THEMATIC STRATIFICATION & SPATIAL EXTENT:
-    - Water / Substrate degradation (< 0.0)     :  14.7 % (  9.53 ha)
-    - Bare soil / Sparse canopy [0.0, 0.2)      :  38.2 % ( 24.67 ha)
-    - Moderate vegetation / Transition [0.2, 0.5):  29.4 % ( 18.99 ha)
-    - Dense vegetation / High vigor [>= 0.5)    :  17.7 % ( 11.44 ha)
-
-==============================================================================
+# A tibble: 5 × 9
+  grid_id area_m2 pct_vegetation pct_bare_soil NDVI_mean NDVI_sd NDVI_median dominant_class surveillance_priority
+  <chr>     <dbl>          <dbl>         <dbl>     <dbl>   <dbl>       <dbl> <chr>          <chr>                
+1 H0001     2165.           65.0          35.0    NA      NA          NA     Vegetation     Low                  
+2 H0002     2165.           65.0          35.0    NA      NA          NA     Vegetation     Low                  
+3 H0003     2165.           14.8          85.2     0.028   0.187       0.002 Bare Soil      Moderate             
+4 H0004     2165.           64.2          35.8     0.234   0.379       0.151 Vegetation     Low                  
+5 H0005     2165.           93.8           6.2     0.679   0.297       0.865 Vegetation     Low                  
 ```
 
 ### 3.6 Cartographic Visualization & Interactive Grid Mapping

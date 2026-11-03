@@ -13,7 +13,7 @@ d4h_raster_general(raster_in)
 A SpatRaster with the mosaic footprint filled with the global mean value.
 }
 \description{
-Creates a continuous SpatRaster matching the exact spatial footprint of the input raster where all valid pixels are assigned the overall global mean value.
+Creates a continuous SpatRaster matching the exact spatial footprint of the input raster where all valid pixels are assigned the overall global mean value. Note: \code{d4h_plot(..., general = TRUE)} can plot this baseline directly without manual raster creation.
 }
 \examples{
 \donttest{

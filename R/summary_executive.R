@@ -8,6 +8,9 @@
 #' @param raster_in SpatRaster, list of SpatRaster layers, or character file path.
 #' @param by Character. Summary aggregation scope: \code{"general"} (default, overall scene report) or \code{"grid"} (zonal summary per grid cell, with one row per cell).
 #' @param grid Optional SpatVector, sf, or character path to existing grid polygon boundaries when \code{by = "grid"}. If NULL, automatically generated using \code{cell_size} and \code{square}.
+#' @param water SpatVector, sf, or SpatRaster (optional). Segmented water bodies or binary water mask to compute grid water coverage (\code{pct_water}).
+#' @param buildings SpatVector, sf, or SpatRaster (optional). Segmented building/roof footprints to compute grid dwelling coverage (\code{pct_houses}).
+#' @param houses Deprecated alias for \code{buildings}.
 #' @param houses_proximity Optional \code{sf} or \code{data.frame} of residential dwellings with calculated distance to water and proximity scores (e.g. from \code{d4h_distance_to_water} or buffer analysis). If provided, appends dedicated household distance and proximity exposure sheets to the Excel workbook.
 #' @param houses_risk Deprecated alias for \code{houses_proximity}.
 #' @param cell_size Numeric. Grid cell size / diameter in meters when generating a new grid for \code{by = "grid"} (default: 50).
@@ -15,7 +18,7 @@
 #' @param out_xlsx Character (optional). File path to export a structured multi-sheet Excel workbook (.xlsx). Default: NULL.
 #' @param sample_size Integer. Maximum number of sampled pixels for quantile and outlier analysis on large rasters (default: 1000000).
 #' @param digits Integer. Number of decimal places to format numerical metrics (default: 3).
-#' @return An object of class \code{d4h_executive_summary} (for \code{by = "general"}) or \code{d4h_grid_summary} / \code{data.frame} (for \code{by = "grid"}) containing structured metrics, spatial coverage metadata, outlier diagnostics, and thematic stratum distributions.
+#' @return When \code{by = "grid"}, returns an object of class \code{d4h_grid_summary} containing both \code{$sf} (spatial polygons with geometry) and \code{$df} (clean tabular tibble without geometry), including micro-environmental composition (\code{pct_bare_soil}, \code{pct_houses}, \code{pct_water}, \code{pct_vegetation}, \code{dominant_class}, \code{surveillance_priority}) and descriptive moments. When \code{by = "general"}, returns an object of class \code{d4h_executive_summary} (\code{tibble} / \code{data.frame}).
 #' @references
 #' Tukey, J. W. (1977). \emph{Exploratory Data Analysis}. Addison-Wesley.
 #' @examples
@@ -47,79 +50,139 @@
 #'     sample_size = 1000000,
 #'     digits      = 3
 #'   )
-#'   head(exec_grid)
+#'   # Always provides both $sf and $df:
+#'   head(exec_grid$df)
+#'   plot(exec_grid$sf)
 #' }
 #' }
 #' @export
-d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = NULL, houses_proximity = NULL, houses_risk = NULL, cell_size = 50, square = TRUE, out_xlsx = NULL, sample_size = 1000000, digits = 3) {
-  by <- match.arg(by)
+d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = NULL,
+                                  water = NULL, buildings = NULL, houses = NULL, features = NULL,
+                                  houses_proximity = NULL, houses_risk = NULL,
+                                  cell_size = 50, square = TRUE, out_xlsx = NULL,
+                                  sample_size = 1000000, digits = 3) {
+  # Auto-infer 'by' if grid is provided
+  if (!is.null(grid) && missing(by)) {
+    by <- "grid"
+  } else if (missing(by)) {
+    by <- "general"
+  } else {
+    by <- match.arg(by)
+  }
+
+  if (is.null(buildings) && !is.null(houses)) {
+    buildings <- houses
+  }
+
+  # Unpack combined features if provided (e.g. from d4h_combine_features)
+  if (!is.null(features)) {
+    if (inherits(features, "sf") && "feature_type" %in% names(features)) {
+      if (is.null(water)) {
+        w_sub <- features[features$feature_type == "Water", ]
+        if (nrow(w_sub) > 0) water <- w_sub
+      }
+      if (is.null(buildings)) {
+        b_sub <- features[features$feature_type == "Building", ]
+        if (nrow(b_sub) > 0) buildings <- b_sub
+      }
+    }
+  }
   if (is.null(houses_proximity) && !is.null(houses_risk)) {
     houses_proximity <- houses_risk
   }
 
-  r <- if (is.character(raster_in) && length(raster_in) == 1L) {
-    if (!file.exists(raster_in)) stop(paste("File not found:", raster_in), call. = FALSE)
-    terra::rast(raster_in)
+  raster_layers <- if (is.character(raster_in)) {
+    lapply(raster_in, function(p) {
+      if (!file.exists(p)) stop(paste("File not found:", p), call. = FALSE)
+      terra::rast(p)
+    })
   } else if (inherits(raster_in, "SpatRaster")) {
-    raster_in
-  } else if (is.list(raster_in) && all(vapply(raster_in, function(x) inherits(x, "SpatRaster"), logical(1)))) {
-    terra::rast(raster_in)
+    lapply(seq_len(terra::nlyr(raster_in)), function(i) raster_in[[i]])
+  } else if (is.list(raster_in)) {
+    unlist(lapply(raster_in, function(item) {
+      if (inherits(item, "SpatRaster")) {
+        lapply(seq_len(terra::nlyr(item)), function(j) item[[j]])
+      } else if (is.character(item) && file.exists(item)) {
+        r_temp <- terra::rast(item)
+        lapply(seq_len(terra::nlyr(r_temp)), function(j) r_temp[[j]])
+      } else {
+        stop("Invalid element in 'raster_in' list.", call. = FALSE)
+      }
+    }), recursive = FALSE)
   } else {
-    stop("'raster_in' must be a SpatRaster, a list of SpatRasters, or a valid file path.", call. = FALSE)
+    stop("'raster_in' must be a SpatRaster, a list of SpatRasters, or valid file paths.", call. = FALSE)
   }
 
-  n_layers <- terra::nlyr(r)
-  layer_names <- names(r)
-  if (is.null(layer_names) || any(layer_names == "")) {
-    layer_names <- paste0("layer_", seq_len(n_layers))
-    names(r) <- layer_names
-  }
+  n_layers <- length(raster_layers)
+  layer_names <- vapply(seq_len(n_layers), function(i) {
+    nm <- names(raster_layers[[i]])[1]
+    if (is.null(nm) || is.na(nm) || nm == "") paste0("layer_", i) else nm
+  }, character(1))
 
   # ============================================================================
   # MODO B: RESUMEN POR GRILLA (UNA FILA POR CELDA)
   # ============================================================================
   if (by == "grid") {
-    # 1. Resolver o generar la grilla vectorial
-    grid_vect <- if (!is.null(grid)) {
+    # 1. Resolver o generar la grilla vectorial como sf
+    grid_sf <- if (!is.null(grid)) {
       if (is.character(grid) && length(grid) == 1L) {
         if (!file.exists(grid)) stop(paste("Grid file not found:", grid), call. = FALSE)
-        terra::vect(grid)
-      } else if (inherits(grid, "sf")) {
-        terra::vect(grid)
+        sf::st_read(grid, quiet = TRUE)
       } else if (inherits(grid, "SpatVector")) {
+        sf::st_as_sf(grid)
+      } else if (inherits(grid, "sf")) {
         grid
       } else {
-        stop("'grid' must be a SpatVector, sf object, or valid file path.", call. = FALSE)
+        stop("'grid' must be an sf, SpatVector, or valid file path.", call. = FALSE)
       }
     } else {
-      # Crear grilla operativa con d4h_hex_grid o st_make_grid
-      boundary_sf <- sf::st_as_sf(terra::as.polygons(terra::ext(r), crs = terra::crs(r)))
-      g_sf <- sf::st_make_grid(boundary_sf, cellsize = cell_size, square = square)
-      prefix <- if (square) "G%04d" else "H%04d"
-      g_sf <- sf::st_sf(
-        grid_id = sprintf(prefix, seq_along(g_sf)),
-        geometry = g_sf
-      )
-      terra::vect(g_sf)
+      # Usar grilla operativa podada a los datos validos (sf)
+      d4h_make_grid(raster_layers[[1]], cell_size = cell_size, square = square, clip_to_footprint = TRUE, as_sf = TRUE)
     }
 
     # Asignar ID si la grilla no lo tiene
-    if (!"grid_id" %in% names(grid_vect)) {
-      grid_vect$grid_id <- sprintf("G%04d", seq_len(nrow(grid_vect)))
+    if (!"grid_id" %in% names(grid_sf)) {
+      grid_sf$grid_id <- sprintf("G%04d", seq_len(nrow(grid_sf)))
     }
 
-    # Extraer valores por celda
-    vals_by_cell <- terra::extract(r, grid_vect)
-    cell_idx <- vals_by_cell[, 1]
+    grid_vect <- terra::vect(grid_sf)
+
+
+
+    # Extraer valores por capa independientemente (con O(1) slice index y auto-resolucion optima)
+    extracted_by_layer <- lapply(seq_len(n_layers), function(lyr_idx) {
+      lyr <- raster_layers[[lyr_idx]]
+      ext_g <- terra::ext(grid_vect)
+      ext_r <- terra::ext(lyr)
+      if (ext_g$xmin > ext_r$xmin || ext_g$xmax < ext_r$xmax || ext_g$ymin > ext_r$ymin || ext_g$ymax < ext_r$ymax) {
+        lyr <- suppressWarnings(terra::crop(lyr, grid_vect))
+      }
+      rx <- terra::xres(lyr)
+      if (rx < 0.20 && cell_size >= 20) {
+        fact <- max(1L, as.integer(round(0.50 / rx)))
+        if (fact > 1L) lyr <- terra::aggregate(lyr, fact = fact, fun = "mean", na.rm = TRUE)
+      }
+      vals_ext <- terra::extract(lyr, grid_vect)
+      if (nrow(vals_ext) == 0L) {
+        return(list(map = integer(0), starts = integer(0), ends = integer(0), vals = numeric(0)))
+      }
+      rl <- rle(vals_ext[[1]])
+      ends <- cumsum(rl$lengths)
+      starts <- c(1L, ends[-length(ends)] + 1L)
+      map_ids <- match(seq_len(nrow(grid_vect)), rl$values)
+      list(
+        map = map_ids,
+        starts = starts,
+        ends = ends,
+        vals = vals_ext[[2]]
+      )
+    })
 
     # Calcular metricas por celda
     grid_rows <- vector("list", nrow(grid_vect))
     grid_ids <- grid_vect$grid_id
 
     for (k in seq_len(nrow(grid_vect))) {
-      row_match <- which(cell_idx == k)
-      sub_vals <- vals_by_cell[row_match, -1, drop = FALSE]
-
       cell_data <- data.frame(
         grid_id = grid_ids[k],
         stringsAsFactors = FALSE
@@ -136,7 +199,9 @@ d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = N
       has_valid_data <- FALSE
       for (lyr_idx in seq_len(n_layers)) {
         v_name <- layer_names[lyr_idx]
-        raw_vals <- sub_vals[[v_name]]
+        lyr_pack <- extracted_by_layer[[lyr_idx]]
+        m_pos <- lyr_pack$map[k]
+        raw_vals <- if (!is.na(m_pos)) lyr_pack$vals[lyr_pack$starts[m_pos]:lyr_pack$ends[m_pos]] else numeric(0)
         v_clean <- raw_vals[!is.na(raw_vals) & is.finite(raw_vals) & raw_vals != 0]
 
         n_v <- length(v_clean)
@@ -210,9 +275,45 @@ d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = N
       }
     }
 
-    df_grid_final <- do.call(rbind, grid_rows[!vapply(grid_rows, is.null, logical(1))])
-    rownames(df_grid_final) <- NULL
-    class(df_grid_final) <- c("d4h_grid_summary", "data.frame")
+    df_grid_stats <- do.call(rbind, grid_rows[!vapply(grid_rows, is.null, logical(1))])
+    rownames(df_grid_stats) <- NULL
+
+    # 2. Compute micro-environmental land cover composition (bare soil, houses, water, vegetation)
+    idx_ndvi <- grep("NDVI|SAVI|GNDVI", toupper(layer_names))
+    r_ndvi_cand <- if (length(idx_ndvi) > 0) raster_layers[[idx_ndvi[1]]] else NULL
+
+    water_cand <- water
+    if (is.null(water_cand)) {
+      idx_ndwi <- grep("NDWI|IRHE", toupper(layer_names))
+      if (length(idx_ndwi) > 0) {
+        water_cand <- raster_layers[[idx_ndwi[1]]] > 0
+      }
+    }
+
+    comp_sf <- d4h_grid_composition(
+      grid        = grid_sf,
+      water       = water_cand,
+      buildings   = buildings,
+      ndvi_raster = r_ndvi_cand
+    )
+
+    # Merge composition and indicator zonal statistics (avoiding duplicate area_m2)
+    stat_cols_to_merge <- names(df_grid_stats)[!names(df_grid_stats) %in% c("area_m2")]
+    df_grid_merged <- merge(comp_sf, df_grid_stats[, stat_cols_to_merge, drop = FALSE], by = "grid_id", all.x = TRUE)
+
+    # Build both spatial (sf) and tabular (df) representations
+    res_sf <- df_grid_merged
+    res_df <- sf::st_drop_geometry(df_grid_merged)
+    if (requireNamespace("tibble", quietly = TRUE)) {
+      res_df <- tibble::as_tibble(res_df)
+    }
+
+    # Compound result containing BOTH $sf and $df
+    res_grid <- list(
+      sf = res_sf,
+      df = res_df
+    )
+    class(res_grid) <- c("d4h_grid_summary", "list")
 
     # Export to Excel if requested
     if (!is.null(out_xlsx)) {
@@ -221,10 +322,11 @@ d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = N
         dir.create(dir_out, recursive = TRUE)
       }
 
-      num_cols <- names(df_grid_final)[vapply(df_grid_final, is.numeric, logical(1))]
+      df_clean_export <- as.data.frame(res_df)
+      num_cols <- names(df_clean_export)[vapply(df_clean_export, is.numeric, logical(1))]
       num_cols <- num_cols[!num_cols %in% c("centroid_x", "centroid_y") & !grepl("_media$|_mediana$|_pct_agua_degradado$|_pct_suelo_desnudo$|_pct_vegetacion_densa$", num_cols)]
       res_glob <- lapply(num_cols, function(col_n) {
-        vals <- df_grid_final[[col_n]]
+        vals <- df_clean_export[[col_n]]
         vals <- vals[!is.na(vals) & is.finite(vals)]
         if (length(vals) == 0) return(NULL)
         data.frame(
@@ -240,7 +342,7 @@ d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = N
       df_glob_grid <- do.call(rbind, res_glob[!vapply(res_glob, is.null, logical(1))])
 
       sheets_grid <- list(
-        Grid_Summary = df_grid_final,
+        Grid_Summary = df_clean_export,
         Global_Grid_Summary = df_glob_grid
       )
 
@@ -260,25 +362,25 @@ d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = N
         openxlsx::write.xlsx(sheets_grid, file = out_xlsx)
       } else {
         csv_fallback <- sub("\\.xlsx$", ".csv", out_xlsx)
-        utils::write.csv(df_grid_final, file = csv_fallback, row.names = FALSE)
+        utils::write.csv(df_clean_export, file = csv_fallback, row.names = FALSE)
       }
     }
 
     h_target <- if (!is.null(houses_proximity)) houses_proximity else houses_risk
     if (!is.null(h_target)) {
-      attr(df_grid_final, "houses_proximity") <- h_target
+      attr(res_grid, "houses_proximity") <- h_target
+      attr(res_grid$sf, "houses_proximity") <- h_target
+      attr(res_grid$df, "houses_proximity") <- h_target
     }
 
-    return(df_grid_final)
-
-    return(df_grid_final)
+    return(res_grid)
   }
 
   # ============================================================================
   # MODO A: RESUMEN GENERAL (INFORME ESCENARIO GLOBAL)
   # ============================================================================
   summaries <- lapply(seq_len(n_layers), function(i) {
-    lyr <- r[[i]]
+    lyr <- raster_layers[[i]]
     var_name <- layer_names[i]
 
     # 1. Metricas espaciales y resolucion
@@ -288,14 +390,16 @@ d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = N
     total_cells <- terra::ncell(lyr)
 
     # Extraer pixeles validos
-    vals <- if (total_cells > sample_size) {
-      terra::spatSample(lyr, size = sample_size, method = "regular", na.rm = TRUE)[, 1]
+    is_sampled <- total_cells > sample_size
+    raw_sample <- if (is_sampled) {
+      terra::spatSample(lyr, size = sample_size, method = "regular", na.rm = FALSE)[, 1]
     } else {
       terra::values(lyr, mat = FALSE)
     }
-    vals <- vals[!is.na(vals) & is.finite(vals) & vals != 0]
+    vals <- raw_sample[!is.na(raw_sample) & is.finite(raw_sample) & raw_sample != 0]
 
     n_valid <- length(vals)
+    n_sample_total <- length(raw_sample)
     if (n_valid == 0L) {
       return(list(
         indicator = var_name,
@@ -303,10 +407,20 @@ d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = N
       ))
     }
 
-    # Calculo de area aproximada
+    valid_fraction <- if (n_sample_total > 0) n_valid / n_sample_total else 0
+    total_valid_est <- if (is_sampled) round(valid_fraction * total_cells) else n_valid_sample
+
+    # Calculo de area de pixel y huella espacial
     pixel_area_m2 <- if (is_projected) res_xy[1] * res_xy[2] else (res_xy[1] * 111320) * (res_xy[2] * 110540)
-    area_m2 <- n_valid * pixel_area_m2
+    area_m2 <- total_valid_est * pixel_area_m2
     area_ha <- area_m2 / 10000
+
+    # Metadatos del recuadro de la escena (matching metadatos.py)
+    e <- terra::ext(lyr)
+    ancho_m <- if (is_projected) (e$xmax - e$xmin) else (e$xmax - e$xmin) * 111320
+    alto_m  <- if (is_projected) (e$ymax - e$ymin) else (e$ymax - e$ymin) * 110540
+    bbox_area_m2 <- ancho_m * alto_m
+    bbox_area_ha <- bbox_area_m2 / 10000
 
     # 2. Estadisticas descriptivas y momentos
     mean_val <- mean(vals)
@@ -375,10 +489,16 @@ d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = N
       spatial = list(
         res_x = round(res_xy[1] * if (is_projected && res_xy[1] < 1) 100 else 1, 2),
         res_unit = if (is_projected && res_xy[1] < 1) "cm" else if (is_projected) "m" else "deg",
-        n_valid = n_valid,
-        coverage_pct = round((n_valid / total_cells) * 100, 1),
+        n_valid = total_valid_est,
+        n_sampled = if (is_sampled) n_valid else total_cells,
+        is_sampled = is_sampled,
+        coverage_pct = round(valid_fraction * 100, 1),
         area_ha = round(area_ha, 3),
-        area_m2 = round(area_m2, 1)
+        area_m2 = round(area_m2, 1),
+        bbox_area_ha = round(bbox_area_ha, 3),
+        bbox_area_m2 = round(bbox_area_m2, 1),
+        field_width_m = round(ancho_m, 1),
+        field_height_m = round(alto_m, 1)
       ),
       stats = list(
         mean = round(mean_val, digits),
@@ -408,19 +528,74 @@ d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = N
   })
 
   names(summaries) <- layer_names
-  class(summaries) <- "d4h_executive_summary"
+
+  # Construct clean data.frame / tibble for executive summary
+  valid_items <- summaries[!vapply(summaries, function(x) !is.null(x$error), logical(1))]
+
+  df_general <- if (length(valid_items) > 0) {
+    data.frame(
+      indicator         = vapply(valid_items, function(x) x$indicator, character(1)),
+      resolution        = vapply(valid_items, function(x) paste(x$spatial$res_x, x$spatial$res_unit), character(1)),
+      area_ha           = vapply(valid_items, function(x) x$spatial$area_ha, numeric(1)),
+      valid_pixels      = vapply(valid_items, function(x) x$spatial$n_valid, numeric(1)),
+      coverage_pct      = vapply(valid_items, function(x) x$spatial$coverage_pct, numeric(1)),
+      mean              = vapply(valid_items, function(x) x$stats$mean, numeric(1)),
+      sd                = vapply(valid_items, function(x) x$stats$sd, numeric(1)),
+      cv_pct            = vapply(valid_items, function(x) x$stats$cv_pct, numeric(1)),
+      min               = vapply(valid_items, function(x) x$stats$min, numeric(1)),
+      max               = vapply(valid_items, function(x) x$stats$max, numeric(1)),
+      q25               = vapply(valid_items, function(x) x$stats$q25, numeric(1)),
+      median            = vapply(valid_items, function(x) x$stats$median, numeric(1)),
+      q75               = vapply(valid_items, function(x) x$stats$q75, numeric(1)),
+      iqr               = vapply(valid_items, function(x) x$stats$iqr, numeric(1)),
+      outliers_count    = vapply(valid_items, function(x) x$outliers$count_total, numeric(1)),
+      outliers_pct      = vapply(valid_items, function(x) x$outliers$pct, numeric(1)),
+      outlier_diagnosis = vapply(valid_items, function(x) x$outliers$diagnosis, character(1)),
+      stringsAsFactors  = FALSE
+    )
+  } else {
+    data.frame(indicator = layer_names, stringsAsFactors = FALSE)
+  }
+
+  if (requireNamespace("tibble", quietly = TRUE)) {
+    df_general <- tibble::as_tibble(df_general)
+  }
+
+  # Build strata dataframe
+  strata_rows <- list()
+  for (item in summaries) {
+    if (!is.null(item$error)) next
+    for (st_name in names(item$strata)) {
+      st_val <- item$strata[[st_name]]
+      strata_rows[[length(strata_rows) + 1L]] <- data.frame(
+        Indicator = item$indicator,
+        Stratum = st_name,
+        Percentage = round(st_val$pct, 2),
+        Surface_ha = round(st_val$ha, 4),
+        stringsAsFactors = FALSE
+      )
+    }
+  }
+  df_strata <- if (length(strata_rows) > 0) do.call(rbind, strata_rows) else data.frame()
+
+  attr(df_general, "raw_summary") <- summaries
+  attr(df_general, "strata")      <- df_strata
+  attr(df_general, "spatial")     <- lapply(summaries, `[[`, "spatial")
+  attr(df_general, "outliers")    <- lapply(summaries, `[[`, "outliers")
 
   h_target <- if (!is.null(houses_proximity)) houses_proximity else houses_risk
   if (!is.null(h_target)) {
-    attr(summaries, "houses_proximity") <- h_target
+    attr(df_general, "houses_proximity") <- h_target
   }
+
+  class(df_general) <- c("d4h_executive_summary", class(df_general))
 
   # Export to Excel if requested
   if (!is.null(out_xlsx)) {
-    d4h_export_summary(summaries, out_xlsx = out_xlsx, houses_proximity = h_target)
+    d4h_export_summary(df_general, out_xlsx = out_xlsx, houses_proximity = h_target)
   }
 
-  summaries
+  df_general
 }
 
 # Internal helper to construct household water proximity sheets
@@ -504,7 +679,7 @@ d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = N
 
   # Aggregated proximity stratification
   df_agg_cnt <- stats::aggregate(house_id ~ proximity_tier, data = df_casas_export, FUN = length)
-  names(df_agg_cnt)[2] <- "n_casas"
+  names(df_agg_cnt)[2] <- "n_houses"
   df_agg_dist <- stats::aggregate(dist_water_m ~ proximity_tier, data = df_casas_export, FUN = function(v) {
     c(mean = round(mean(v, na.rm = TRUE), 1),
       min  = round(min(v, na.rm = TRUE), 1),
@@ -514,8 +689,8 @@ d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = N
 
   df_strat <- data.frame(
     Proximity_Tier    = df_agg_cnt$proximity_tier,
-    Household_Count   = df_agg_cnt$n_casas,
-    Household_Pct     = round((df_agg_cnt$n_casas / nrow(df_casas_export)) * 100, 1),
+    Household_Count   = df_agg_cnt$n_houses,
+    Household_Pct     = round((df_agg_cnt$n_houses / nrow(df_casas_export)) * 100, 1),
     Mean_Distance_m   = dist_mat[, "mean"],
     Min_Distance_m    = dist_mat[, "min"],
     Max_Distance_m    = dist_mat[, "max"],
@@ -527,10 +702,6 @@ d4h_executive_summary <- function(raster_in, by = c("general", "grid"), grid = N
     Household_Proximity_Summary = df_strat
   )
 }
-
-#' @rdname d4h_executive_summary
-#' @export
-d4h_report <- d4h_executive_summary
 
 #' @title Export Executive Summary to Multi-Sheet Excel File
 #' @description Exports a \code{d4h_executive_summary} object to an Excel workbook (.xlsx) with dedicated sheets for Global Summary, Stratification, Outlier Diagnostics, and optional Household Water Proximity.
@@ -573,7 +744,8 @@ d4h_export_summary <- function(x, out_xlsx, houses_proximity = NULL, houses_risk
   }
 
   # 1. Sheet 1: Global Summary
-  global_rows <- lapply(x, function(item) {
+  raw_items <- if (!is.null(attr(x, "raw_summary"))) attr(x, "raw_summary") else x
+  global_rows <- lapply(raw_items, function(item) {
     if (!is.null(item$error)) return(NULL)
     sp <- item$spatial
     st <- item$stats
@@ -606,7 +778,7 @@ d4h_export_summary <- function(x, out_xlsx, houses_proximity = NULL, houses_risk
 
   # 2. Sheet 2: Thematic Stratification
   strata_rows <- list()
-  for (item in x) {
+  for (item in raw_items) {
     if (!is.null(item$error)) next
     for (st_name in names(item$strata)) {
       st_val <- item$strata[[st_name]]
@@ -622,7 +794,7 @@ d4h_export_summary <- function(x, out_xlsx, houses_proximity = NULL, houses_risk
   df_strata <- if (length(strata_rows) > 0) do.call(rbind, strata_rows) else data.frame()
 
   # 3. Sheet 3: Outlier Diagnostics
-  outlier_rows <- lapply(x, function(item) {
+  outlier_rows <- lapply(raw_items, function(item) {
     if (!is.null(item$error)) return(NULL)
     ot <- item$outliers
     data.frame(
@@ -677,13 +849,15 @@ d4h_export_summary <- function(x, out_xlsx, houses_proximity = NULL, houses_risk
 
 #' @export
 print.d4h_executive_summary <- function(x, ...) {
+  raw_items <- if (!is.null(attr(x, "raw_summary"))) attr(x, "raw_summary") else x
+
   cat("\n")
   cat(rep("=", 78), "\n", sep = "")
   cat("             DRONES4HEALTH - EXECUTIVE SUMMARY REPORT\n")
   cat(rep("=", 78), "\n\n", sep = "")
 
-  for (i in seq_along(x)) {
-    item <- x[[i]]
+  for (i in seq_along(raw_items)) {
+    item <- raw_items[[i]]
     if (!is.null(item$error)) {
       cat(sprintf("Indicator: %s [ERROR: %s]\n\n", item$indicator, item$error))
       next
@@ -698,8 +872,19 @@ print.d4h_executive_summary <- function(x, ...) {
 
     cat(" 1. SPATIAL COVERAGE AND RESOLUTION:\n")
     cat(sprintf("    - Pixel Resolution    : %s %s\n", sp$res_x, sp$res_unit))
+    if (!is.null(sp$bbox_area_ha)) {
+      cat(sprintf("    - Scene Bounding Box  : %s ha (%s m2 | %s m x %s m)\n",
+                  format(sp$bbox_area_ha, big.mark = ","), format(sp$bbox_area_m2, big.mark = ","),
+                  format(sp$field_width_m, big.mark = ","), format(sp$field_height_m, big.mark = ",")))
+    }
     cat(sprintf("    - Surveyed Area       : %s ha (%s m2)\n", format(sp$area_ha, big.mark = ","), format(sp$area_m2, big.mark = ",")))
-    cat(sprintf("    - Evaluated Pixels    : %s (%s%% valid footprint coverage)\n\n", format(sp$n_valid, big.mark = ","), sp$coverage_pct))
+    if (isTRUE(sp$is_sampled)) {
+      cat(sprintf("    - Evaluated Pixels    : %s sampled (~%s valid total, %s%% footprint coverage)\n\n",
+                  format(sp$n_sampled, big.mark = ","), format(sp$n_valid, big.mark = ","), sp$coverage_pct))
+    } else {
+      cat(sprintf("    - Evaluated Pixels    : %s (%s%% valid footprint coverage)\n\n",
+                  format(sp$n_valid, big.mark = ","), sp$coverage_pct))
+    }
 
     cat(" 2. GLOBAL DESCRIPTIVE STATISTICAL MOMENTS:\n")
     cat(sprintf("    - Arithmetic Mean     : %s (+/- %s SD)\n", st$mean, st$sd))
@@ -720,7 +905,7 @@ print.d4h_executive_summary <- function(x, ...) {
       cat(sprintf("    - %-42s: %5.1f %% (%6.2f ha)\n", st_name, st_info$pct, st_info$ha))
     }
     cat("\n")
-    if (i < length(x)) cat(rep(".", 78), "\n\n", sep = "")
+    if (i < length(raw_items)) cat(rep(".", 78), "\n\n", sep = "")
   }
 
   # 5. Section for household proximity if provided
@@ -755,23 +940,87 @@ print.d4h_executive_summary <- function(x, ...) {
 
 #' @export
 as.data.frame.d4h_executive_summary <- function(x, ...) {
-  rows <- lapply(x, function(item) {
-    if (!is.null(item$error)) return(NULL)
-    sp <- item$spatial
-    st <- item$stats
-    ot <- item$outliers
-    tibble::tibble(
-      indicator = item$indicator,
-      area_ha = sp$area_ha,
-      mean = st$mean,
-      sd = st$sd,
-      cv_pct = st$cv_pct,
-      min = st$min,
-      max = st$max,
-      median = st$median,
-      iqr = st$iqr,
-      outliers_pct = ot$pct
-    )
-  })
-  do.call(rbind, rows)
+  if (is.data.frame(x)) {
+    df <- as.data.frame(unclass(x))
+    # Remove raw list attributes for pure data.frame printing if desired
+    attr(df, "raw_summary") <- NULL
+    attr(df, "strata") <- NULL
+    df
+  } else {
+    raw_items <- if (!is.null(attr(x, "raw_summary"))) attr(x, "raw_summary") else x
+    rows <- lapply(raw_items, function(item) {
+      if (!is.null(item$error)) return(NULL)
+      sp <- item$spatial
+      st <- item$stats
+      ot <- item$outliers
+      data.frame(
+        indicator = item$indicator,
+        area_ha = sp$area_ha,
+        mean = st$mean,
+        sd = st$sd,
+        cv_pct = st$cv_pct,
+        min = st$min,
+        max = st$max,
+        median = st$median,
+        iqr = st$iqr,
+        outliers_pct = ot$pct,
+        stringsAsFactors = FALSE
+      )
+    })
+    do.call(rbind, rows)
+  }
+}
+
+#' @export
+as.data.frame.d4h_grid_summary <- function(x, ...) {
+  if (!is.null(x$df)) as.data.frame(x$df) else NextMethod()
+}
+
+#' @export
+st_as_sf.d4h_grid_summary <- function(x, ...) {
+  if (!is.null(x$sf)) x$sf else NextMethod()
+}
+
+#' @export
+`$.d4h_grid_summary` <- function(x, name) {
+  if (name %in% c("sf", "df", "summary", "composition")) {
+    return(.subset2(x, name))
+  }
+  df_obj <- .subset2(x, "df")
+  if (!is.null(df_obj) && name %in% names(df_obj)) {
+    return(df_obj[[name]])
+  }
+  sf_obj <- .subset2(x, "sf")
+  if (!is.null(sf_obj) && name %in% names(sf_obj)) {
+    return(sf_obj[[name]])
+  }
+  .subset2(x, name)
+}
+
+#' @export
+`[[.d4h_grid_summary` <- function(x, i, ...) {
+  if (is.character(i) && !i %in% c("sf", "df", "summary", "composition")) {
+    df_obj <- .subset2(x, "df")
+    if (!is.null(df_obj) && i %in% names(df_obj)) {
+      return(df_obj[[i]])
+    }
+  }
+  NextMethod()
+}
+
+#' @export
+print.d4h_grid_summary <- function(x, ...) {
+  cat("\n==============================================================================\n")
+  cat("             DRONES4HEALTH - OPERATIONAL GRID SURVEILLANCE SUMMARY            \n")
+  cat("==============================================================================\n")
+  cat(sprintf(" Evaluated Units : %d grid cells | Attributes: %d\n", nrow(x$df), ncol(x$df)))
+  cat(" Structure       : Both spatial ($sf) and tabular ($df) representations provided.\n")
+  cat(" Available parts : $sf (sf polygons with geometry) | $df (clean tibble/data.frame)\n")
+  cat(" Included fields : Micro-environmental composition (pct_bare_soil, pct_houses,\n")
+  cat("                   pct_water, pct_vegetation, dominant_class, surveillance_priority)\n")
+  cat("                   and descriptive indicator moments (mean, sd, median, outliers).\n")
+  cat("------------------------------------------------------------------------------\n")
+  print(head(x$df, 6))
+  cat("==============================================================================\n\n")
+  invisible(x)
 }

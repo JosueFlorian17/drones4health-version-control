@@ -95,19 +95,10 @@
 <span>  <span class="va">raster_in</span>,</span>
 <span>  by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"general"</span>, <span class="st">"grid"</span><span class="op">)</span>,</span>
 <span>  grid <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  houses_proximity <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  houses_risk <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  cell_size <span class="op">=</span> <span class="fl">50</span>,</span>
-<span>  square <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  out_xlsx <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  sample_size <span class="op">=</span> <span class="fl">1e+06</span>,</span>
-<span>  digits <span class="op">=</span> <span class="fl">3</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">d4h_report</span><span class="op">(</span></span>
-<span>  <span class="va">raster_in</span>,</span>
-<span>  by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"general"</span>, <span class="st">"grid"</span><span class="op">)</span>,</span>
-<span>  grid <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  water <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  buildings <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  houses <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  features <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  houses_proximity <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  houses_risk <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  cell_size <span class="op">=</span> <span class="fl">50</span>,</span>
@@ -132,6 +123,18 @@
 
 <dt id="arg-grid">grid<a class="anchor" aria-label="anchor" href="#arg-grid"></a></dt>
 <dd><p>Optional SpatVector, sf, or character path to existing grid polygon boundaries when <code>by = "grid"</code>. If NULL, automatically generated using <code>cell_size</code> and <code>square</code>.</p></dd>
+
+
+<dt id="arg-water">water<a class="anchor" aria-label="anchor" href="#arg-water"></a></dt>
+<dd><p>SpatVector, sf, or SpatRaster (optional). Segmented water bodies or binary water mask to compute grid water coverage (<code>pct_water</code>).</p></dd>
+
+
+<dt id="arg-buildings">buildings<a class="anchor" aria-label="anchor" href="#arg-buildings"></a></dt>
+<dd><p>SpatVector, sf, or SpatRaster (optional). Segmented building/roof footprints to compute grid dwelling coverage (<code>pct_houses</code>).</p></dd>
+
+
+<dt id="arg-houses">houses<a class="anchor" aria-label="anchor" href="#arg-houses"></a></dt>
+<dd><p>Deprecated alias for <code>buildings</code>.</p></dd>
 
 
 <dt id="arg-houses-proximity">houses_proximity<a class="anchor" aria-label="anchor" href="#arg-houses-proximity"></a></dt>
@@ -164,7 +167,7 @@
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>An object of class <code>d4h_executive_summary</code> (for <code>by = "general"</code>) or <code>d4h_grid_summary</code> / <code>data.frame</code> (for <code>by = "grid"</code>) containing structured metrics, spatial coverage metadata, outlier diagnostics, and thematic stratum distributions.</p>
+    <p>When <code>by = "grid"</code>, returns an object of class <code>d4h_grid_summary</code> containing both <code>$sf</code> (spatial polygons with geometry) and <code>$df</code> (clean tabular tibble without geometry), including micro-environmental composition (<code>pct_bare_soil</code>, <code>pct_houses</code>, <code>pct_water</code>, <code>pct_vegetation</code>, <code>dominant_class</code>, <code>surveillance_priority</code>) and descriptive moments. When <code>by = "general"</code>, returns an object of class <code>d4h_executive_summary</code> (<code>tibble</code> / <code>data.frame</code>).</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -209,7 +212,9 @@ When <code>by = "grid"</code>, each row represents an operational surveillance g
 <span class="r-in"><span>    sample_size <span class="op">=</span> <span class="fl">1000000</span>,</span></span>
 <span class="r-in"><span>    digits      <span class="op">=</span> <span class="fl">3</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">exec_grid</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="co"># Always provides both $sf and $df:</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">exec_grid</span><span class="op">$</span><span class="va">df</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">exec_grid</span><span class="op">$</span><span class="va">sf</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>

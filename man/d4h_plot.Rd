@@ -5,11 +5,15 @@
 \title{Unified Cartographic and Interactive Visualization}
 \usage{
 d4h_plot(
-  x,
+  x = NULL,
   y = NULL,
   interactive = FALSE,
   grid = NULL,
   houses = NULL,
+  buildings = NULL,
+  water = NULL,
+  features = NULL,
+  water_color = "#00B0FF",
   houses_filter_extent = FALSE,
   house_color = "red",
   house_size = 2,
@@ -21,7 +25,8 @@ d4h_plot(
   title = NULL,
   max_pixels = 5e+05,
   zcol = NULL,
-  ortho = NULL
+  ortho = NULL,
+  general = FALSE
 )
 }
 \arguments{
@@ -33,7 +38,13 @@ d4h_plot(
 
 \item{grid}{Optional SpatVector, sf, or character path to overlay grid boundaries.}
 
-\item{houses}{Optional sf, data.frame, SpatVector, or character path to CSV/Excel containing house coordinates. Automatically plotted as points.}
+\item{houses}{Optional sf, data.frame, SpatVector, or character path to CSV/Excel containing house coordinates. Automatically plotted as points or polygons.}
+
+\item{buildings}{Optional alias for \code{houses}. Accepts building footprint polygons (\code{sf}) or centroids.}
+
+\item{water}{Optional sf, SpatVector, or character path to delineate aquatic vector breeding habitats or water bodies.}
+
+\item{water_color}{Character. Fill color for water polygons (default: "#00B0FF").}
 
 \item{houses_filter_extent}{Logical. If TRUE, filters houses to only those intersecting the raster extent / footprint. If FALSE (default), retains all houses.}
 
@@ -58,6 +69,8 @@ d4h_plot(
 \item{zcol}{Character. Optional column name to color/fill spatial vector features (e.g., \code{"proximity_level"}, \code{"risk_level"}, or \code{"dist_water_m"}).}
 
 \item{ortho}{SpatRaster or character path. Optional high-resolution RGB orthomosaic to render as an underlay base layer beneath grids, vectors, or point features.}
+
+\item{general}{Logical. If TRUE, transforms continuous raster layers into homogeneous mosaics filled with the overall global mean value across valid pixels before plotting (default: FALSE).}
 }
 \value{
 A \code{ggplot} object (if \code{interactive = FALSE}) or an interactive \code{mapview} / \code{leaflet} slider widget (if \code{interactive = TRUE}).
@@ -90,6 +103,10 @@ if (interactive()) {
   # 3. Single indicator: static map
   p_single <- d4h_plot(x = ndvi_file, interactive = FALSE)
   print(p_single)
+
+  # 4. Homogeneous general scene baseline plot
+  p_gen <- d4h_plot(x = ndvi_file, general = TRUE)
+  print(p_gen)
 }
 }
 }

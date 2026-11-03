@@ -153,34 +153,36 @@ fences, and export multi-sheet executive spreadsheets.</p>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left"><strong>Hexagonal Grid</strong></td>
-<td align="left"><code><a href="../reference/d4h_hex_grid.html">d4h_hex_grid()</a></code></td>
-<td align="left">Generates regular hexagonal surveillance partitions
-with unique alphanumeric identifiers (H0001, H0002).</td>
+<td align="left"><strong>Operational Grid</strong></td>
+<td align="left">
+<code><a href="../reference/d4h_make_grid.html">d4h_make_grid()</a></code> /
+<code><a href="../reference/d4h_hex_grid.html">d4h_hex_grid()</a></code>
+</td>
+<td align="left">Generates regular hexagonal or square surveillance
+partitions using 3 mutually exclusive sizing modes
+(<code>cell_size</code>, <code>area_m2</code>, or
+<code>n_cells</code>).</td>
 </tr>
 <tr class="even">
-<td align="left"><strong>Zonal Summary Grid</strong></td>
-<td align="left"><code><a href="../reference/d4h_summarize_grid.html">d4h_summarize_grid()</a></code></td>
-<td align="left">Extracts zonal summary statistics (mean, quantiles) per
-square or hexagonal cell with automated NoData background pruning.</td>
-</tr>
-<tr class="odd">
-<td align="left"><strong>Scene General Polygon</strong></td>
-<td align="left"><code><a href="../reference/d4h_summarize_general.html">d4h_summarize_general()</a></code></td>
-<td align="left">Computes global mean indicators across the exact valid
-flight footprint as a single reference spatial vector.</td>
-</tr>
-<tr class="even">
-<td align="left"><strong>Homogeneous Mosaic</strong></td>
-<td align="left"><code><a href="../reference/d4h_raster_general.html">d4h_raster_general()</a></code></td>
-<td align="left">Generates a continuous raster matching the flight
-extent filled with overall global mean values.</td>
-</tr>
-<tr class="odd">
-<td align="left"><strong>Executive Reporting</strong></td>
+<td align="left"><strong>Executive Summary (DF / SF)</strong></td>
 <td align="left"><code><a href="../reference/d4h_executive_summary.html">d4h_executive_summary()</a></code></td>
-<td align="left">Extracts multi-moment descriptive statistics, Tukey IQR
-outlier fences, and exports multi-sheet Excel reports.</td>
+<td align="left">Extracts multi-moment statistics and outlier
+diagnostics, returning an <code>sf</code> object when summarizing by
+grid or a <code>tibble</code> when summarizing globally.</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>Multi-Indicator Extraction</strong></td>
+<td align="left"><code><a href="../reference/d4h_extract_indicators.html">d4h_extract_indicators()</a></code></td>
+<td align="left">Simultaneously calculates and extracts multiple
+biophysical/terrain indicators (<code>ndvi</code>, <code>ndwi</code>,
+<code>savi</code>, <code>vari</code>, <code>slope</code>, etc.) per
+region.</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>Unified Visualization</strong></td>
+<td align="left"><code><a href="../reference/d4h_plot.html">d4h_plot()</a></code></td>
+<td align="left">Unified static and interactive maps with continuous,
+discrete, or homogeneous baselines.</td>
 </tr>
 </tbody>
 </table>
@@ -211,109 +213,100 @@ derived from the drone flight:</p>
 <span><span class="va">r_ndwi</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_ndwi.html">d4h_ndwi</a></span><span class="op">(</span>green <span class="op">=</span> <span class="st">"img/Ohuay_G.tif"</span>, nir <span class="op">=</span> <span class="st">"img/Ohuay_NIR.tif"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="parametric-grid-generation-hexagonal-vs-square">3.3 Parametric Grid Generation (Hexagonal vs Square)<a class="anchor" aria-label="anchor" href="#parametric-grid-generation-hexagonal-vs-square"></a>
+<h3 id="parametric-grid-generation-3-way-sizing">3.3 Parametric Grid Generation (3-Way Sizing)<a class="anchor" aria-label="anchor" href="#parametric-grid-generation-3-way-sizing"></a>
 </h3>
-<p><code>drones4health</code> provides flexible spatial partitioning
-parameters:</p>
+<p><code>drones4health</code> allows configuring grid cell size using
+exactly one of three mutually exclusive parameters:</p>
 <ul>
 <li>
-<code>cell_size</code>: Resolution or diameter of each grid cell in
-meters (e.g., 20 m for household peridomestic inspections, 50 m for
-rural blocks, 100 m for regional transects).</li>
+<code>cell_size</code>: Distance from side-to-side or diameter in
+meters (e.g., <code>cell_size = 50</code>).</li>
 <li>
-<code>square</code>: Set <code>FALSE</code> for regular hexagonal
-partitions or <code>TRUE</code> for square grids. Hexagonal
-tessellations minimize perimeter-to-area ratio and provide equidistant
-neighborhood connectivity.</li>
+<code>area_m2</code>: Target surface area of each individual grid
+cell in square meters (e.g., <code>area_m2 = 2500</code>).</li>
 <li>
-<code>discard_na</code>: Automatically removes peripheral cells
-falling outside the valid flight footprint.</li>
+<code>n_cells</code>: Total number of grid units desired over the
+surveyed flight footprint (e.g., <code>n_cells = 100</code>).</li>
 </ul>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Generate 50-meter hexagonal surveillance grid</span></span>
-<span><span class="va">grid_hex</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_hex_grid.html">d4h_hex_grid</a></span><span class="op">(</span></span>
-<span>  aoi       <span class="op">=</span> <span class="va">r_ndvi</span>,</span>
-<span>  cell_size <span class="op">=</span> <span class="fl">50</span></span>
-<span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># Option 1: By diameter/cell_size (50 meters)</span></span>
+<span><span class="va">grid_hex</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_hex_grid.html">d4h_hex_grid</a></span><span class="op">(</span>aoi <span class="op">=</span> <span class="va">r_ndvi</span>, cell_size <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Inspect grid structure</span></span>
+<span><span class="co"># Option 2: By target cell area (2,500 m2)</span></span>
+<span><span class="va">grid_area</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_hex_grid.html">d4h_hex_grid</a></span><span class="op">(</span>aoi <span class="op">=</span> <span class="va">r_ndvi</span>, area_m2 <span class="op">=</span> <span class="fl">2500</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Option 3: By target total number of cells (50 cells)</span></span>
+<span><span class="va">grid_n</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_hex_grid.html">d4h_hex_grid</a></span><span class="op">(</span>aoi <span class="op">=</span> <span class="va">r_ndvi</span>, n_cells <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Inspect generated sf object</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">grid_hex</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="zonal-statistical-extraction">3.4 Zonal Statistical Extraction<a class="anchor" aria-label="anchor" href="#zonal-statistical-extraction"></a>
+<h3 id="pipe-friendly-zonal-statistical-extraction-summaries">3.4 Pipe-Friendly Zonal Statistical Extraction &amp; Summaries<a class="anchor" aria-label="anchor" href="#pipe-friendly-zonal-statistical-extraction-summaries"></a>
 </h3>
-<p>We aggregate continuous pixel values across each operational grid
-cell:</p>
+<p>The generated grid directly feeds into
+<code><a href="../reference/d4h_executive_summary.html">d4h_executive_summary()</a></code>, which automatically detects the
+grid and returns a complete <code>sf</code> object:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Extract zonal mean NDVI per 50m hexagonal cell</span></span>
-<span><span class="va">grid_summary_ndvi</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_summarize_grid.html">d4h_summarize_grid</a></span><span class="op">(</span></span>
-<span>  raster_in  <span class="op">=</span> <span class="va">r_ndvi</span>,</span>
-<span>  cell_size  <span class="op">=</span> <span class="fl">50</span>,</span>
-<span>  square     <span class="op">=</span> <span class="cn">FALSE</span>,     <span class="co"># Hexagonal geometry</span></span>
-<span>  discard_na <span class="op">=</span> <span class="cn">TRUE</span>       <span class="co"># Prune empty peripheral cells</span></span>
+<code class="sourceCode R"><span><span class="co"># Seamless pipe from grid to executive summary</span></span>
+<span><span class="va">grid_summary_ndvi</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_executive_summary.html">d4h_executive_summary</a></span><span class="op">(</span></span>
+<span>  raster_in <span class="op">=</span> <span class="va">r_ndvi</span>,</span>
+<span>  grid      <span class="op">=</span> <span class="va">grid_hex</span>,</span>
+<span>  out_xlsx  <span class="op">=</span> <span class="st">"salidas/Executive_Summary_Case02_Grids.xlsx"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Inspect extracted values per grid unit</span></span>
-<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">grid_summary_ndvi</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Compute overall scene reference baseline</span></span>
-<span><span class="va">gen_summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_summarize_general.html">d4h_summarize_general</a></span><span class="op">(</span>raster_in <span class="op">=</span> <span class="va">r_ndvi</span>, exact_boundary <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="va">r_homo</span>      <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_raster_general.html">d4h_raster_general</a></span><span class="op">(</span>raster_in <span class="op">=</span> <span class="va">r_ndvi</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># Returns an sf data frame ready for spatial analysis and plotting</span></span>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">grid_summary_ndvi</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="tukey-spatial-outlier-diagnostics-excel-export">3.5 Tukey Spatial Outlier Diagnostics &amp; Excel Export<a class="anchor" aria-label="anchor" href="#tukey-spatial-outlier-diagnostics-excel-export"></a>
+<h3 id="multi-indicator-extraction-d4h_extract_indicators">3.5 Multi-Indicator Extraction
+(<code>d4h_extract_indicators</code>)<a class="anchor" aria-label="anchor" href="#multi-indicator-extraction-d4h_extract_indicators"></a>
+</h3>
+<p>Modeled after <code>land4health</code>,
+<code><a href="../reference/d4h_extract_indicators.html">d4h_extract_indicators()</a></code> allows extracting multiple
+environmental indicators simultaneously:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Extract NDVI and NDWI in a single pipe call</span></span>
+<span><span class="va">indicators_sf</span> <span class="op">&lt;-</span> <span class="va">grid_hex</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/d4h_extract_indicators.html">d4h_extract_indicators</a></span><span class="op">(</span></span>
+<span>    bands <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ndvi"</span>, <span class="st">"ndwi"</span><span class="op">)</span>,</span>
+<span>    nir   <span class="op">=</span> <span class="st">"img/Ohuay_NIR.tif"</span>,</span>
+<span>    red   <span class="op">=</span> <span class="st">"img/Ohuay_R.tif"</span>,</span>
+<span>    green <span class="op">=</span> <span class="st">"img/Ohuay_G.tif"</span>,</span>
+<span>    stat  <span class="op">=</span> <span class="st">"mean"</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">indicators_sf</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="spatial-grid-executive-reporting-excel-export">3.6 Spatial Grid Executive Reporting &amp; Excel Export<a class="anchor" aria-label="anchor" href="#spatial-grid-executive-reporting-excel-export"></a>
 </h3>
 <p>We execute a comprehensive statistical report evaluating descriptive
 moments (mean, standard deviation, coefficient of variation, median,
-IQR), detecting spatial anomalies with Tukey fences
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>Q</mi><mn>25</mn></msub><mo>−</mo><mn>1.5</mn><mo>×</mo><mtext mathvariant="normal">IQR</mtext></mrow><annotation encoding="application/x-tex">Q_{25} - 1.5 \times \text{IQR}</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>Q</mi><mn>75</mn></msub><mo>+</mo><mn>1.5</mn><mo>×</mo><mtext mathvariant="normal">IQR</mtext></mrow><annotation encoding="application/x-tex">Q_{75} + 1.5 \times \text{IQR}</annotation></semantics></math>),
-and exporting directly to Excel:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Multi-moment executive summary aggregated by grid cell</span></span>
+IQR), micro-environmental composition (<code>pct_vegetation</code>,
+<code>pct_bare_soil</code>), and surveillance priorities per grid unit,
+exporting directly to Excel:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Multi-moment executive summary aggregated by grid cell (returns both $df and $sf)</span></span>
 <span><span class="va">grid_exec_summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_executive_summary.html">d4h_executive_summary</a></span><span class="op">(</span></span>
 <span>  raster_in   <span class="op">=</span> <span class="va">r_ndvi</span>,</span>
 <span>  by          <span class="op">=</span> <span class="st">"grid"</span>,</span>
 <span>  cell_size   <span class="op">=</span> <span class="fl">50</span>,</span>
 <span>  square      <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  out_xlsx    <span class="op">=</span> <span class="st">"salidas/Executive_Summary_Case02_Grids.xlsx"</span>,</span>
-<span>  sample_size <span class="op">=</span> <span class="fl">1000000</span>,</span>
 <span>  digits      <span class="op">=</span> <span class="fl">3</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Inspect report output</span></span>
-<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">grid_exec_summary</span><span class="op">)</span></span></code></pre></div>
-<pre class="text"><code>==============================================================================
-             DRONES4HEALTH - EXECUTIVE SUMMARY REPORT
-==============================================================================
-
- INDICATOR: NDVI
-------------------------------------------------------------------------------
- 1. SPATIAL COVERAGE AND RESOLUTION:
-    - Pixel Resolution    : 99.21 cm
-    - Surveyed Area       : 64.628 ha (646,276 m2)
-    - Evaluated Pixels    : 656,624 (36.5% valid footprint coverage)
-
- 2. GLOBAL DESCRIPTIVE STATISTICAL MOMENTS:
-    - Arithmetic Mean     : 0.238 (+/- 0.255 SD)
-    - Coeff. of Variation : 106.9 %
-    - Overall Range [Min,Max]: [-0.954, 0.99] (Span: 1.944)
-    - Median (Q50)        : 0.182
-    - Interquartile Range : [0.052, 0.399] (IQR: 0.347)
-    - Central 90% Span    : [-0.083, 0.716] (P05 - P95)
-
- 3. SPATIAL OUTLIER DIAGNOSTICS (TUKEY IQR):
-    - Tukey IQR Fences    : Lower &lt; -0.469 | Upper &gt; 0.92
-    - Outliers Detected   : 5,388 pixels (0.82% of valid pixels)
-    - Spatial Diagnostics : Homogeneous distribution (extreme values &lt; 1%)
-
- 4. THEMATIC STRATIFICATION &amp; SPATIAL EXTENT:
-    - Water / Substrate degradation (&lt; 0.0)     :  14.7 % (  9.53 ha)
-    - Bare soil / Sparse canopy [0.0, 0.2)      :  38.2 % ( 24.67 ha)
-    - Moderate vegetation / Transition [0.2, 0.5):  29.4 % ( 18.99 ha)
-    - Dense vegetation / High vigor [&gt;= 0.5)    :  17.7 % ( 11.44 ha)
-
-==============================================================================</code></pre>
+<span><span class="co"># Inspect clean tabular data frame ($df)</span></span>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">grid_exec_summary</span><span class="op">$</span><span class="va">df</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"grid_id"</span>, <span class="st">"area_m2"</span>, <span class="st">"pct_vegetation"</span>, <span class="st">"pct_bare_soil"</span>, <span class="st">"NDVI_mean"</span>, <span class="st">"NDVI_sd"</span>, <span class="st">"NDVI_median"</span>, <span class="st">"dominant_class"</span>, <span class="st">"surveillance_priority"</span><span class="op">)</span><span class="op">]</span>, <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
+<pre class="text"><code># A tibble: 5 × 9
+  grid_id area_m2 pct_vegetation pct_bare_soil NDVI_mean NDVI_sd NDVI_median dominant_class surveillance_priority
+  &lt;chr&gt;     &lt;dbl&gt;          &lt;dbl&gt;         &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;       &lt;dbl&gt; &lt;chr&gt;          &lt;chr&gt;                
+1 H0001     2165.           65.0          35.0    NA      NA          NA     Vegetation     Low                  
+2 H0002     2165.           65.0          35.0    NA      NA          NA     Vegetation     Low                  
+3 H0003     2165.           14.8          85.2     0.028   0.187       0.002 Bare Soil      Moderate             
+4 H0004     2165.           64.2          35.8     0.234   0.379       0.151 Vegetation     Low                  
+5 H0005     2165.           93.8           6.2     0.679   0.297       0.865 Vegetation     Low                  </code></pre>
 </div>
 <div class="section level3">
 <h3 id="cartographic-visualization-interactive-grid-mapping">3.6 Cartographic Visualization &amp; Interactive Grid Mapping<a class="anchor" aria-label="anchor" href="#cartographic-visualization-interactive-grid-mapping"></a>
@@ -321,7 +314,7 @@ and exporting directly to Excel:</p>
 <p>We visualize the operational grid units using the unified
 <code><a href="../reference/d4h_plot.html">d4h_plot()</a></code> function, switching between static and
 interactive modes:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 1. Publication-quality ggplot2 mapping of zonal indicators (interactive = FALSE)</span></span>
 <span><span class="va">p_grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_plot.html">d4h_plot</a></span><span class="op">(</span></span>
 <span>  x           <span class="op">=</span> <span class="va">grid_summary_ndvi</span>,</span>
@@ -353,7 +346,7 @@ surveillance cell independently, computing descriptive statistical
 moments (mean, standard deviation, coefficient of variation, median,
 IQR), detecting spatial Tukey anomalies per cell, and extracting
 granular percentage composition across environmental strata:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Execute zonal grid executive summary per 50m hexagonal cell</span></span>
 <span><span class="va">grid_exec_summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_executive_summary.html">d4h_executive_summary</a></span><span class="op">(</span></span>
 <span>  raster_in   <span class="op">=</span> <span class="va">r_ndvi</span>,</span>

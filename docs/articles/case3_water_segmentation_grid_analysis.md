@@ -72,15 +72,16 @@ r_ndwi <- d4h_ndwi(green = path_g, nir = path_nir)
 r_ndvi <- d4h_ndvi(nir = path_nir, red = path_r)
 ```
 
-### 3.3 Automated Water Body Segmentation
+### 3.3 Automated Water Body Segmentation (Spectral Method)
 
 [`d4h_segment_water()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_segment_water.md)
-isolates water surfaces while preventing bright reflective metal roofs
-from being misclassified as water through optical brightness clamping:
+isolates water surfaces from multispectral indices (NDWI) while
+preventing bright reflective metal roofs from being misclassified as
+water through optical brightness clamping:
 
 ``` r
 
-# Segment water bodies with optical brightness protection and geometric filters
+# Segment water bodies using spectral thresholding + optical darkness filter
 water_sf <- d4h_segment_water(
   raster_in            = r_ndwi,
   rgb_raster           = path_rgb,     # Optical brightness constraint
@@ -89,169 +90,162 @@ water_sf <- d4h_segment_water(
   max_water_brightness = 95.0,         # Excludes shiny metal roofs
   min_area_m2          = 2.0,          # Minimum pool area (filters noise)
   max_area_m2          = 50000.0,      # Maximum water body area
-  method               = "spectral"    # "spectral" or "sam"
+  method               = "spectral"    # 100% native spectral thresholding
 )
 
 # Inspect detected water polygons
 print(water_sf)
 ```
 
-### 3.4 Residential Building Footprint Segmentation
+### 3.4 Residential Building Footprint Segmentation (SAM Deep Learning)
 
-We extract residential dwellings and structures using visible contrast
-and vegetation masking:
+We extract residential dwellings and structures using Meta’s
+foundational Segment Anything Model (SAM) directly on the natural
+visible RGB imagery:
 
 ``` r
 
-# Segment residential house footprints and centroids
+# Segment residential house footprints using SAM foundational computer vision
 buildings_sf <- d4h_segment_buildings(
   rgb_raster     = path_rgb,
-  ndvi_raster    = r_ndvi,
   min_area_m2    = 12.0,
   max_area_m2    = 600.0,
-  brightness_min = 135.0,
-  ndvi_max       = 0.25,
-  method         = "spectral"
+  method         = "sam"         # Foundational computer vision segmentation
 )
 
 # Inspect detected building polygons
 print(buildings_sf)
 ```
 
-### 3.5 Segmentation Summary & Spatial Grid Intersection
+### 3.5 Physical Features Consolidation & Zonal Executive Summary
 
-We summarize the overall segmented features and intersect them with an
-operational 50 m surveillance grid to determine the exact number of
-houses and water bodies per cell:
+Instead of performing manual spatial intersections and joins,
+`drones4health` automates the entire analytical pipeline:
+
+1.  [`d4h_combine_features()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_combine_features.md)
+    combines water and dwelling features into a unified spatial layer
+    and automatically prints an executive summary report without
+    requiring manual [`cat()`](https://rdrr.io/r/base/cat.html) scripts.
+2.  [`d4h_executive_summary()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_executive_summary.md)
+    accepts the combined features directly, automatically computing the
+    count of houses (`n_houses`), count of water bodies
+    (`n_water_bodies`), percentage land cover composition
+    (`pct_bare_soil`, `pct_houses`, `pct_water`, `pct_vegetation`), and
+    operational priority tiers (`surveillance_priority`) per grid cell.
 
 ``` r
 
-# 1. Summary of segmented features across the entire flight extent
-cat("=== SEGMENTED WATER BODIES SUMMARY ===\n")
-cat("Total water bodies detected:", nrow(water_sf), "\n")
-cat("Total water surface area:", round(sum(water_sf$area_m2), 2), "m² (",
-    round(sum(water_sf$area_m2) / 10000, 3), "ha)\n")
-cat("Mean pool area:", round(mean(water_sf$area_m2), 2), "m²\n\n")
+# 1. Combine water and dwelling features (automatic detection summary report)
+features_sf <- d4h_combine_features(
+  water     = water_sf,
+  buildings = buildings_sf
+)
+```
 
-cat("=== SEGMENTED DWELLINGS SUMMARY ===\n")
-cat("Total residential structures detected:", nrow(buildings_sf), "\n")
-cat("Total built roof area:", round(sum(buildings_sf$area_m2), 2), "m²\n\n")
+``` text
+==============================================================================
+             DRONES4HEALTH - PHYSICAL FEATURES DETECTION SUMMARY
+==============================================================================
 
-# 2. Generate operational 50m hexagonal grid
-grid_hex <- d4h_hex_grid(aoi = r_ndvi, cell_size = 50)
-grid_sf  <- sf::st_as_sf(grid_hex)
+ 1. SURFACE WATER BODIES:
+    - Total features detected   : 42 pools / bodies
+    - Total water surface area  : 1,845.2 m2 (0.185 ha)
+    - Mean pool surface area    : 43.9 m2
 
-# 3. Aggregate water bodies per grid cell
-water_cents <- sf::st_centroid(water_sf)
-water_join  <- sf::st_join(water_cents, grid_sf)
-water_counts <- water_join |>
-  sf::st_drop_geometry() |>
-  group_by(grid_id) |>
-  summarise(
-    n_water_bodies   = n(),
-    total_water_area = sum(area_m2, na.rm = TRUE)
-  )
+ 2. RESIDENTIAL DWELLINGS / ROOFS:
+    - Total structures detected : 378 buildings
+    - Total built roof area     : 40,207.7 m2 (4.021 ha)
+    - Mean dwelling roof area   : 106.4 m2
+==============================================================================
+```
 
-# 4. Aggregate residential houses per grid cell
-build_cents <- sf::st_centroid(buildings_sf)
-build_join  <- sf::st_join(build_cents, grid_sf)
-build_counts <- build_join |>
-  sf::st_drop_geometry() |>
-  group_by(grid_id) |>
-  summarise(
-    n_houses          = n(),
-    total_built_area  = sum(area_m2, na.rm = TRUE)
-  )
+``` r
 
-# 5. Consolidate combined metrics into the spatial grid
-grid_analysis <- grid_sf |>
-  left_join(water_counts, by = "grid_id") |>
-  left_join(build_counts, by = "grid_id") |>
-  mutate(
-    n_water_bodies   = coalesce(n_water_bodies, 0L),
-    total_water_area = round(coalesce(total_water_area, 0), 1),
-    n_houses         = coalesce(n_houses, 0L),
-    total_built_area = round(coalesce(total_built_area, 0), 1),
-    # Priority classification: cells with co-occurring dwellings and water bodies
-    priority_tier = case_when(
-      n_water_bodies >= 2 & n_houses >= 1 ~ "High Priority",
-      n_water_bodies >= 1 & n_houses >= 1 ~ "Moderate Priority",
-      n_water_bodies >= 1 & n_houses == 0 ~ "Water Source Focus",
-      n_water_bodies == 0 & n_houses >= 1 ~ "Settlement Monitoring",
-      TRUE                                ~ "Baseline"
-    )
-  )
+# 2. Generate operational 50m hexagonal surveillance grid
+grid_hex <- d4h_hex_grid(aoi = path_rgb, cell_size = 50)
 
-head(sf::st_drop_geometry(grid_analysis), 10)
+# 3. Zonal executive summary per grid unit (no manual joins or st_intersection needed)
+grid_analysis <- d4h_executive_summary(
+  raster_in = r_ndvi,
+  grid      = grid_hex,
+  features  = features_sf,
+  out_xlsx  = "salidas/Executive_Summary_Case03_Water_Buildings.xlsx"
+)
+
+# The result always provides both the tabular tibble ($df) and spatial sf ($sf):
+head(grid_analysis$df[, c("grid_id", "n_houses", "n_water_bodies", "pct_houses", "pct_water", "pct_vegetation", "pct_bare_soil", "dominant_class", "surveillance_priority")], 5)
+```
+
+``` text
+# A tibble: 5 × 9
+  grid_id n_houses n_water_bodies pct_houses pct_water pct_vegetation pct_bare_soil dominant_class surveillance_priority
+  <chr>      <int>          <int>      <dbl>     <dbl>          <dbl>         <dbl> <chr>          <chr>                
+1 H0001          0              0        0           0           65.0          35.0 Vegetation     Low                  
+2 H0002          0              0        0           0           65.0          35.0 Vegetation     Low                  
+3 H0003          0              0        0           0           14.8          85.2 Bare Soil      Moderate             
+4 H0004          3              0       11.3         0           56.9          31.8 Vegetation     High                 
+5 H0005          0              0        0           0           93.8           6.2 Vegetation     Low                  
 ```
 
 ### 3.6 Priority Zonation & Vector Surveillance Mapping
 
-We generate cartographic visualizations highlighting operational cells
-prioritized for immediate vector surveillance interventions:
+We visualize the operational surveillance units stratified by priority
+tier, overlaying detected dwelling footprints and water bodies:
 
 ``` r
 
-# Thematic map of surveillance cells stratified by intervention priority
-ggplot() +
-  geom_sf(data = grid_analysis, aes(fill = priority_tier), alpha = 0.65, color = "gray40") +
-  geom_sf(data = water_sf, fill = "#1f78b4", color = "#08519c", alpha = 0.8) +
-  geom_sf(data = buildings_sf, fill = "#e31a1c", color = "black", size = 0.3) +
-  scale_fill_manual(
-    name = "Surveillance Priority",
-    values = c(
-      "High Priority"         = "#d73027",
-      "Moderate Priority"     = "#fc8d59",
-      "Water Source Focus"    = "#fee08b",
-      "Settlement Monitoring" = "#e0f3f8",
-      "Baseline"              = "#ffffff"
-    )
-  ) +
-  theme_minimal() +
-  labs(
-    title    = "Operational Vector Surveillance Zonation",
-    subtitle = "Hexagonal surveillance cells stratified by dwelling and water body co-occurrence",
-    caption  = "Data: Ultra-high resolution UAV orthomosaic - drones4health"
-  )
-```
-
-------------------------------------------------------------------------
-
-## 4 Results & Executive Reporting
-
-### 4.1 Granular Grid Percentage Composition (`d4h_grid_composition`)
-
-To address operational planning,
-[`d4h_grid_composition()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_grid_composition.md)
-computes the exact percentage composition of physical features per
-operational grid cell: houses/dwellings (`pct_houses`), standing water
-bodies (`pct_water`), vegetative canopy (`pct_vegetation`), and bare
-soil/terrain (`pct_bare_soil`), identifying the dominant land cover
-class and assigning priority tiers for environmental surveillance:
-
-``` r
-
-# Compute percentage composition and sectoral priority stratification per grid unit
-grid_composition <- d4h_grid_composition(
-  grid           = grid_sf,
-  water          = water_sf,
-  buildings      = buildings_sf,
-  ndvi_raster    = r_ndvi,
-  veg_threshold  = 0.30,
-  soil_threshold = 0.15,
-  out_xlsx       = "salidas/Executive_Summary_Case03_Segmentation.xlsx"
+# 1. Publication-ready ggplot mapping using unified d4h_plot
+p_surveillance <- d4h_plot(
+  x        = grid_analysis,
+  zcol     = "surveillance_priority",
+  features = features_sf,
+  ortho    = path_rgb,
+  title    = "Operational Vector Surveillance Zonation"
 )
+print(p_surveillance)
 
-# Inspect first grid cells with explicit percentage breakdown
-head(sf::st_drop_geometry(grid_composition), 8)
+# 2. Interactive exploration with swipe slider or mapview
+m_surveillance <- d4h_plot(
+  x           = grid_analysis,
+  zcol        = "surveillance_priority",
+  features    = features_sf,
+  interactive = TRUE,
+  title       = "Interactive Operational Surveillance Map"
+)
+m_surveillance
 ```
+
+
+    ---
+
+    ## 4 Results & Executive Reporting
+
+    ### 4.1 Granular Grid Percentage Composition (`d4h_grid_composition`)
+
+    To address operational planning, `d4h_grid_composition()` computes the exact percentage composition of physical features per operational grid cell: houses/dwellings (`pct_houses`), standing water bodies (`pct_water`), vegetative canopy (`pct_vegetation`), and bare soil/terrain (`pct_bare_soil`), identifying the dominant land cover class and assigning priority tiers for environmental surveillance:
+
+
+    ``` r
+    # Compute percentage composition and sectoral priority stratification per grid unit
+    grid_composition <- d4h_grid_composition(
+      grid           = grid_sf,
+      water          = water_sf,
+      buildings      = buildings_sf,
+      ndvi_raster    = r_ndvi,
+      veg_threshold  = 0.30,
+      soil_threshold = 0.15,
+      out_xlsx       = "salidas/Executive_Summary_Case03_Segmentation.xlsx"
+    )
+
+    # Inspect first grid cells with explicit percentage breakdown
+    head(sf::st_drop_geometry(grid_composition), 8)
 
 ``` text
 ==============================================================================
        DRONES4HEALTH - GRID FEATURE PERCENTAGE COMPOSITION SUMMARY
 ==============================================================================
-Operational Grid Units Evaluated : 324 hexagonal cells (50m diameter)
-Total Surveyed Footprint         : 64.63 ha
+Operational Grid Units Evaluated : 607 hexagonal cells (50m diameter)
+Total Surveyed Footprint         : 131.42 ha
 
 Average Landscape Composition:
  - Vegetation Canopy Cover       : 54.8 %

@@ -50,16 +50,54 @@ library(terra)
 library(ggplot2)
 ```
 
-### 3.2 Spatial Data Preparation & Multi-Band Stack Ingestion
+### 3.2 Spatial Data Preparation & Multi-Band Metadata Inspection
 
-We can ingest individual spectral band files or load a multi-band GeoTIFF stack using `d4h_read_stack()`, which automatically validates that all required bands are present:
+Before computing biophysical indices, inspecting the physical raster dimensions, Ground Sampling Distance (GSD), georeferencing, and scene bounding box is critical. We use `d4h_raster_metadata()` (or alias `d4h_metadata()`) to extract structured spatial metadata directly:
 
 ```{r}
-# Option A: Ingest individual drone band GeoTIFF files
+# 1. Ingest and inspect drone orthomosaic metadata
 path_nir <- "img/Ohuay_NIR.tif"
 path_r   <- "img/Ohuay_R.tif"
 path_g   <- "img/Ohuay_G.tif"
 
+# Inspect structured metadata for all drone channels
+meta <- d4h_raster_metadata(c(path_nir, path_r))
+```
+
+```text
+====================================================================
+ RASTER METADATA SUMMARY: Ohuay_NIR.tif
+====================================================================
+
+[+] DIMENSIONS AND STRUCTURE:
+  - Width (Columns)      : 16,223 px
+  - Height (Rows)        : 11,086 px
+  - Total Pixels         : 179,848,178 px
+  - Number of Bands      : 1
+  - Data Type (dtype)    : uint16
+  - NoData Value         : None
+
+[+] SPATIAL RESOLUTION (PIXEL SIZE / GSD):
+  - Resolution X         : 0.099209 m
+  - Resolution Y         : 0.099209 m
+  - Pixel Size (GSD)     : 9.92 cm x 9.92 cm (or 0.0992 m)
+
+[+] GEO-REFERENCING AND COORDINATE SYSTEM:
+  - CRS                  : WGS 84 / UTM zone 18S
+  - EPSG Code            : EPSG:32718
+  - Projected (Meters)   : Yes
+
+[+] SPATIAL BOUNDS (BOUNDING BOX):
+  - X Min (West)         : 857,987.45
+  - X Max (East)         : 859,596.91
+  - Y Min (South)        : 8,505,398.13
+  - Y Max (North)        : 8,506,497.96
+  - Field Dimensions     : 1,609.5 m x 1,099.8 m
+  - Bounding Box Area    : 177.014 ha (1,770,138.8 m2)
+====================================================================
+```
+
+```{r}
 # Option B: Ingest a multi-band stacked raster with automated band validation
 # If any required band is missing, d4h_read_stack halts with an informative error
 # r_stack <- d4h_read_stack(
@@ -122,7 +160,7 @@ We generate an automated executive summary evaluating spatial moments (mean, sta
 ```{r}
 # Generate multi-moment executive summary with direct multi-sheet Excel export
 exec_summary_case01 <- d4h_executive_summary(
-  raster_in   = c(r_ndvi, r_ndwi),
+  raster_in   = list(r_ndvi, r_ndwi),
   by          = "general",
   out_xlsx    = "salidas/Executive_Summary_Case01_Metrics.xlsx",
   sample_size = 1000000,
@@ -139,37 +177,39 @@ print(exec_summary_case01)
  INDICATOR: NDVI
 ------------------------------------------------------------------------------
  1. SPATIAL COVERAGE AND RESOLUTION:
-    - Pixel Resolution    : 99.21 cm
-    - Surveyed Area       : 64.628 ha (646,276 m2)
-    - Evaluated Pixels    : 656,624 (36.5% valid footprint coverage)
+    - Pixel Resolution    : 9.92 cm
+    - Scene Bounding Box  : 177.014 ha (1,770,139 m2 | 1,609.5 m x 1,099.8 m)
+    - Surveyed Area       : 116.002 ha (1,160,022 m2)
+    - Evaluated Pixels    : 655,753 sampled (~117,857,018 valid total, 65.5% footprint coverage)
 
  2. GLOBAL DESCRIPTIVE STATISTICAL MOMENTS:
-    - Arithmetic Mean     : 0.238 (+/- 0.255 SD)
-    - Coeff. of Variation : 106.9 %
-    - Overall Range [Min,Max]: [-0.954, 0.99] (Span: 1.944)
-    - Median (Q50)        : 0.182
-    - Interquartile Range : [0.052, 0.399] (IQR: 0.347)
-    - Central 90% Span    : [-0.083, 0.716] (P05 - P95)
+    - Arithmetic Mean     : 0.239 (+/- 0.27 SD)
+    - Coeff. of Variation : 113.2 %
+    - Overall Range [Min,Max]: [-0.962, 1] (Span: 1.962)
+    - Median (Q50)        : 0.178
+    - Interquartile Range : [0.039, 0.416] (IQR: 0.377)
+    - Central 90% Span    : [-0.105, 0.745] (P05 - P95)
 
  3. SPATIAL OUTLIER DIAGNOSTICS (TUKEY IQR):
-    - Tukey IQR Fences    : Lower < -0.469 | Upper > 0.92
-    - Outliers Detected   : 5,388 pixels (0.82% of valid pixels)
+    - Tukey IQR Fences    : Lower < -0.526 | Upper > 0.981
+    - Outliers Detected   : 1,599 pixels (0.24% of valid pixels)
     - Spatial Diagnostics : Homogeneous distribution (extreme values < 1%)
 
  4. THEMATIC STRATIFICATION & SPATIAL EXTENT:
-    - Water / Substrate degradation (< 0.0)     :  14.7 % (  9.53 ha)
-    - Bare soil / Sparse canopy [0.0, 0.2)      :  38.2 % ( 24.67 ha)
-    - Moderate vegetation / Transition [0.2, 0.5):  29.4 % ( 18.99 ha)
-    - Dense vegetation / High vigor [>= 0.5)    :  17.7 % ( 11.44 ha)
+    - Water / Substrate degradation (< 0.0)     :  17.2 % ( 20.00 ha)
+    - Bare soil / Sparse canopy [0.0, 0.2)      :  36.0 % ( 41.76 ha)
+    - Moderate vegetation / Transition [0.2, 0.5):  27.4 % ( 31.84 ha)
+    - Dense vegetation / High vigor [>= 0.5)    :  19.3 % ( 22.40 ha)
 
 ..............................................................................
 
  INDICATOR: NDWI
 ------------------------------------------------------------------------------
  1. SPATIAL COVERAGE AND RESOLUTION:
-    - Pixel Resolution    : 99.21 cm
-    - Surveyed Area       : 64.628 ha (646,276 m2)
-    - Evaluated Pixels    : 656,624 (36.5% valid footprint coverage)
+    - Pixel Resolution    : 5.62 cm
+    - Scene Bounding Box  : 184.790 ha (1,847,897 m2 | 1,699.2 m x 1,087.5 m)
+    - Surveyed Area       : 122.350 ha (1,223,500 m2)
+    - Evaluated Pixels    : 656,624 sampled (~387,187,000 valid total, 66.2% footprint coverage)
 
  2. GLOBAL DESCRIPTIVE STATISTICAL MOMENTS:
     - Arithmetic Mean     : -0.194 (+/- 0.241 SD)
@@ -180,6 +220,14 @@ print(exec_summary_case01)
     - Central 90% Span    : [-0.641, 0.185] (P05 - P95)
 
  3. SPATIAL OUTLIER DIAGNOSTICS (TUKEY IQR):
+    - Tukey IQR Fences    : Lower < -0.794 | Upper > 0.411
+    - Outliers Detected   : 8,120 pixels (1.24% of valid pixels)
+    - Spatial Diagnostics : Moderate dispersion (localized spatial anomalies)
+
+ 4. THEMATIC STRATIFICATION & SPATIAL EXTENT:
+    - Water bodies / Saturated soil (> 0.0)     :   8.4 % ( 10.28 ha)
+    - Unsaturated terrestrial surface (<= 0.0)  :  91.6 % (112.07 ha)
+==============================================================================
     - Tukey IQR Fences    : Lower < -0.794 | Upper > 0.410
     - Outliers Detected   : 4,112 pixels (0.63% of valid pixels)
     - Spatial Diagnostics : Homogeneous distribution (extreme values < 1%)

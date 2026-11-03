@@ -2,12 +2,9 @@
 % Please edit documentation in R/read_stack.R
 \name{d4h_read_stack}
 \alias{d4h_read_stack}
-\alias{d4h_load_stack}
 \title{Read and Validate Multi-Band Stack Raster}
 \usage{
 d4h_read_stack(file_path, required_bands = NULL, band_names = NULL)
-
-d4h_load_stack(file_path, required_bands = NULL, band_names = NULL)
 }
 \arguments{
 \item{file_path}{Character path or SpatRaster. File path to a multi-band GeoTIFF/raster file, or an existing SpatRaster object.}

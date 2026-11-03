@@ -77,8 +77,3 @@ d4h_read_stack <- function(file_path, required_bands = NULL, band_names = NULL) 
 
   r
 }
-
-#' @title Load Multi-Band Raster Stack (Alias)
-#' @rdname d4h_read_stack
-#' @export
-d4h_load_stack <- d4h_read_stack

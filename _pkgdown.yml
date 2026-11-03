@@ -137,25 +137,23 @@ reference:
       - d4h_iead
 
   - title: "Feature Segmentation & Spatial Proximity to Water"
-    desc: "Automated object segmentation of water bodies and residential building footprints from ultra-high resolution RGB imagery, with Euclidean distance to water modeling."
+    desc: "Automated object segmentation of water bodies and residential building footprints from ultra-high resolution RGB imagery, feature aggregation, and Euclidean distance to water modeling."
     contents:
       - d4h_segment_water
       - d4h_segment_buildings
+      - d4h_combine_features
       - d4h_distance_to_water
-      - d4h_distance_to_risk
       - d4h_raster_distance
 
   - title: "Spatial Grids & Zonation"
     desc: "Operational surveillance grids (hexagons/squares), grid-level distance-to-water proximity exposure modeling, land cover percentage composition, and zonal summary statistics extraction."
     contents:
+      - d4h_make_grid
       - d4h_hex_grid
       - d4h_grid_distance_to_water
       - d4h_grid_composition
       - d4h_summarize_grid
-      - d4h_summarize_general
       - d4h_raster_general
-      - d4h_summarize_global
-      - d4h_global_summary
 
   - title: "Interactive Mapping & Cartography"
     desc: "Interactive swipe comparison viewers with dynamic contrast tuning, buffer-targeted focal index rendering with house overlays, and static publication-quality ggplot2 cartography."
@@ -164,20 +162,18 @@ reference:
       - d4h_indicator_buffer
       - d4h_plot
 
-  - title: "Executive Reporting & Excel Export"
-    desc: "Multi-moment statistical summaries, Tukey outlier diagnostics, and direct multi-sheet Excel (.xlsx) workbook export."
+  - title: "Indicator Extraction, Executive Reporting & Excel Export"
+    desc: "Multi-indicator automated extraction, multi-moment statistical summaries, Tukey outlier diagnostics, and direct multi-sheet Excel (.xlsx) workbook export."
     contents:
+      - d4h_extract_indicators
       - d4h_executive_summary
-      - d4h_report
       - d4h_export_summary
 
   - title: "Preprocessing, Calibration & Utilities"
-    desc: "Surface reflectance scaling, thermal calibration to Celsius Land Surface Temperature, raster cleaning, and multi-band stack ingestion workflows."
+    desc: "Raster metadata inspection, surface reflectance scaling, thermal calibration to Celsius Land Surface Temperature, raster cleaning, and multi-band stack ingestion workflows."
     contents:
+      - d4h_raster_metadata
       - d4h_read_stack
-      - d4h_load_stack
       - d4h_normalize_reflectance
       - d4h_thermal_to_celsius
-      - d4h_clean_band
-      - d4h_process_mosaic
       - d4h_list_metrics

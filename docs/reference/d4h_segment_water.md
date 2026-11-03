@@ -9,10 +9,10 @@ NDVI) or RGB orthomosaics using spectral thresholding or Deep Learning
 
 ``` r
 d4h_segment_water(
-  raster_in,
+  raster_in = NULL,
   rgb_raster = NULL,
-  threshold = -0.05,
-  is_ndwi = FALSE,
+  threshold = NULL,
+  is_ndwi = NULL,
   max_water_brightness = 95,
   min_area_m2 = 2,
   max_area_m2 = 50000,
@@ -37,14 +37,16 @@ d4h_segment_water(
 
 - threshold:
 
-  Numeric. Spectral threshold for water delineation (default: -0.05 for
-  NDVI, 0.0 for NDWI).
+  Numeric (optional). Spectral threshold for water delineation. If
+  `NULL` (default), automatically set to `0.0` when `is_ndwi = TRUE` or
+  `-0.05` when `is_ndwi = FALSE`.
 
 - is_ndwi:
 
-  Logical. If TRUE, treats values \\\> \text{threshold}\\ as water; if
-  FALSE (default for NDVI), treats values \\\< \text{threshold}\\ as
-  water.
+  Logical (optional). If `TRUE`, treats values \\\> \text{threshold}\\
+  as water. If `FALSE`, treats values \\\< \text{threshold}\\ as water
+  (NDVI convention). If `NULL` (default), automatically detected from
+  the layer names or filename of `raster_in`.
 
 - max_water_brightness:
 
@@ -66,12 +68,16 @@ d4h_segment_water(
 
   Character. Segmentation algorithm: `"spectral"` (default, 100% native
   R Object-Based GeoAI) or `"sam"` (Meta Segment Anything Model via
-  reticulate/Python).
+  reticulate/Python). When `method = "sam"`, delineation is driven by
+  SAM on RGB imagery and filtered by `min_area_m2`, `max_area_m2`, and
+  `exclude_buildings`.
 
 - sam_checkpoint:
 
   Character path (optional). Path to SAM model weights (.pth) when
-  `method = "sam"`.
+  `method = "sam"`. If `NULL` (default), automatically checks the
+  internal package cache and downloads Meta's official ViT-B model (~375
+  MB) on first use.
 
 - exclude_buildings:
 
@@ -86,14 +92,32 @@ An `sf` POLYGON object with columns: `water_id`, `area_m2`,
 
 ## Details
 
-Water bodies are extracted by isolating negative NDVI or positive NDWI
-spectral signatures combined with low optical reflectance:
-\$\$\text{WaterMask} = \begin{cases} 1 & \text{if } (\text{NDWI} \>
-\theta\_{\text{water}} \text{ or } \text{NDVI} \< \theta\_{\text{veg}})
-\text{ and } \text{Brightness} \le \theta\_{\text{dark}} \\ 0 &
-\text{otherwise} \end{cases}\$\$ Extracted pixel clusters are converted
-to vector polygons (`sf`), with calculated surface area (\\\text{m}^2\\)
-and perimeter.
+Water bodies are extracted using two alternative methodologies:
+
+- **Spectral Thresholding (`method = "spectral"`):** Combines negative
+  NDVI or positive NDWI signatures with an optical darkness constraint:
+  \$\$\text{WaterMask} = \begin{cases} 1 & \text{if } (\text{NDWI} \>
+  \theta\_{\text{water}} \text{ or } \text{NDVI} \<
+  \theta\_{\text{veg}}) \text{ and } \text{Brightness} \le
+  \theta\_{\text{dark}} \\ 0 & \text{otherwise} \end{cases}\$\$
+  **Automatic Detection:** When `is_ndwi = NULL` (default), the function
+  inspects the layer name or filepath. If an NDWI/water index is
+  detected, it applies \\\text{threshold} = 0.0\\ (\\\> 0\\); if an
+  NDVI/vegetation index is detected, it applies \\\text{threshold} =
+  -0.05\\ (\\\< -0.05\\). Users can explicitly override
+  `is_ndwi = TRUE/FALSE` and `threshold`.
+
+- **Deep Learning (`method = "sam"`):** Utilizes Meta's Segment Anything
+  Model (SAM) via `reticulate`. Operates on natural visible RGB imagery
+  (`rgb_raster`) to delineate precise morphological water boundaries.
+  Spectral parameters (`threshold`, `is_ndwi`, `max_water_brightness`)
+  are bypassed in favor of visual feature extraction, filtering
+  candidates exclusively by `min_area_m2`, `max_area_m2`, and
+  `exclude_buildings`. Model weights (`sam_checkpoint`) are
+  automatically resolved and cached locally on first use.
+
+Extracted pixel clusters are converted to vector polygons (`sf`), with
+calculated surface area (\\\text{m}^2\\) and perimeter.
 
 ## Examples
 
@@ -110,11 +134,10 @@ if (interactive()) {
   houses_sf  <- st_read(system.file("extdata", "buildings.gpkg", package = "drones4health"))
 
   # Segment surface water bodies with brightness filtering and building exclusion
+  # (is_ndwi and threshold are auto-detected from ndwi_file)
   water_sf <- d4h_segment_water(
     raster_in            = ndwi_file,
     rgb_raster           = rgb_file,
-    threshold            = 0.0,
-    is_ndwi              = TRUE,
     max_water_brightness = 95.0,
     min_area_m2          = 2.0,
     max_area_m2          = 50000.0,

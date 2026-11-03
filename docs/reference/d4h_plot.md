@@ -18,11 +18,15 @@ For a single layer: `interactive = TRUE` produces an interactive
 
 ``` r
 d4h_plot(
-  x,
+  x = NULL,
   y = NULL,
   interactive = FALSE,
   grid = NULL,
   houses = NULL,
+  buildings = NULL,
+  water = NULL,
+  features = NULL,
+  water_color = "#00B0FF",
   houses_filter_extent = FALSE,
   house_color = "red",
   house_size = 2,
@@ -34,7 +38,8 @@ d4h_plot(
   title = NULL,
   max_pixels = 5e+05,
   zcol = NULL,
-  ortho = NULL
+  ortho = NULL,
+  general = FALSE
 )
 ```
 
@@ -65,7 +70,22 @@ d4h_plot(
 - houses:
 
   Optional sf, data.frame, SpatVector, or character path to CSV/Excel
-  containing house coordinates. Automatically plotted as points.
+  containing house coordinates. Automatically plotted as points or
+  polygons.
+
+- buildings:
+
+  Optional alias for `houses`. Accepts building footprint polygons
+  (`sf`) or centroids.
+
+- water:
+
+  Optional sf, SpatVector, or character path to delineate aquatic vector
+  breeding habitats or water bodies.
+
+- water_color:
+
+  Character. Fill color for water polygons (default: "#00B0FF").
 
 - houses_filter_extent:
 
@@ -124,6 +144,12 @@ d4h_plot(
   to render as an underlay base layer beneath grids, vectors, or point
   features.
 
+- general:
+
+  Logical. If TRUE, transforms continuous raster layers into homogeneous
+  mosaics filled with the overall global mean value across valid pixels
+  before plotting (default: FALSE).
+
 ## Value
 
 A `ggplot` object (if `interactive = FALSE`) or an interactive `mapview`
@@ -150,6 +176,10 @@ if (interactive()) {
   # 3. Single indicator: static map
   p_single <- d4h_plot(x = ndvi_file, interactive = FALSE)
   print(p_single)
+
+  # 4. Homogeneous general scene baseline plot
+  p_gen <- d4h_plot(x = ndvi_file, general = TRUE)
+  print(p_gen)
 }
 # }
 ```

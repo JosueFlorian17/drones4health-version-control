@@ -47,6 +47,24 @@ NULL
     sub <- terra::resample(sub, ref, method = "bilinear")
   }
 
+  # Normalización radiométrica automática si una banda es 8-bit (0-255) y la otra es 16-bit (0-65535)
+  max_ref <- suppressWarnings(terra::minmax(ref)[2, 1])
+  max_sub <- suppressWarnings(terra::minmax(sub)[2, 1])
+  if (is.na(max_ref) || is.infinite(max_ref) || is.na(max_sub) || is.infinite(max_sub)) {
+    s_ref <- terra::spatSample(ref, size = 500, na.rm = TRUE)
+    s_sub <- terra::spatSample(sub, size = 500, na.rm = TRUE)
+    max_ref <- if (nrow(s_ref) > 0) max(s_ref[, 1], na.rm = TRUE) else 1
+    max_sub <- if (nrow(s_sub) > 0) max(s_sub[, 1], na.rm = TRUE) else 1
+  }
+
+  if (max_ref > 1000 && max_sub <= 255) {
+    # ref es 16-bit, sub es 8-bit -> normalizar sub a la escala de ref
+    sub <- sub * (max_ref / 255)
+  } else if (max_sub > 1000 && max_ref <= 255) {
+    # sub es 16-bit, ref es 8-bit -> normalizar ref a la escala de sub
+    ref <- ref * (max_sub / 255)
+  }
+
   list(ref = ref, sub = sub)
 }
 
@@ -124,31 +142,4 @@ d4h_thermal_to_celsius <- function(thermal_raster, gain = 0.01, offset = -273.15
   res[is.infinite(res) | is.nan(res)] <- NA
   names(res) <- "LST_Celsius"
   res
-}
-
-#' @title Clean Raster Band Artefacts
-#' @description Replaces non-finite and zero values with NA and clamps the raster to valid bio-physical limits.
-#' @param raster_layer SpatRaster or character. Input band or path to file.
-#' @param min_val Numeric. Minimum valid value (default: -1).
-#' @param max_val Numeric. Maximum valid value (default: 1).
-#' @return A cleaned SpatRaster.
-#' @examples
-#' \donttest{
-#' if (interactive()) {
-#'   library(drones4health)
-#'   library(terra)
-#'
-#'   # Path to uncleaned index raster
-#'   idx_file <- system.file("extdata", "ndvi.tif", package = "drones4health")
-#'
-#'   # Clean invalid artefacts and clamp to valid range [-1, 1]
-#'   r_clean <- d4h_clean_band(raster_layer = idx_file, min_val = -1, max_val = 1)
-#'   print(r_clean)
-#' }
-#' }
-#' @export
-d4h_clean_band <- function(raster_layer, min_val = -1, max_val = 1) {
-  r <- .ensure_raster(raster_layer, mask_zeros = FALSE)
-  r[is.nan(r) | is.infinite(r) | r == 0] <- NA
-  terra::clamp(r, lower = min_val, upper = max_val)
 }

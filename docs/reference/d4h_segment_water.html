@@ -92,10 +92,10 @@
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">d4h_segment_water</span><span class="op">(</span></span>
-<span>  <span class="va">raster_in</span>,</span>
+<span>  raster_in <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  rgb_raster <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  threshold <span class="op">=</span> <span class="op">-</span><span class="fl">0.05</span>,</span>
-<span>  is_ndwi <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  threshold <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  is_ndwi <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  max_water_brightness <span class="op">=</span> <span class="fl">95</span>,</span>
 <span>  min_area_m2 <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  max_area_m2 <span class="op">=</span> <span class="fl">50000</span>,</span>
@@ -118,11 +118,11 @@
 
 
 <dt id="arg-threshold">threshold<a class="anchor" aria-label="anchor" href="#arg-threshold"></a></dt>
-<dd><p>Numeric. Spectral threshold for water delineation (default: -0.05 for NDVI, 0.0 for NDWI).</p></dd>
+<dd><p>Numeric (optional). Spectral threshold for water delineation. If <code>NULL</code> (default), automatically set to <code>0.0</code> when <code>is_ndwi = TRUE</code> or <code>-0.05</code> when <code>is_ndwi = FALSE</code>.</p></dd>
 
 
 <dt id="arg-is-ndwi">is_ndwi<a class="anchor" aria-label="anchor" href="#arg-is-ndwi"></a></dt>
-<dd><p>Logical. If TRUE, treats values \(&gt; \text{threshold}\) as water; if FALSE (default for NDVI), treats values \(&lt; \text{threshold}\) as water.</p></dd>
+<dd><p>Logical (optional). If <code>TRUE</code>, treats values \(&gt; \text{threshold}\) as water. If <code>FALSE</code>, treats values \(&lt; \text{threshold}\) as water (NDVI convention). If <code>NULL</code> (default), automatically detected from the layer names or filename of <code>raster_in</code>.</p></dd>
 
 
 <dt id="arg-max-water-brightness">max_water_brightness<a class="anchor" aria-label="anchor" href="#arg-max-water-brightness"></a></dt>
@@ -138,11 +138,11 @@
 
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
-<dd><p>Character. Segmentation algorithm: <code>"spectral"</code> (default, 100% native R Object-Based GeoAI) or <code>"sam"</code> (Meta Segment Anything Model via reticulate/Python).</p></dd>
+<dd><p>Character. Segmentation algorithm: <code>"spectral"</code> (default, 100% native R Object-Based GeoAI) or <code>"sam"</code> (Meta Segment Anything Model via reticulate/Python). When <code>method = "sam"</code>, delineation is driven by SAM on RGB imagery and filtered by <code>min_area_m2</code>, <code>max_area_m2</code>, and <code>exclude_buildings</code>.</p></dd>
 
 
 <dt id="arg-sam-checkpoint">sam_checkpoint<a class="anchor" aria-label="anchor" href="#arg-sam-checkpoint"></a></dt>
-<dd><p>Character path (optional). Path to SAM model weights (.pth) when <code>method = "sam"</code>.</p></dd>
+<dd><p>Character path (optional). Path to SAM model weights (.pth) when <code>method = "sam"</code>. If <code>NULL</code> (default), automatically checks the internal package cache and downloads Meta's official ViT-B model (~375 MB) on first use.</p></dd>
 
 
 <dt id="arg-exclude-buildings">exclude_buildings<a class="anchor" aria-label="anchor" href="#arg-exclude-buildings"></a></dt>
@@ -155,9 +155,11 @@
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Water bodies are extracted by isolating negative NDVI or positive NDWI spectral signatures combined with low optical reflectance:
+    <p>Water bodies are extracted using two alternative methodologies:</p><ul><li><p><strong>Spectral Thresholding (<code>method = "spectral"</code>):</strong> Combines negative NDVI or positive NDWI signatures with an optical darkness constraint:
 $$\text{WaterMask} = \begin{cases} 1 &amp; \text{if } (\text{NDWI} &gt; \theta_{\text{water}} \text{ or } \text{NDVI} &lt; \theta_{\text{veg}}) \text{ and } \text{Brightness} \le \theta_{\text{dark}} \\ 0 &amp; \text{otherwise} \end{cases}$$
-Extracted pixel clusters are converted to vector polygons (<code>sf</code>), with calculated surface area (\(\text{m}^2\)) and perimeter.</p>
+<strong>Automatic Detection:</strong> When <code>is_ndwi = NULL</code> (default), the function inspects the layer name or filepath. If an NDWI/water index is detected, it applies \(\text{threshold} = 0.0\) (\(&gt; 0\)); if an NDVI/vegetation index is detected, it applies \(\text{threshold} = -0.05\) (\(&lt; -0.05\)). Users can explicitly override <code>is_ndwi = TRUE/FALSE</code> and <code>threshold</code>.</p></li>
+<li><p><strong>Deep Learning (<code>method = "sam"</code>):</strong> Utilizes Meta's Segment Anything Model (SAM) via <code>reticulate</code>. Operates on natural visible RGB imagery (<code>rgb_raster</code>) to delineate precise morphological water boundaries. Spectral parameters (<code>threshold</code>, <code>is_ndwi</code>, <code>max_water_brightness</code>) are bypassed in favor of visual feature extraction, filtering candidates exclusively by <code>min_area_m2</code>, <code>max_area_m2</code>, and <code>exclude_buildings</code>. Model weights (<code>sam_checkpoint</code>) are automatically resolved and cached locally on first use.</p></li>
+</ul><p>Extracted pixel clusters are converted to vector polygons (<code>sf</code>), with calculated surface area (\(\text{m}^2\)) and perimeter.</p>
     </div>
 
     <div class="section level2">
@@ -174,11 +176,10 @@ Extracted pixel clusters are converted to vector polygons (<code>sf</code>), wit
 <span class="r-in"><span>  <span class="va">houses_sf</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">st_read</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"buildings.gpkg"</span>, package <span class="op">=</span> <span class="st">"drones4health"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># Segment surface water bodies with brightness filtering and building exclusion</span></span></span>
+<span class="r-in"><span>  <span class="co"># (is_ndwi and threshold are auto-detected from ndwi_file)</span></span></span>
 <span class="r-in"><span>  <span class="va">water_sf</span> <span class="op">&lt;-</span> <span class="fu">d4h_segment_water</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    raster_in            <span class="op">=</span> <span class="va">ndwi_file</span>,</span></span>
 <span class="r-in"><span>    rgb_raster           <span class="op">=</span> <span class="va">rgb_file</span>,</span></span>
-<span class="r-in"><span>    threshold            <span class="op">=</span> <span class="fl">0.0</span>,</span></span>
-<span class="r-in"><span>    is_ndwi              <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>    max_water_brightness <span class="op">=</span> <span class="fl">95.0</span>,</span></span>
 <span class="r-in"><span>    min_area_m2          <span class="op">=</span> <span class="fl">2.0</span>,</span></span>
 <span class="r-in"><span>    max_area_m2          <span class="op">=</span> <span class="fl">50000.0</span>,</span></span>

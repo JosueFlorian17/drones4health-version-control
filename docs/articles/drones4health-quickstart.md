@@ -71,7 +71,7 @@ res_buffer <- d4h_indicator_buffer(
 )
 
 # Distance decay risk modeling to water bodies
-risk_houses <- d4h_distance_to_risk(
+risk_houses <- d4h_distance_to_water(
   buildings    = res_buffer$houses,
   sources      = water_bodies,
   decay_lambda = 100.0

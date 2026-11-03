@@ -28,7 +28,7 @@ d4h_grid_distance_to_water(
 An \code{sf} object containing the grid cells with appended columns: \code{dist_water_m}, \code{nearest_water_id}, \code{proximity_score}, and \code{proximity_level}.
 }
 \description{
-Computes the minimum Euclidean distance from each operational grid cell (square or hexagonal) to the nearest water body or aquatic habitat, calculates exponential proximity exposure scores in \link{0, 1}, and stratifies grid units into operational priority tiers.
+Computes the minimum Euclidean distance from each operational grid cell (square or hexagonal) to the nearest water body or aquatic habitat, calculates exponential proximity exposure scores in \code{[0, 1]}, and stratifies grid units into operational priority tiers.
 }
 \details{
 Evaluates spatial exposure at the operational territorial level:

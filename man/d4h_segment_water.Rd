@@ -5,10 +5,10 @@
 \title{Segment Water Bodies and Surface Moisture Pools}
 \usage{
 d4h_segment_water(
-  raster_in,
+  raster_in = NULL,
   rgb_raster = NULL,
-  threshold = -0.05,
-  is_ndwi = FALSE,
+  threshold = NULL,
+  is_ndwi = NULL,
   max_water_brightness = 95,
   min_area_m2 = 2,
   max_area_m2 = 50000,
@@ -22,9 +22,9 @@ d4h_segment_water(
 
 \item{rgb_raster}{SpatRaster or character path (optional). RGB orthomosaic to enforce optical darkness constraint (water absorbs visible light, while shiny metal/calamina roofs reflect high brightness).}
 
-\item{threshold}{Numeric. Spectral threshold for water delineation (default: -0.05 for NDVI, 0.0 for NDWI).}
+\item{threshold}{Numeric (optional). Spectral threshold for water delineation. If \code{NULL} (default), automatically set to \code{0.0} when \code{is_ndwi = TRUE} or \code{-0.05} when \code{is_ndwi = FALSE}.}
 
-\item{is_ndwi}{Logical. If TRUE, treats values \eqn{> \text{threshold}} as water; if FALSE (default for NDVI), treats values \eqn{< \text{threshold}} as water.}
+\item{is_ndwi}{Logical (optional). If \code{TRUE}, treats values \eqn{> \text{threshold}} as water. If \code{FALSE}, treats values \eqn{< \text{threshold}} as water (NDVI convention). If \code{NULL} (default), automatically detected from the layer names or filename of \code{raster_in}.}
 
 \item{max_water_brightness}{Numeric. Maximum allowable mean RGB brightness \eqn{[0, 255]} for water (default: 95.0). Prevents metal roofs and concrete from being classified as water.}
 
@@ -32,9 +32,9 @@ d4h_segment_water(
 
 \item{max_area_m2}{Numeric. Maximum water body surface area in square meters to retain (default: 50000.0).}
 
-\item{method}{Character. Segmentation algorithm: \code{"spectral"} (default, 100\% native R Object-Based GeoAI) or \code{"sam"} (Meta Segment Anything Model via reticulate/Python).}
+\item{method}{Character. Segmentation algorithm: \code{"spectral"} (default, 100\% native R Object-Based GeoAI) or \code{"sam"} (Meta Segment Anything Model via reticulate/Python). When \code{method = "sam"}, delineation is driven by SAM on RGB imagery and filtered by \code{min_area_m2}, \code{max_area_m2}, and \code{exclude_buildings}.}
 
-\item{sam_checkpoint}{Character path (optional). Path to SAM model weights (.pth) when \code{method = "sam"}.}
+\item{sam_checkpoint}{Character path (optional). Path to SAM model weights (.pth) when \code{method = "sam"}. If \code{NULL} (default), automatically checks the internal package cache and downloads Meta's official ViT-B model (~375 MB) on first use.}
 
 \item{exclude_buildings}{\code{sf} POLYGON object (optional). Residential buildings, roofs, or structures to strictly exclude from water bodies to prevent metal/calamina roofs from being misclassified as water.}
 }
@@ -45,8 +45,13 @@ An \code{sf} POLYGON object with columns: \code{water_id}, \code{area_m2}, \code
 Detects, delineates, and vectorizes surface water bodies, irrigation trenches, and micro-pooling zones from multispectral indices (NDWI / NDVI) or RGB orthomosaics using spectral thresholding or Deep Learning (SAM).
 }
 \details{
-Water bodies are extracted by isolating negative NDVI or positive NDWI spectral signatures combined with low optical reflectance:
+Water bodies are extracted using two alternative methodologies:
+\itemize{
+\item \strong{Spectral Thresholding (\code{method = "spectral"}):} Combines negative NDVI or positive NDWI signatures with an optical darkness constraint:
 \deqn{\text{WaterMask} = \begin{cases} 1 & \text{if } (\text{NDWI} > \theta_{\text{water}} \text{ or } \text{NDVI} < \theta_{\text{veg}}) \text{ and } \text{Brightness} \le \theta_{\text{dark}} \\ 0 & \text{otherwise} \end{cases}}
+\strong{Automatic Detection:} When \code{is_ndwi = NULL} (default), the function inspects the layer name or filepath. If an NDWI/water index is detected, it applies \eqn{\text{threshold} = 0.0} (\eqn{> 0}); if an NDVI/vegetation index is detected, it applies \eqn{\text{threshold} = -0.05} (\eqn{< -0.05}). Users can explicitly override \code{is_ndwi = TRUE/FALSE} and \code{threshold}.
+\item \strong{Deep Learning (\code{method = "sam"}):} Utilizes Meta's Segment Anything Model (SAM) via \code{reticulate}. Operates on natural visible RGB imagery (\code{rgb_raster}) to delineate precise morphological water boundaries. Spectral parameters (\code{threshold}, \code{is_ndwi}, \code{max_water_brightness}) are bypassed in favor of visual feature extraction, filtering candidates exclusively by \code{min_area_m2}, \code{max_area_m2}, and \code{exclude_buildings}. Model weights (\code{sam_checkpoint}) are automatically resolved and cached locally on first use.
+}
 Extracted pixel clusters are converted to vector polygons (\code{sf}), with calculated surface area (\eqn{\text{m}^2}) and perimeter.
 }
 \examples{
@@ -62,11 +67,10 @@ if (interactive()) {
   houses_sf  <- st_read(system.file("extdata", "buildings.gpkg", package = "drones4health"))
 
   # Segment surface water bodies with brightness filtering and building exclusion
+  # (is_ndwi and threshold are auto-detected from ndwi_file)
   water_sf <- d4h_segment_water(
     raster_in            = ndwi_file,
     rgb_raster           = rgb_file,
-    threshold            = 0.0,
-    is_ndwi              = TRUE,
     max_water_brightness = 95.0,
     min_area_m2          = 2.0,
     max_area_m2          = 50000.0,

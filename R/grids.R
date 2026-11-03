@@ -1,77 +1,41 @@
-#' @title Summarize Raster Indicator by Spatial Grid
-#' @description Generates a square or hexagonal spatial grid and extracts zonal summary statistics (mean, quantiles) of raster indicators per grid cell.
-#' @details Zonal extraction aggregates high-resolution pixel values into operational territorial units:
-#' \deqn{\bar{x}_k = \frac{1}{N_k} \sum_{i \in \text{Cell}_k} x_i}
-#' Empty grid cells outside the valid flight footprint are automatically pruned when \code{discard_na = TRUE}.
+#' @title Summarize Raster Indicator by Spatial Grid or General Footprint (Deprecated)
+#' @description This function is deprecated in favor of \code{\link{d4h_executive_summary}} with \code{grid = ...} or \code{by = "grid"}.
+#' Generates a square or hexagonal spatial grid and extracts zonal summary statistics of raster indicators per grid cell.
 #' @param raster_in SpatRaster or character. Input raster layer, stack, or path to file.
-#' @param cell_size Numeric. Grid cell size / diameter in meters (default: 20).
-#' @param square Logical. If TRUE, creates square cells; if FALSE, hexagonal cells (default: TRUE).
-#' @param discard_na Logical. If TRUE, removes grid cells outside the valid raster data area (default: TRUE).
-#' @return A SpatVector containing the grid cells with extracted mean values.
-#' @references
-#' Birch, C. P., Oom, S. P., & Beecham, J. A. (2007). Rectangular and hexagonal grids used for observation, experiment and simulation in ecology. \emph{Ecological Modelling}, 206(3-4), 347-359. \doi{10.1016/j.ecolmodel.2007.03.041}
-#' @examples
-#' \donttest{
-#' if (interactive()) {
-#'   library(drones4health)
-#'   library(terra)
-#'
-#'   # Load continuous indicator raster
-#'   ndvi_file <- system.file("extdata", "ndvi.tif", package = "drones4health")
-#'
-#'   # Aggregate NDVI values into a 50m hexagonal surveillance grid
-#'   grid_summary <- d4h_summarize_grid(
-#'     raster_in = ndvi_file,
-#'     cell_size = 50,
-#'     square = FALSE,
-#'     discard_na = TRUE
-#'   )
-#'   head(grid_summary)
-#' }
-#' }
+#' @param cell_size Numeric. Grid cell size / diameter in meters (default: 20). Ignored when \code{general = TRUE}.
+#' @param square Logical. If TRUE, creates square cells; if FALSE, hexagonal cells (default: TRUE). Ignored when \code{general = TRUE}.
+#' @param discard_na Logical. If TRUE, removes grid cells outside the valid raster data area (default: TRUE). Ignored when \code{general = TRUE}.
+#' @param general Logical. If TRUE, computes the overall mean value of raster layers across the entire area of interest as a single spatial vector polygon (SpatVector) with \code{grid_id = "GENERAL"} (default: FALSE).
+#' @param exact_boundary Logical. When \code{general = TRUE}, if TRUE, traces the exact outer boundary of valid non-NA flight data; if FALSE, uses the bounding box extent (default: TRUE).
+#' @return A SpatVector or sf containing the grid cells (or single general footprint polygon) with extracted values.
 #' @export
-d4h_summarize_grid <- function(raster_in, cell_size = 20, square = TRUE, discard_na = TRUE) {
-  r <- if (is.character(raster_in) && length(raster_in) == 1L) {
-    if (!file.exists(raster_in)) stop(paste("File not found:", raster_in), call. = FALSE)
-    terra::rast(raster_in)
-  } else if (inherits(raster_in, "SpatRaster")) {
-    raster_in
+d4h_summarize_grid <- function(raster_in, cell_size = 20, square = TRUE, discard_na = TRUE, general = FALSE, exact_boundary = TRUE) {
+  .Deprecated("d4h_executive_summary", package = "drones4health",
+              msg = "'d4h_summarize_grid' is deprecated. Please use 'd4h_executive_summary(raster_in, by = 'grid')' or provide 'grid' directly.")
+  if (isTRUE(general)) {
+    d4h_executive_summary(raster_in = raster_in, by = "general")
   } else {
-    stop("'raster_in' must be a SpatRaster object or a valid file path string.", call. = FALSE)
+    d4h_executive_summary(raster_in = raster_in, by = "grid", cell_size = cell_size, square = square)
   }
-
-  boundary_sf <- sf::st_as_sf(terra::as.polygons(terra::ext(r), crs = terra::crs(r)))
-  grid_sf <- sf::st_make_grid(boundary_sf, cellsize = cell_size, square = square)
-
-  prefix <- if (square) "G%04d" else "H%04d"
-  grid_sf <- sf::st_sf(
-    grid_id = sprintf(prefix, seq_along(grid_sf)),
-    geometry = grid_sf
-  )
-  grid_vect <- terra::vect(grid_sf)
-
-  summary_vect <- terra::extract(r, grid_vect, fun = mean, na.rm = TRUE, bind = TRUE)
-
-  if (discard_na) {
-    first_layer <- names(r)[1]
-    vals <- summary_vect[[first_layer]][, 1]
-    summary_vect <- summary_vect[!is.na(vals) & !is.nan(vals) & vals != 0, ]
-  }
-
-  summary_vect
 }
 
-#' @title Generate Hexagonal Surveillance Grid
-#' @description Creates an operative hexagonal surveillance grid with unique alphanumeric identifiers over an Area of Interest (AOI).
+#' @title Generate Operational Spatial Surveillance Grid (Square or Hexagonal)
+#' @description Creates an operational spatial surveillance grid with unique alphanumeric identifiers over an Area of Interest (AOI).
+#' Sizing can be strictly configured using exactly one of three mutually exclusive parameters: \code{cell_size} (diameter/width in meters),
+#' \code{area_m2} (individual cell area in square meters), or \code{n_cells} (target total number of cells over the AOI).
 #' @details Hexagonal spatial partitions minimize perimeter-to-area ratio and provide equidistant neighborhood connectivity:
-#' \deqn{A_{\text{hex}} = \frac{3\sqrt{3}}{2} r^2}
-#' Ideal for vector control teams, larviciding deployments, and spatial health sampling.
+#' \deqn{A_{\text{hex}} = \frac{\sqrt{3}}{2} D^2 \approx 0.866 \times D^2}
+#' where \eqn{D} is the flat-to-flat diameter (\code{cell_size}). Square partitions use \eqn{A_{\text{sq}} = D^2}.
 #' By default, cells are clipped strictly to the valid non-NA flight footprint of the raster or polygon boundaries (\code{clip_to_footprint = TRUE})
 #' to prevent artificial bounding-box grid padding outside the surveyed area.
 #' @param aoi SpatRaster, SpatVector, sf, or character path defining the spatial bounds or mosaic.
-#' @param cell_size Numeric. Hexagon diameter in meters (default: 50).
+#' @param cell_size Numeric (optional). Cell size / diameter in meters (e.g. 50).
+#' @param area_m2 Numeric (optional). Target cell area in square meters (e.g. 2500 for a 50x50m equivalent cell).
+#' @param n_cells Numeric / Integer (optional). Desired total number of grid cells distributed across the AOI footprint.
+#' @param square Logical. If TRUE, creates square cells; if FALSE, creates regular hexagonal cells (default: FALSE).
 #' @param clip_to_footprint Logical. If TRUE (default), restricts grid cells strictly to the valid non-NA flight footprint of the input raster or polygon boundaries.
-#' @return A SpatVector containing the hexagonal grid polygons with unique IDs.
+#' @param as_sf Logical. If TRUE (default), returns an \code{sf} object; if FALSE, returns a \code{terra::SpatVector}.
+#' @return An \code{sf} or \code{SpatVector} containing the grid polygons with unique IDs (\code{grid_id}) and individual cell area (\code{area_m2}).
 #' @references
 #' Carr, D. B., Olsen, A. R., & White, D. (1992). Hexagon mosaic maps for display of univariate and bivariate data. \emph{Cartography and Geographic Information Systems}, 19(4), 228-236. \doi{10.1559/152304092783721231}
 #' @examples
@@ -80,16 +44,40 @@ d4h_summarize_grid <- function(raster_in, cell_size = 20, square = TRUE, discard
 #'   library(drones4health)
 #'   library(terra)
 #'
-#'   # Define Area of Interest raster
 #'   aoi_file <- system.file("extdata", "ortho_rgb.tif", package = "drones4health")
 #'
-#'   # Create hexagonal grid cells with 50-meter diameter clipped to flight footprint
-#'   hex_grid <- d4h_hex_grid(aoi = aoi_file, cell_size = 50, clip_to_footprint = TRUE)
-#'   plot(hex_grid)
+#'   # Option 1: By diameter/cell_size (50 meters)
+#'   grid1 <- d4h_make_grid(aoi = aoi_file, cell_size = 50, square = FALSE)
+#'
+#'   # Option 2: By target cell area (2,500 m2 per cell)
+#'   grid2 <- d4h_make_grid(aoi = aoi_file, area_m2 = 2500, square = FALSE)
+#'
+#'   # Option 3: By desired total number of cells (~100 cells)
+#'   grid3 <- d4h_make_grid(aoi = aoi_file, n_cells = 100, square = FALSE)
 #' }
 #' }
 #' @export
-d4h_hex_grid <- function(aoi, cell_size = 50, clip_to_footprint = TRUE) {
+d4h_make_grid <- function(aoi,
+                          cell_size = NULL,
+                          area_m2 = NULL,
+                          n_cells = NULL,
+                          square = FALSE,
+                          clip_to_footprint = TRUE,
+                          as_sf = TRUE) {
+  # 1. Validate mutually exclusive sizing parameters
+  modes <- c(
+    cell_size = !is.null(cell_size),
+    area_m2   = !is.null(area_m2),
+    n_cells   = !is.null(n_cells)
+  )
+  if (sum(modes) > 1L) {
+    stop("Please specify exactly ONE sizing method: 'cell_size', 'area_m2', or 'n_cells'.", call. = FALSE)
+  }
+  if (sum(modes) == 0L) {
+    cell_size <- 50
+  }
+
+  # 2. Parse AOI input
   if (is.character(aoi) && length(aoi) == 1L) {
     if (!file.exists(aoi)) stop(paste("File not found:", aoi), call. = FALSE)
     aoi <- tryCatch(sf::st_read(aoi, quiet = TRUE), error = function(e) terra::rast(aoi))
@@ -120,7 +108,35 @@ d4h_hex_grid <- function(aoi, cell_size = 50, clip_to_footprint = TRUE) {
     stop("'aoi' must be a SpatRaster, SpatVector, sf object, or valid file path.", call. = FALSE)
   }
 
-  grid_raw <- sf::st_make_grid(boundary_sf, cellsize = cell_size, square = FALSE)
+  aoi_total_area_m2 <- as.numeric(sum(sf::st_area(boundary_sf)))
+
+  # 3. Calculate target diameter / cellsize
+  if (isTRUE(square)) {
+    if (!is.null(cell_size)) {
+      target_d <- as.numeric(cell_size)
+    } else if (!is.null(area_m2)) {
+      target_d <- sqrt(as.numeric(area_m2))
+    } else {
+      target_d <- sqrt(aoi_total_area_m2 / as.numeric(n_cells))
+    }
+  } else {
+    # Hexagonal geometry: Area = (sqrt(3)/2) * D^2  =>  D = sqrt(2 * Area / sqrt(3))
+    if (!is.null(cell_size)) {
+      target_d <- as.numeric(cell_size)
+    } else if (!is.null(area_m2)) {
+      target_d <- sqrt((2 * as.numeric(area_m2)) / sqrt(3))
+    } else {
+      target_cell_area <- aoi_total_area_m2 / as.numeric(n_cells)
+      target_d <- sqrt((2 * target_cell_area) / sqrt(3))
+    }
+  }
+
+  if (target_d <= 0 || is.na(target_d) || is.infinite(target_d)) {
+    stop("Calculated grid cell size must be a positive finite number.", call. = FALSE)
+  }
+
+  # 4. Generate spatial grid
+  grid_raw <- sf::st_make_grid(boundary_sf, cellsize = target_d, square = square)
   grid_sf <- sf::st_sf(geometry = grid_raw)
 
   if (isTRUE(clip_to_footprint) && !is.null(boundary_sf)) {
@@ -129,66 +145,84 @@ d4h_hex_grid <- function(aoi, cell_size = 50, clip_to_footprint = TRUE) {
     grid_sf <- grid_sf[keep, ]
   }
 
-  grid_sf$grid_id <- sprintf("H%04d", seq_len(nrow(grid_sf)))
-  terra::vect(grid_sf)
+  prefix <- if (isTRUE(square)) "S" else "H"
+  grid_sf$grid_id <- sprintf(paste0(prefix, "%04d"), seq_len(nrow(grid_sf)))
+  grid_sf$area_m2 <- round(as.numeric(sf::st_area(grid_sf)), 1)
+
+  # 5. Output informative console summary
+  n_generated    <- nrow(grid_sf)
+  mean_cell_area <- round(mean(grid_sf$area_m2), 1)
+  footprint_ha   <- round(sum(grid_sf$area_m2) / 10000, 2)
+  grid_type      <- if (isTRUE(square)) "Square" else "Hexagonal"
+
+  message(sprintf("✔ %s grid generated: %d cells | Cell area: %.1f m\u00b2 | Cell size: %.1f m | Footprint: %.2f ha",
+                  grid_type, n_generated, mean_cell_area, target_d, footprint_ha))
+
+  if (isTRUE(as_sf)) {
+    grid_sf
+  } else {
+    terra::vect(grid_sf)
+  }
 }
 
-#' @title Summarize Raster Indicator for the General Mosaic Footprint
-#' @description Computes the overall mean value of raster layers across the entire area of interest (AOI) as a single spatial vector polygon (SpatVector), formatted identically to zonal grid summaries for consistent map plotting.
-#' @param raster_in SpatRaster or character. Input raster layer, stack, or path to file.
-#' @param exact_boundary Logical. If TRUE, traces the exact outer boundary of valid non-NA flight data; if FALSE, uses the bounding box extent (default: TRUE).
-#' @return A SpatVector with a single polygon containing the overall mean value(s).
+#' @title Generate Hexagonal Surveillance Grid
+#' @description Creates an operative hexagonal surveillance grid with unique alphanumeric identifiers over an Area of Interest (AOI).
+#' Sizing can be strictly configured using exactly one of three mutually exclusive parameters: \code{cell_size} (diameter in meters),
+#' \code{area_m2} (individual cell area in square meters), or \code{n_cells} (target total number of cells over the AOI).
+#' @details Hexagonal spatial partitions minimize perimeter-to-area ratio and provide equidistant neighborhood connectivity:
+#' \deqn{A_{\text{hex}} = \frac{\sqrt{3}}{2} D^2 \approx 0.866 \times D^2}
+#' Ideal for vector control teams, larviciding deployments, and spatial health sampling.
+#' By default, cells are clipped strictly to the valid non-NA flight footprint of the raster or polygon boundaries (\code{clip_to_footprint = TRUE})
+#' to prevent artificial bounding-box grid padding outside the surveyed area.
+#' @param aoi SpatRaster, SpatVector, sf, or character path defining the spatial bounds or mosaic.
+#' @param cell_size Numeric (optional). Hexagon diameter in meters (default: 50 if all size options are NULL).
+#' @param area_m2 Numeric (optional). Target cell area in square meters.
+#' @param n_cells Numeric / Integer (optional). Desired total number of grid cells across the AOI.
+#' @param clip_to_footprint Logical. If TRUE (default), restricts grid cells strictly to the valid non-NA flight footprint of the input raster or polygon boundaries.
+#' @param as_sf Logical. If TRUE (default), returns an \code{sf} object; if FALSE, returns a \code{terra::SpatVector}.
+#' @return An \code{sf} or \code{SpatVector} containing the hexagonal grid polygons with unique IDs (\code{grid_id}).
+#' @references
+#' Carr, D. B., Olsen, A. R., & White, D. (1992). Hexagon mosaic maps for display of univariate and bivariate data. \emph{Cartography and Geographic Information Systems}, 19(4), 228-236. \doi{10.1559/152304092783721231}
 #' @examples
 #' \donttest{
 #' if (interactive()) {
 #'   library(drones4health)
 #'   library(terra)
 #'
-#'   # Load environmental index raster
-#'   twi_file <- system.file("extdata", "twi.tif", package = "drones4health")
+#'   # Define Area of Interest raster
+#'   aoi_file <- system.file("extdata", "ortho_rgb.tif", package = "drones4health")
 #'
-#'   # Extract overall mean across the flight mosaic footprint
-#'   gen_summary <- d4h_summarize_general(raster_in = twi_file, exact_boundary = TRUE)
-#'   print(gen_summary)
+#'   # Create hexagonal grid cells with 50-meter diameter clipped to flight footprint
+#'   hex_grid <- d4h_hex_grid(aoi = aoi_file, cell_size = 50, clip_to_footprint = TRUE)
+#'   plot(hex_grid)
 #' }
 #' }
 #' @export
+d4h_hex_grid <- function(aoi,
+                         cell_size = NULL,
+                         area_m2 = NULL,
+                         n_cells = NULL,
+                         clip_to_footprint = TRUE,
+                         as_sf = TRUE) {
+  d4h_make_grid(
+    aoi               = aoi,
+    cell_size         = cell_size,
+    area_m2           = area_m2,
+    n_cells           = n_cells,
+    square            = FALSE,
+    clip_to_footprint = clip_to_footprint,
+    as_sf             = as_sf
+  )
+}
+
+#' @rdname d4h_summarize_grid
+#' @export
 d4h_summarize_general <- function(raster_in, exact_boundary = TRUE) {
-  r <- if (is.character(raster_in) && length(raster_in) == 1L) {
-    if (!file.exists(raster_in)) stop(paste("File not found:", raster_in), call. = FALSE)
-    terra::rast(raster_in)
-  } else if (inherits(raster_in, "SpatRaster")) {
-    raster_in
-  } else {
-    stop("'raster_in' must be a SpatRaster object or a valid file path string.", call. = FALSE)
-  }
-
-  boundary_vect <- if (exact_boundary) {
-    r1 <- r[[1]]
-    total_cells <- terra::ncell(r1)
-    agg_fact <- if (total_cells > 100000) ceiling(sqrt(total_cells / 50000)) else 1
-    r_agg <- if (agg_fact > 1) {
-      terra::aggregate(!is.na(r1) & r1 != 0, fact = agg_fact, fun = "max", na.rm = TRUE)
-    } else {
-      !is.na(r1) & r1 != 0
-    }
-    poly <- terra::as.polygons(r_agg, dissolve = TRUE)
-    poly <- poly[poly[[1]][, 1] == 1, ]
-    sf_poly <- sf::st_as_sf(poly)
-    sf_poly <- sf::st_sf(grid_id = "GENERAL", geometry = sf::st_geometry(sf_poly))
-    terra::vect(sf_poly)
-  } else {
-    boundary_sf <- sf::st_as_sf(terra::as.polygons(terra::ext(r), crs = terra::crs(r)))
-    sf_poly <- sf::st_sf(grid_id = "GENERAL", geometry = sf::st_geometry(boundary_sf))
-    terra::vect(sf_poly)
-  }
-
-  summary_vect <- terra::extract(r, boundary_vect, fun = mean, na.rm = TRUE, bind = TRUE)
-  summary_vect
+  d4h_summarize_grid(raster_in = raster_in, general = TRUE, exact_boundary = exact_boundary)
 }
 
 #' @title Convert Raster Indicator to General Homogeneous Mosaic
-#' @description Creates a continuous SpatRaster matching the exact spatial footprint of the input raster where all valid pixels are assigned the overall global mean value.
+#' @description Creates a continuous SpatRaster matching the exact spatial footprint of the input raster where all valid pixels are assigned the overall global mean value. Note: \code{d4h_plot(..., general = TRUE)} can plot this baseline directly without manual raster creation.
 #' @param raster_in SpatRaster or character. Input raster layer, stack, or path to file.
 #' @return A SpatRaster with the mosaic footprint filled with the global mean value.
 #' @examples
@@ -228,7 +262,7 @@ d4h_raster_general <- function(raster_in) {
 
 
 #' @title Spatial Grid Proximity and Exposure Modeling to Water Bodies
-#' @description Computes the minimum Euclidean distance from each operational grid cell (square or hexagonal) to the nearest water body or aquatic habitat, calculates exponential proximity exposure scores in [0, 1], and stratifies grid units into operational priority tiers.
+#' @description Computes the minimum Euclidean distance from each operational grid cell (square or hexagonal) to the nearest water body or aquatic habitat, calculates exponential proximity exposure scores in \code{[0, 1]}, and stratifies grid units into operational priority tiers.
 #' @details Evaluates spatial exposure at the operational territorial level:
 #' \deqn{\text{Proximity Score} = \exp\left(-\frac{\text{Distance}}{\lambda}\right)}
 #' Grid cells directly intersecting or located in close proximity to standing water bodies receive high priority scores (\eqn{\to 1.0}), enabling health brigades to prioritize interventions by territorial sectors rather than individual dwellings alone.
@@ -379,36 +413,66 @@ d4h_grid_composition <- function(grid,
   n_water_vec <- integer(nrow(grid_sf))
 
   if (!is.null(water)) {
-    water_sf <- if (is.character(water) && length(water) == 1L) {
-      sf::st_read(water, quiet = TRUE)
-    } else if (inherits(water, "SpatVector")) {
-      sf::st_as_sf(water)
-    } else if (inherits(water, "sf")) {
-      water
-    } else {
-      NULL
-    }
-
-    if (!is.null(water_sf) && nrow(water_sf) > 0L) {
-      if (sf::st_crs(water_sf) != target_crs) {
-        water_sf <- sf::st_transform(water_sf, target_crs)
+    if (inherits(water, "SpatRaster")) {
+      grid_v <- terra::vect(grid_sf)
+      w_lyr <- water[[1]]
+      rx_w <- terra::xres(w_lyr)
+      if (rx_w < 0.20) {
+        fact_w <- max(1L, as.integer(round(0.50 / rx_w)))
+        if (fact_w > 1L) w_lyr <- terra::aggregate(w_lyr, fact = fact_w, fun = "max", na.rm = TRUE)
       }
-      water_valid <- suppressWarnings(sf::st_make_valid(water_sf))
-      grid_valid <- suppressWarnings(sf::st_make_valid(grid_sf))
+      ex_w <- suppressWarnings(terra::extract(w_lyr, grid_v))
+      if (nrow(ex_w) > 0) {
+        rl_w <- rle(ex_w[[1]])
+        ends_w <- cumsum(rl_w$lengths)
+        starts_w <- c(1L, ends_w[-length(ends_w)] + 1L)
+        map_w <- match(seq_len(nrow(grid_sf)), rl_w$values)
+        vals_w <- ex_w[[2]]
 
-      inter_w <- suppressWarnings(sf::st_intersection(water_valid, grid_valid))
-      if (nrow(inter_w) > 0L) {
-        inter_w$w_area <- as.numeric(sf::st_area(inter_w))
-        agg_w <- stats::aggregate(w_area ~ grid_id, data = inter_w, FUN = sum)
-        agg_cnt <- stats::aggregate(w_area ~ grid_id, data = inter_w, FUN = length)
-        names(agg_cnt)[2] <- "w_count"
+        for (idx in seq_len(nrow(grid_sf))) {
+          m_w <- map_w[idx]
+          if (!is.na(m_w)) {
+            w_vals <- vals_w[starts_w[m_w]:ends_w[m_w]]
+            w_clean <- w_vals[!is.na(w_vals) & is.finite(w_vals)]
+            if (length(w_clean) > 0) {
+              pct_water_vec[idx] <- round(mean(w_clean > 0) * 100, 1)
+              n_water_vec[idx]   <- if (any(w_clean > 0)) 1L else 0L
+            }
+          }
+        }
+      }
+    } else {
+      water_sf <- if (is.character(water) && length(water) == 1L) {
+        sf::st_read(water, quiet = TRUE)
+      } else if (inherits(water, "SpatVector")) {
+        sf::st_as_sf(water)
+      } else if (inherits(water, "sf")) {
+        water
+      } else {
+        NULL
+      }
 
-        m_w <- match(grid_sf$grid_id, agg_w$grid_id)
-        m_cnt <- match(grid_sf$grid_id, agg_cnt$grid_id)
+      if (!is.null(water_sf) && nrow(water_sf) > 0L) {
+        if (sf::st_crs(water_sf) != target_crs) {
+          water_sf <- sf::st_transform(water_sf, target_crs)
+        }
+        water_valid <- suppressWarnings(sf::st_make_valid(water_sf))
+        grid_valid <- suppressWarnings(sf::st_make_valid(grid_sf))
 
-        w_areas <- ifelse(is.na(m_w), 0, agg_w$w_area[m_w])
-        pct_water_vec <- round(pmin(100, (w_areas / grid_sf$area_m2) * 100), 1)
-        n_water_vec <- ifelse(is.na(m_cnt), 0L, as.integer(agg_cnt$w_count[m_cnt]))
+        inter_w <- suppressWarnings(sf::st_intersection(water_valid, grid_valid))
+        if (nrow(inter_w) > 0L) {
+          inter_w$w_area <- as.numeric(sf::st_area(inter_w))
+          agg_w <- stats::aggregate(w_area ~ grid_id, data = inter_w, FUN = sum)
+          agg_cnt <- stats::aggregate(w_area ~ grid_id, data = inter_w, FUN = length)
+          names(agg_cnt)[2] <- "w_count"
+
+          m_w <- match(grid_sf$grid_id, agg_w$grid_id)
+          m_cnt <- match(grid_sf$grid_id, agg_cnt$grid_id)
+
+          w_areas <- ifelse(is.na(m_w), 0, agg_w$w_area[m_w])
+          pct_water_vec <- round(pmin(100, (w_areas / grid_sf$area_m2) * 100), 1)
+          n_water_vec <- ifelse(is.na(m_cnt), 0L, as.integer(agg_cnt$w_count[m_cnt]))
+        }
       }
     }
   }
@@ -418,36 +482,66 @@ d4h_grid_composition <- function(grid,
   n_bld_vec <- integer(nrow(grid_sf))
 
   if (!is.null(buildings)) {
-    bld_sf <- if (is.character(buildings) && length(buildings) == 1L) {
-      sf::st_read(buildings, quiet = TRUE)
-    } else if (inherits(buildings, "SpatVector")) {
-      sf::st_as_sf(buildings)
-    } else if (inherits(buildings, "sf")) {
-      buildings
-    } else {
-      NULL
-    }
-
-    if (!is.null(bld_sf) && nrow(bld_sf) > 0L) {
-      if (sf::st_crs(bld_sf) != target_crs) {
-        bld_sf <- sf::st_transform(bld_sf, target_crs)
+    if (inherits(buildings, "SpatRaster")) {
+      grid_v <- terra::vect(grid_sf)
+      b_lyr <- buildings[[1]]
+      rx_b <- terra::xres(b_lyr)
+      if (rx_b < 0.20) {
+        fact_b <- max(1L, as.integer(round(0.50 / rx_b)))
+        if (fact_b > 1L) b_lyr <- terra::aggregate(b_lyr, fact = fact_b, fun = "max", na.rm = TRUE)
       }
-      bld_valid <- suppressWarnings(sf::st_make_valid(bld_sf))
-      grid_valid <- suppressWarnings(sf::st_make_valid(grid_sf))
+      ex_b <- suppressWarnings(terra::extract(b_lyr, grid_v))
+      if (nrow(ex_b) > 0) {
+        rl_b <- rle(ex_b[[1]])
+        ends_b <- cumsum(rl_b$lengths)
+        starts_b <- c(1L, ends_b[-length(ends_b)] + 1L)
+        map_b <- match(seq_len(nrow(grid_sf)), rl_b$values)
+        vals_b <- ex_b[[2]]
 
-      inter_b <- suppressWarnings(sf::st_intersection(bld_valid, grid_valid))
-      if (nrow(inter_b) > 0L) {
-        inter_b$b_area <- as.numeric(sf::st_area(inter_b))
-        agg_b <- stats::aggregate(b_area ~ grid_id, data = inter_b, FUN = sum)
-        agg_bcnt <- stats::aggregate(b_area ~ grid_id, data = inter_b, FUN = length)
-        names(agg_bcnt)[2] <- "b_count"
+        for (idx in seq_len(nrow(grid_sf))) {
+          m_b <- map_b[idx]
+          if (!is.na(m_b)) {
+            b_vals <- vals_b[starts_b[m_b]:ends_b[m_b]]
+            b_clean <- b_vals[!is.na(b_vals) & is.finite(b_vals)]
+            if (length(b_clean) > 0) {
+              pct_bld_vec[idx] <- round(mean(b_clean > 0) * 100, 1)
+              n_bld_vec[idx]   <- if (any(b_clean > 0)) 1L else 0L
+            }
+          }
+        }
+      }
+    } else {
+      bld_sf <- if (is.character(buildings) && length(buildings) == 1L) {
+        sf::st_read(buildings, quiet = TRUE)
+      } else if (inherits(buildings, "SpatVector")) {
+        sf::st_as_sf(buildings)
+      } else if (inherits(buildings, "sf")) {
+        buildings
+      } else {
+        NULL
+      }
 
-        m_b <- match(grid_sf$grid_id, agg_b$grid_id)
-        m_bcnt <- match(grid_sf$grid_id, agg_bcnt$grid_id)
+      if (!is.null(bld_sf) && nrow(bld_sf) > 0L) {
+        if (sf::st_crs(bld_sf) != target_crs) {
+          bld_sf <- sf::st_transform(bld_sf, target_crs)
+        }
+        bld_valid <- suppressWarnings(sf::st_make_valid(bld_sf))
+        grid_valid <- suppressWarnings(sf::st_make_valid(grid_sf))
 
-        b_areas <- ifelse(is.na(m_b), 0, agg_b$b_area[m_b])
-        pct_bld_vec <- round(pmin(100, (b_areas / grid_sf$area_m2) * 100), 1)
-        n_bld_vec <- ifelse(is.na(m_bcnt), 0L, as.integer(agg_bcnt$b_count[m_bcnt]))
+        inter_b <- suppressWarnings(sf::st_intersection(bld_valid, grid_valid))
+        if (nrow(inter_b) > 0L) {
+          inter_b$b_area <- as.numeric(sf::st_area(inter_b))
+          agg_b <- stats::aggregate(b_area ~ grid_id, data = inter_b, FUN = sum)
+          agg_bcnt <- stats::aggregate(b_area ~ grid_id, data = inter_b, FUN = length)
+          names(agg_bcnt)[2] <- "b_count"
+
+          m_b <- match(grid_sf$grid_id, agg_b$grid_id)
+          m_bcnt <- match(grid_sf$grid_id, agg_bcnt$grid_id)
+
+          b_areas <- ifelse(is.na(m_b), 0, agg_b$b_area[m_b])
+          pct_bld_vec <- round(pmin(100, (b_areas / grid_sf$area_m2) * 100), 1)
+          n_bld_vec <- ifelse(is.na(m_bcnt), 0L, as.integer(agg_bcnt$b_count[m_bcnt]))
+        }
       }
     }
   }
@@ -467,31 +561,49 @@ d4h_grid_composition <- function(grid,
 
     if (!is.null(r_ndvi)) {
       grid_v <- terra::vect(grid_sf)
-      ex_vals <- suppressWarnings(terra::extract(r_ndvi[[1]], grid_v))
-      cell_col <- names(ex_vals)[1]
-      val_col  <- names(ex_vals)[2]
+      r_lyr <- r_ndvi[[1]]
+      rx_n <- terra::xres(r_lyr)
+      if (rx_n < 0.20) {
+        fact_n <- max(1L, as.integer(round(0.50 / rx_n)))
+        if (fact_n > 1L) r_lyr <- terra::aggregate(r_lyr, fact = fact_n, fun = "mean", na.rm = TRUE)
+      }
+      ex_vals <- suppressWarnings(terra::extract(r_lyr, grid_v))
+      if (nrow(ex_vals) > 0) {
+        rl_n <- rle(ex_vals[[1]])
+        ends_n <- cumsum(rl_n$lengths)
+        starts_n <- c(1L, ends_n[-length(ends_n)] + 1L)
+        map_n <- match(seq_len(nrow(grid_sf)), rl_n$values)
+        vals_n <- ex_vals[[2]]
 
-      for (idx in seq_len(nrow(grid_sf))) {
-        c_vals <- ex_vals[[val_col]][ex_vals[[cell_col]] == idx]
-        c_clean <- c_vals[!is.na(c_vals) & is.finite(c_vals) & c_vals != 0]
+        for (idx in seq_len(nrow(grid_sf))) {
+          m_n <- map_n[idx]
+          if (!is.na(m_n)) {
+            c_vals <- vals_n[starts_n[m_n]:ends_n[m_n]]
+            c_clean <- c_vals[!is.na(c_vals) & is.finite(c_vals) & c_vals != 0]
 
-        if (length(c_clean) > 0L) {
-          raw_veg  <- mean(c_clean >= veg_threshold) * 100
-          raw_soil <- mean(c_clean >= 0 & c_clean < soil_threshold) * 100
+            if (length(c_clean) > 0L) {
+              raw_veg  <- mean(c_clean >= veg_threshold) * 100
+              raw_soil <- mean(c_clean >= 0 & c_clean < soil_threshold) * 100
 
-          rem_avail <- pmax(0, 100 - (pct_water_vec[idx] + pct_bld_vec[idx]))
-          sum_raw <- raw_veg + raw_soil
-          if (sum_raw > 0) {
-            pct_veg_vec[idx]  <- round(pmin(rem_avail, rem_avail * (raw_veg / sum_raw)), 1)
-            pct_soil_vec[idx] <- round(pmax(0, rem_avail - pct_veg_vec[idx]), 1)
+              rem_avail <- pmax(0, 100 - (pct_water_vec[idx] + pct_bld_vec[idx]))
+              sum_raw <- raw_veg + raw_soil
+              if (sum_raw > 0) {
+                pct_veg_vec[idx]  <- round(pmin(rem_avail, rem_avail * (raw_veg / sum_raw)), 1)
+                pct_soil_vec[idx] <- round(pmax(0, rem_avail - pct_veg_vec[idx]), 1)
+              } else {
+                pct_veg_vec[idx]  <- round(rem_avail * 0.7, 1)
+                pct_soil_vec[idx] <- round(rem_avail * 0.3, 1)
+              }
+            } else {
+              rem_avail <- pmax(0, 100 - (pct_water_vec[idx] + pct_bld_vec[idx]))
+              pct_veg_vec[idx]  <- round(rem_avail * 0.65, 1)
+              pct_soil_vec[idx] <- round(pmax(0, rem_avail - pct_veg_vec[idx]), 1)
+            }
           } else {
-            pct_veg_vec[idx]  <- round(rem_avail * 0.7, 1)
-            pct_soil_vec[idx] <- round(rem_avail * 0.3, 1)
+            rem_avail <- pmax(0, 100 - (pct_water_vec[idx] + pct_bld_vec[idx]))
+            pct_veg_vec[idx]  <- round(rem_avail * 0.65, 1)
+            pct_soil_vec[idx] <- round(pmax(0, rem_avail - pct_veg_vec[idx]), 1)
           }
-        } else {
-          rem_avail <- pmax(0, 100 - (pct_water_vec[idx] + pct_bld_vec[idx]))
-          pct_veg_vec[idx]  <- round(rem_avail * 0.65, 1)
-          pct_soil_vec[idx] <- round(pmax(0, rem_avail - pct_veg_vec[idx]), 1)
         }
       }
     }

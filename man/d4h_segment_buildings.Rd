@@ -28,9 +28,9 @@ d4h_segment_buildings(
 
 \item{ndvi_max}{Numeric. Maximum NDVI threshold to exclude tree canopies over roofs (default: 0.18).}
 
-\item{method}{Character. Segmentation method: \code{"spectral"} (default, fast native R) or \code{"sam"} (Meta Segment Anything Model).}
+\item{method}{Character. Segmentation method: \code{"spectral"} (default, fast native R) or \code{"sam"} (Meta Segment Anything Model). When \code{method = "sam"}, delineation is driven by SAM on RGB imagery and filtered by \code{min_area_m2} and \code{max_area_m2}.}
 
-\item{sam_checkpoint}{Character path (optional). Model weights path when \code{method = "sam"}.}
+\item{sam_checkpoint}{Character path (optional). Model weights path when \code{method = "sam"}. If \code{NULL} (default), automatically checks the internal package cache and downloads Meta's official ViT-B model (~375 MB) on first use.}
 }
 \value{
 An \code{sf} POLYGON object with columns: \code{building_id}, \code{area_m2}, \code{centroid_x}, \code{centroid_y}, and spatial geometry.
@@ -39,9 +39,13 @@ An \code{sf} POLYGON object with columns: \code{building_id}, \code{area_m2}, \c
 Identifies, delineates, and vectorizes residential houses, roofs, and man-made structures from ultra-high resolution RGB orthomosaics using spectral-geometric OBIA or Segment Anything (SAM).
 }
 \details{
-Buildings are extracted by combining high surface brightness / spectral contrast in visible RGB bands with non-vegetated constraints (\eqn{\text{NDVI} < \theta_{\text{ndvi}}}):
-\deqn{\text{BuildingCandidate} = \begin{cases} 1 & \text{if } \text{RGB}_{\text{mean}} \ge \theta_{\text{bright}} \text{ and } \text{NDVI} < \theta_{\text{ndvi}} \\ 0 & \text{otherwise} \end{cases}}
-Vectorized candidates are filtered by residential building footprints (\eqn{10\text{ m}^2 \le \text{Area} \le 500\text{ m}^2}).
+Buildings are extracted using two alternative methodologies:
+\itemize{
+\item \strong{Spectral OBIA (\code{method = "spectral"}):} Combines high surface brightness (corrugated metal/calamina roofs, \eqn{\text{RGB}_{\text{mean}} \ge \theta_{\text{bright}}}) and red-clay tile chromatic signatures with vegetation exclusion constraints (\eqn{\text{NDVI} < \theta_{\text{ndvi}}}):
+\deqn{\text{BuildingCandidate} = \begin{cases} 1 & \text{if } (\text{Brightness} \ge \theta_{\text{bright}} \lor \text{RedTile}) \text{ and } \text{NDVI} < \theta_{\text{ndvi}} \\ 0 & \text{otherwise} \end{cases}}
+\item \strong{Deep Learning (\code{method = "sam"}):} Utilizes Meta's Segment Anything Model (SAM) via \code{reticulate}. Delineates geometric regular roof boundaries directly from the 3-band visible RGB orthomosaic. Spectral thresholds (\code{brightness_min}, \code{ndvi_max}) are bypassed, filtering candidates exclusively by \code{min_area_m2} and \code{max_area_m2}. Model weights are automatically managed in the internal package cache.
+}
+Vectorized candidates are filtered by residential building footprints (\eqn{12\text{ m}^2 \le \text{Area} \le 600\text{ m}^2}), with centroid coordinates computed.
 }
 \examples{
 \donttest{

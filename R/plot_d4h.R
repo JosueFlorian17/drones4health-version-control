@@ -11,7 +11,10 @@
 #' @param y Optional SpatRaster, SpatVector, sf, or character path. Right layer for comparative visualization (e.g., comparing NDVI vs NDWI, or Pre vs Post intervention).
 #' @param interactive Logical. If \code{FALSE} (default), outputs a static \code{ggplot2} plot (or dual-panel comparison if \code{y} is provided). If \code{TRUE}, outputs an interactive swipe slider (when \code{y} is provided) or interactive \code{mapview} web map (when single layer).
 #' @param grid Optional SpatVector, sf, or character path to overlay grid boundaries.
-#' @param houses Optional sf, data.frame, SpatVector, or character path to CSV/Excel containing house coordinates. Automatically plotted as points.
+#' @param houses Optional sf, data.frame, SpatVector, or character path to CSV/Excel containing house coordinates. Automatically plotted as points or polygons.
+#' @param buildings Optional alias for \code{houses}. Accepts building footprint polygons (\code{sf}) or centroids.
+#' @param water Optional sf, SpatVector, or character path to delineate aquatic vector breeding habitats or water bodies.
+#' @param water_color Character. Fill color for water polygons (default: "#00B0FF").
 #' @param houses_filter_extent Logical. If TRUE, filters houses to only those intersecting the raster extent / footprint. If FALSE (default), retains all houses.
 #' @param house_color Character. Color for house points (default: "red").
 #' @param house_size Numeric. Size for house points (default: 2.0).
@@ -24,6 +27,7 @@
 #' @param max_pixels Numeric. Maximum number of pixels to render before spatial aggregation (default: 500000).
 #' @param zcol Character. Optional column name to color/fill spatial vector features (e.g., \code{"proximity_level"}, \code{"risk_level"}, or \code{"dist_water_m"}).
 #' @param ortho SpatRaster or character path. Optional high-resolution RGB orthomosaic to render as an underlay base layer beneath grids, vectors, or point features.
+#' @param general Logical. If TRUE, transforms continuous raster layers into homogeneous mosaics filled with the overall global mean value across valid pixels before plotting (default: FALSE).
 #' @return A \code{ggplot} object (if \code{interactive = FALSE}) or an interactive \code{mapview} / \code{leaflet} slider widget (if \code{interactive = TRUE}).
 #' @examples
 #' \donttest{
@@ -44,14 +48,101 @@
 #'   # 3. Single indicator: static map
 #'   p_single <- d4h_plot(x = ndvi_file, interactive = FALSE)
 #'   print(p_single)
+#'
+#'   # 4. Homogeneous general scene baseline plot
+#'   p_gen <- d4h_plot(x = ndvi_file, general = TRUE)
+#'   print(p_gen)
 #' }
 #' }
 #' @export
-d4h_plot <- function(x, y = NULL, interactive = FALSE, grid = NULL, houses = NULL,
+d4h_plot <- function(x = NULL, y = NULL, interactive = FALSE, grid = NULL, houses = NULL,
+                     buildings = NULL, water = NULL, features = NULL, water_color = "#00B0FF",
                      houses_filter_extent = FALSE, house_color = "red", house_size = 2.0,
                      rgb_bands = NULL, palette = "viridis", palette_y = "magma",
                      limits = NULL, limits_y = NULL, title = NULL, max_pixels = 500000,
-                     zcol = NULL, ortho = NULL) {
+                     zcol = NULL, ortho = NULL, general = FALSE) {
+
+  # Support compound result object with $sf (e.g. from d4h_executive_summary or d4h_extract_indicators)
+  if (is.list(x) && !inherits(x, c("sf", "SpatVector", "SpatRaster")) && !is.null(x$sf)) {
+    x <- x$sf
+  }
+  if (!is.null(y) && is.list(y) && !inherits(y, c("sf", "SpatVector", "SpatRaster")) && !is.null(y$sf)) {
+    y <- y$sf
+  }
+  if (!is.null(grid) && is.list(grid) && !inherits(grid, c("sf", "SpatVector", "SpatRaster")) && !is.null(grid$sf)) {
+    grid <- grid$sf
+  }
+
+  # Unpack combined features if provided (e.g. from d4h_combine_features)
+  if (!is.null(features)) {
+    if (inherits(features, "sf") && "feature_type" %in% names(features)) {
+      if (is.null(water)) {
+        w_sub <- features[features$feature_type == "Water", ]
+        if (nrow(w_sub) > 0) water <- w_sub
+      }
+      if (is.null(houses) && is.null(buildings)) {
+        b_sub <- features[features$feature_type == "Building", ]
+        if (nrow(b_sub) > 0) houses <- b_sub
+      }
+    } else if (is.null(x)) {
+      x <- features
+    }
+  }
+
+  # Soporte de alias: buildings -> houses
+  if (is.null(houses) && !is.null(buildings)) {
+    houses <- buildings
+  }
+
+  # Soporte intuitivo si el usuario pasa el nombre de la variable temática en 'x'
+  # Ej: d4h_plot(x = "dist_water_m", houses = riesgo_casas, water = agua_sam, ortho = r_rgb)
+  if (is.character(x) && length(x) == 1L && !file.exists(x)) {
+    if (!is.null(houses) && inherits(houses, c("sf", "data.frame", "SpatVector")) && x %in% names(houses)) {
+      if (is.null(zcol)) zcol <- x
+      x <- houses
+      houses <- NULL
+    } else if (!is.null(water) && inherits(water, c("sf", "data.frame", "SpatVector")) && x %in% names(water)) {
+      if (is.null(zcol)) zcol <- x
+      x <- water
+      water <- NULL
+    } else if (!is.null(ortho)) {
+      if (is.null(zcol)) zcol <- x
+      x <- ortho
+    }
+  }
+
+  if (is.null(x)) {
+    if (!is.null(houses)) {
+      x <- houses
+      houses <- NULL
+    } else if (!is.null(water)) {
+      x <- water
+      water <- NULL
+    } else if (!is.null(ortho)) {
+      x <- ortho
+    } else {
+      stop("You must provide at least one layer to visualize ('x', 'houses', 'buildings', 'water' or 'ortho').", call. = FALSE)
+    }
+  }
+
+  # If general = TRUE, convert raster layers to homogeneous scene mean mosaic
+  if (isTRUE(general)) {
+    .make_general_mosaic <- function(item) {
+      if (is.null(item)) return(NULL)
+      r_obj <- .ensure_raster(item, mask_zeros = FALSE)
+      m_val <- as.numeric(terra::global(r_obj, "mean", na.rm = TRUE)[, 1])
+      r_out <- terra::ifel(!is.na(r_obj) & r_obj != 0, m_val, NA)
+      names(r_out) <- paste0(names(r_obj), "_mean")
+      r_out
+    }
+    x <- .make_general_mosaic(x)
+    if (!is.null(y)) {
+      y <- .make_general_mosaic(y)
+    }
+    if (is.null(title)) {
+      title <- paste0("General Scene Mean Baseline (", names(x)[1], ")")
+    }
+  }
 
   # ============================================================================
   # MODO 1: COMPARACION DE DOS INDICADORES (x e y presentes)
@@ -61,6 +152,26 @@ d4h_plot <- function(x, y = NULL, interactive = FALSE, grid = NULL, houses = NUL
       # MODO INTERACTIVO: SLIDER COMPARATIVO ROBUSTO CON LEAFLET.EXTRAS2 WRAPPED EN MAPVIEW
       if (!requireNamespace("leaflet", quietly = TRUE) || !requireNamespace("leaflet.extras2", quietly = TRUE) || !requireNamespace("raster", quietly = TRUE)) {
         stop("For interactive swipe slider ('interactive = TRUE'), install leaflet, leaflet.extras2, and raster: install.packages(c('leaflet', 'leaflet.extras2', 'raster'))", call. = FALSE)
+      }
+
+      # Auto-rasterizar si x o y son capas vectoriales sf / SpatVector
+      if (inherits(x, c("sf", "SpatVector")) || inherits(y, c("sf", "SpatVector"))) {
+        r_ref <- if (!is.null(ortho)) .ensure_raster(ortho, mask_zeros = FALSE) else NULL
+        if (is.null(r_ref)) {
+          ext_b <- if (inherits(x, c("sf", "SpatVector"))) terra::ext(terra::vect(x)) else terra::ext(x)
+          crs_b <- if (inherits(x, c("sf", "SpatVector"))) sf::st_crs(x)$wkt else terra::crs(x)
+          r_ref <- terra::rast(ext_b, nrows = 600, ncols = 600, crs = crs_b)
+        }
+        field_x <- if (!is.null(zcol) && inherits(x, c("sf", "data.frame")) && zcol %in% names(x)) zcol else 1
+        field_y <- if (!is.null(zcol) && inherits(y, c("sf", "data.frame")) && zcol %in% names(y)) zcol else 1
+        if (inherits(x, c("sf", "SpatVector"))) {
+          x <- terra::rasterize(terra::vect(x), r_ref[[1]], field = field_x, background = NA)
+          names(x) <- if (is.null(title)) "Layer 1" else title
+        }
+        if (inherits(y, c("sf", "SpatVector"))) {
+          y <- terra::rasterize(terra::vect(y), r_ref[[1]], field = field_y, background = NA)
+          names(y) <- "Layer 2"
+        }
       }
 
       # 1. Preparar capas raster
@@ -175,7 +286,13 @@ d4h_plot <- function(x, y = NULL, interactive = FALSE, grid = NULL, houses = NUL
       )
       m <- htmlwidgets::onRender(m, js_hook)
 
-      # Superposicion opcional de grilla o casas
+      # Superposicion opcional de agua, grilla o casas
+      if (!is.null(water)) {
+        sf_water <- if (inherits(water, "SpatVector")) sf::st_as_sf(water) else if (inherits(water, "sf")) water else sf::st_read(water, quiet = TRUE)
+        sf_w_wgs <- sf::st_transform(sf_water, 4326)
+        m <- m |> leaflet::addPolygons(data = sf_w_wgs, fillColor = water_color, color = "#01579B", fillOpacity = 0.65, weight = 1.2)
+      }
+
       if (!is.null(grid)) {
         sf_grid <- if (inherits(grid, "SpatVector")) sf::st_as_sf(grid) else if (inherits(grid, "sf")) grid else sf::st_read(grid, quiet = TRUE)
         sf_grid_wgs <- sf::st_transform(sf_grid, 4326)
@@ -202,18 +319,24 @@ d4h_plot <- function(x, y = NULL, interactive = FALSE, grid = NULL, houses = NUL
 
       if (inherits(x, "SpatRaster")) name_x <- names(x)[1]
       if (inherits(y, "SpatRaster")) name_y <- names(y)[1]
+      if (inherits(x, c("sf", "SpatVector"))) name_x <- if (!is.null(title)) title else "Spectral"
+      if (inherits(y, c("sf", "SpatVector"))) name_y <- "SAM"
 
       p1 <- d4h_plot(
         x                    = x,
         interactive          = FALSE,
         grid                 = grid,
         houses               = houses,
+        water                = water,
+        water_color          = water_color,
         houses_filter_extent = houses_filter_extent,
         house_color          = house_color,
         house_size           = house_size,
         palette              = palette,
         limits               = limits,
         title                = name_x,
+        zcol                 = zcol,
+        ortho                = ortho,
         max_pixels           = max_pixels
       )
 
@@ -222,12 +345,16 @@ d4h_plot <- function(x, y = NULL, interactive = FALSE, grid = NULL, houses = NUL
         interactive          = FALSE,
         grid                 = grid,
         houses               = houses,
+        water                = water,
+        water_color          = water_color,
         houses_filter_extent = houses_filter_extent,
         house_color          = house_color,
         house_size           = house_size,
         palette              = palette_y,
         limits               = limits_y,
         title                = name_y,
+        zcol                 = zcol,
+        ortho                = ortho,
         max_pixels           = max_pixels
       )
 
@@ -329,6 +456,11 @@ d4h_plot <- function(x, y = NULL, interactive = FALSE, grid = NULL, houses = NUL
       stop("Interactive mapview requires a SpatRaster, SpatVector, or sf object.", call. = FALSE)
     }
 
+    if (!is.null(water)) {
+      sf_w <- if (inherits(water, "SpatVector")) sf::st_as_sf(water) else if (inherits(water, "sf")) water else sf::st_read(water, quiet = TRUE)
+      m <- m + mapview::mapview(sf_w, col.regions = water_color, color = "#01579B", alpha.regions = 0.65, layer.name = "Water Bodies", map.types = clean_basemaps)
+    }
+
     if (!is.null(grid)) {
       sf_grid <- if (inherits(grid, "SpatVector")) sf::st_as_sf(grid) else if (inherits(grid, "sf")) grid else sf::st_read(grid, quiet = TRUE)
       m <- m + mapview::mapview(sf_grid, color = "black", alpha.regions = 0, lwd = 1.2, layer.name = "Grid", map.types = clean_basemaps)
@@ -404,6 +536,12 @@ d4h_plot <- function(x, y = NULL, interactive = FALSE, grid = NULL, houses = NUL
       }
     }
 
+    # Underlay optional water bodies beneath house/grid features
+    if (!is.null(water)) {
+      sf_water <- if (inherits(water, "SpatVector")) sf::st_as_sf(water) else if (inherits(water, "sf")) water else sf::st_read(water, quiet = TRUE)
+      p <- p + ggplot2::geom_sf(data = sf_water, fill = water_color, color = "#01579B", alpha = 0.65, linewidth = 0.3)
+    }
+
     fill_col <- if (!is.null(zcol)) {
       zcol
     } else if ("proximity_level" %in% names(sf_obj)) {
@@ -427,9 +565,13 @@ d4h_plot <- function(x, y = NULL, interactive = FALSE, grid = NULL, houses = NUL
             name = if (!is.null(title)) title else "Surveillance Priority\n(Proximity to Water)",
             values = c(
               "Critical (<50m)"     = "#D50000",
+              "Critico (<50m)"      = "#D50000",
               "High (50-100m)"      = "#FF6D00",
+              "Alto (50-100m)"      = "#FF6D00",
               "Moderate (100-200m)" = "#FFD600",
-              "Low (>200m)"         = "#00E676"
+              "Moderado (100-200m)" = "#FFD600",
+              "Low (>200m)"         = "#00E676",
+              "Bajo (>200m)"        = "#00E676"
             ),
             drop = FALSE
           )
@@ -477,6 +619,12 @@ d4h_plot <- function(x, y = NULL, interactive = FALSE, grid = NULL, houses = NUL
 
   } else {
     stop("'x' must be a SpatRaster, SpatVector, sf object, summary data.frame, or valid file path.", call. = FALSE)
+  }
+
+  # Overlay optional water bodies if x was a raster
+  if (!is.null(water) && !inherits(x, c("SpatVector", "sf"))) {
+    sf_water <- if (inherits(water, "SpatVector")) sf::st_as_sf(water) else if (inherits(water, "sf")) water else sf::st_read(water, quiet = TRUE)
+    p <- p + ggplot2::geom_sf(data = sf_water, fill = water_color, color = "#01579B", alpha = 0.65, linewidth = 0.3)
   }
 
   # Overlay optional houses

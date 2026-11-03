@@ -2,26 +2,16 @@
 % Please edit documentation in R/summary_executive.R
 \name{d4h_executive_summary}
 \alias{d4h_executive_summary}
-\alias{d4h_report}
 \title{Executive Summary of Micro-Environmental and Epidemiological Indicators}
 \usage{
 d4h_executive_summary(
   raster_in,
   by = c("general", "grid"),
   grid = NULL,
-  houses_proximity = NULL,
-  houses_risk = NULL,
-  cell_size = 50,
-  square = TRUE,
-  out_xlsx = NULL,
-  sample_size = 1e+06,
-  digits = 3
-)
-
-d4h_report(
-  raster_in,
-  by = c("general", "grid"),
-  grid = NULL,
+  water = NULL,
+  buildings = NULL,
+  houses = NULL,
+  features = NULL,
   houses_proximity = NULL,
   houses_risk = NULL,
   cell_size = 50,
@@ -38,6 +28,12 @@ d4h_report(
 
 \item{grid}{Optional SpatVector, sf, or character path to existing grid polygon boundaries when \code{by = "grid"}. If NULL, automatically generated using \code{cell_size} and \code{square}.}
 
+\item{water}{SpatVector, sf, or SpatRaster (optional). Segmented water bodies or binary water mask to compute grid water coverage (\code{pct_water}).}
+
+\item{buildings}{SpatVector, sf, or SpatRaster (optional). Segmented building/roof footprints to compute grid dwelling coverage (\code{pct_houses}).}
+
+\item{houses}{Deprecated alias for \code{buildings}.}
+
 \item{houses_proximity}{Optional \code{sf} or \code{data.frame} of residential dwellings with calculated distance to water and proximity scores (e.g. from \code{d4h_distance_to_water} or buffer analysis). If provided, appends dedicated household distance and proximity exposure sheets to the Excel workbook.}
 
 \item{houses_risk}{Deprecated alias for \code{houses_proximity}.}
@@ -53,7 +49,7 @@ d4h_report(
 \item{digits}{Integer. Number of decimal places to format numerical metrics (default: 3).}
 }
 \value{
-An object of class \code{d4h_executive_summary} (for \code{by = "general"}) or \code{d4h_grid_summary} / \code{data.frame} (for \code{by = "grid"}) containing structured metrics, spatial coverage metadata, outlier diagnostics, and thematic stratum distributions.
+When \code{by = "grid"}, returns an object of class \code{d4h_grid_summary} containing both \code{$sf} (spatial polygons with geometry) and \code{$df} (clean tabular tibble without geometry), including micro-environmental composition (\code{pct_bare_soil}, \code{pct_houses}, \code{pct_water}, \code{pct_vegetation}, \code{dominant_class}, \code{surveillance_priority}) and descriptive moments. When \code{by = "general"}, returns an object of class \code{d4h_executive_summary} (\code{tibble} / \code{data.frame}).
 }
 \description{
 Generates a comprehensive executive report for a given raster layer or multi-band mosaic. It extracts key statistical moments, spatial extent and resolution metrics, Tukey outlier diagnostics, domain-specific bio-physical/epidemiological stratum interpretations, either globally (\code{by = "general"}) or per territorial grid cell (\code{by = "grid"}), and optionally exports a formatted multi-sheet Excel spreadsheet.
@@ -94,7 +90,9 @@ if (interactive()) {
     sample_size = 1000000,
     digits      = 3
   )
-  head(exec_grid)
+  # Always provides both $sf and $df:
+  head(exec_grid$df)
+  plot(exec_grid$sf)
 }
 }
 }

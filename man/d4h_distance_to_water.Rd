@@ -2,7 +2,7 @@
 % Please edit documentation in R/segmentation.R
 \name{d4h_distance_to_water}
 \alias{d4h_distance_to_water}
-\title{Calculate Distance and Proximity to Water Sources}
+\title{Calculate Distance and Vulnerability Risk to Water Sources}
 \usage{
 d4h_distance_to_water(
   buildings,
@@ -28,8 +28,40 @@ d4h_distance_to_water(
 \item{proximity_labels}{Character vector (optional). Custom names for each stratified proximity tier (alternative to \code{risk_labels}).}
 }
 \value{
-An \code{sf} object with distance to water, nearest water ID, and proximity score columns.
+An \code{sf} object matching \code{buildings} with appended columns: \code{dist_water_m}, \code{nearest_water_id}, \code{proximity_score} in \code{[0, 1]}, and \code{proximity_level}.
 }
 \description{
-Computes the minimum Euclidean distance from each residential building to the nearest water body or aquatic site.
+Computes the minimum Euclidean distance from each residential building to the nearest aquatic vector breeding site, calculates an exponential infection exposure risk score, and stratifies epidemiological vulnerability levels.
+}
+\details{
+The distance-decay transmission risk score is formulated based on vector flight dispersion models:
+\deqn{\text{RiskScore}_i = \exp\left(-\frac{d_{\text{min}}(i)}{\lambda}\right)}
+where \eqn{d_{\text{min}}(i)} is the minimum Euclidean distance (in meters) from building centroid \eqn{i} to the closest water polygon, and \eqn{\lambda} is the characteristic dispersal radius of disease vectors (e.g. \eqn{\lambda = 100\text{ m}} for \emph{Aedes aegypti} / \emph{Anopheles}).
+}
+\examples{
+\donttest{
+if (interactive()) {
+  library(drones4health)
+  library(sf)
+
+  # Load building and water source polygons
+  houses_sf <- st_read(system.file("extdata", "buildings.gpkg", package = "drones4health"))
+  water_sf  <- st_read(system.file("extdata", "water_bodies.gpkg", package = "drones4health"))
+
+  # Calculate Euclidean distance and vector proximity scores with custom tiers
+  proximity_sf <- d4h_distance_to_water(
+    buildings        = houses_sf,
+    sources          = water_sf,
+    decay_lambda     = 100.0,
+    buffer_breaks    = c(50, 100, 200),
+    proximity_labels = c("Immediate (<50m)", "High (50-100m)", "Moderate (100-200m)", "Distal (>200m)")
+  )
+  head(proximity_sf)
+}
+}
+}
+\references{
+World Health Organization. (2020). \emph{Operational framework for building climate resilient health systems}. World Health Organization.
+
+Guerra, C. A., Snow, R. W., & Hay, S. I. (2006). Mapping the global extent of malaria in 2005. \emph{Trends in Parasitology}, 22(8), 353-358. \doi{10.1016/j.pt.2006.06.006}
 }

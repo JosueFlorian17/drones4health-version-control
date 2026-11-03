@@ -2,50 +2,37 @@
 % Please edit documentation in R/grids.R
 \name{d4h_summarize_grid}
 \alias{d4h_summarize_grid}
-\title{Summarize Raster Indicator by Spatial Grid}
+\alias{d4h_summarize_general}
+\title{Summarize Raster Indicator by Spatial Grid or General Footprint (Deprecated)}
 \usage{
-d4h_summarize_grid(raster_in, cell_size = 20, square = TRUE, discard_na = TRUE)
+d4h_summarize_grid(
+  raster_in,
+  cell_size = 20,
+  square = TRUE,
+  discard_na = TRUE,
+  general = FALSE,
+  exact_boundary = TRUE
+)
+
+d4h_summarize_general(raster_in, exact_boundary = TRUE)
 }
 \arguments{
 \item{raster_in}{SpatRaster or character. Input raster layer, stack, or path to file.}
 
-\item{cell_size}{Numeric. Grid cell size / diameter in meters (default: 20).}
+\item{cell_size}{Numeric. Grid cell size / diameter in meters (default: 20). Ignored when \code{general = TRUE}.}
 
-\item{square}{Logical. If TRUE, creates square cells; if FALSE, hexagonal cells (default: TRUE).}
+\item{square}{Logical. If TRUE, creates square cells; if FALSE, hexagonal cells (default: TRUE). Ignored when \code{general = TRUE}.}
 
-\item{discard_na}{Logical. If TRUE, removes grid cells outside the valid raster data area (default: TRUE).}
+\item{discard_na}{Logical. If TRUE, removes grid cells outside the valid raster data area (default: TRUE). Ignored when \code{general = TRUE}.}
+
+\item{general}{Logical. If TRUE, computes the overall mean value of raster layers across the entire area of interest as a single spatial vector polygon (SpatVector) with \code{grid_id = "GENERAL"} (default: FALSE).}
+
+\item{exact_boundary}{Logical. When \code{general = TRUE}, if TRUE, traces the exact outer boundary of valid non-NA flight data; if FALSE, uses the bounding box extent (default: TRUE).}
 }
 \value{
-A SpatVector containing the grid cells with extracted mean values.
+A SpatVector or sf containing the grid cells (or single general footprint polygon) with extracted values.
 }
 \description{
-Generates a square or hexagonal spatial grid and extracts zonal summary statistics (mean, quantiles) of raster indicators per grid cell.
-}
-\details{
-Zonal extraction aggregates high-resolution pixel values into operational territorial units:
-\deqn{\bar{x}_k = \frac{1}{N_k} \sum_{i \in \text{Cell}_k} x_i}
-Empty grid cells outside the valid flight footprint are automatically pruned when \code{discard_na = TRUE}.
-}
-\examples{
-\donttest{
-if (interactive()) {
-  library(drones4health)
-  library(terra)
-
-  # Load continuous indicator raster
-  ndvi_file <- system.file("extdata", "ndvi.tif", package = "drones4health")
-
-  # Aggregate NDVI values into a 50m hexagonal surveillance grid
-  grid_summary <- d4h_summarize_grid(
-    raster_in = ndvi_file,
-    cell_size = 50,
-    square = FALSE,
-    discard_na = TRUE
-  )
-  head(grid_summary)
-}
-}
-}
-\references{
-Birch, C. P., Oom, S. P., & Beecham, J. A. (2007). Rectangular and hexagonal grids used for observation, experiment and simulation in ecology. \emph{Ecological Modelling}, 206(3-4), 347-359. \doi{10.1016/j.ecolmodel.2007.03.041}
+This function is deprecated in favor of \code{\link{d4h_executive_summary}} with \code{grid = ...} or \code{by = "grid"}.
+Generates a square or hexagonal spatial grid and extracts zonal summary statistics of raster indicators per grid cell.
 }
