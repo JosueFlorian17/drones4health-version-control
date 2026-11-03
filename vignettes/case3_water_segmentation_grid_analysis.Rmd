@@ -119,7 +119,7 @@ print(buildings_sf)
 
 Instead of performing manual spatial intersections and joins, `drones4health` automates the entire analytical pipeline:
 
-1. `d4h_combine_features()` combines water and dwelling features into a unified spatial layer and automatically prints an executive summary report without requiring manual `cat()` scripts.
+1. `d4h_combine_features()` combines water and dwelling features into a unified spatial layer and automatically prints an executive summary report.
 2. `d4h_executive_summary()` accepts the combined features directly, automatically computing the count of houses (`n_houses`), count of water bodies (`n_water_bodies`), percentage land cover composition (`pct_bare_soil`, `pct_houses`, `pct_water`, `pct_vegetation`), and operational priority tiers (`surveillance_priority`) per grid cell.
 
 ```{r}
@@ -196,7 +196,6 @@ m_surveillance <- d4h_plot(
   title       = "Interactive Operational Surveillance Map"
 )
 m_surveillance
-```
 ```
 
 ---

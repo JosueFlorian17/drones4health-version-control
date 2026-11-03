@@ -280,8 +280,7 @@ Summary<a class="anchor" aria-label="anchor" href="#physical-features-consolidat
 <li>
 <code><a href="../reference/d4h_combine_features.html">d4h_combine_features()</a></code> combines water and dwelling
 features into a unified spatial layer and automatically prints an
-executive summary report without requiring manual <code><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat()</a></code>
-scripts.</li>
+executive summary report.</li>
 <li>
 <code><a href="../reference/d4h_executive_summary.html">d4h_executive_summary()</a></code> accepts the combined features
 directly, automatically computing the count of houses
@@ -358,30 +357,37 @@ bodies:</p>
 <span>  title       <span class="op">=</span> <span class="st">"Interactive Operational Surveillance Map"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">m_surveillance</span></span></code></pre></div>
-<pre><code>
----
-
-## 4 Results &amp; Executive Reporting
-
-### 4.1 Granular Grid Percentage Composition (`d4h_grid_composition`)
-
-To address operational planning, `d4h_grid_composition()` computes the exact percentage composition of physical features per operational grid cell: houses/dwellings (`pct_houses`), standing water bodies (`pct_water`), vegetative canopy (`pct_vegetation`), and bare soil/terrain (`pct_bare_soil`), identifying the dominant land cover class and assigning priority tiers for environmental surveillance:
-
-
-``` r
-# Compute percentage composition and sectoral priority stratification per grid unit
-grid_composition &lt;- d4h_grid_composition(
-  grid           = grid_sf,
-  water          = water_sf,
-  buildings      = buildings_sf,
-  ndvi_raster    = r_ndvi,
-  veg_threshold  = 0.30,
-  soil_threshold = 0.15,
-  out_xlsx       = "salidas/Executive_Summary_Case03_Segmentation.xlsx"
-)
-
-# Inspect first grid cells with explicit percentage breakdown
-head(sf::st_drop_geometry(grid_composition), 8)</code></pre>
+<hr>
+</div>
+</div>
+<div class="section level2">
+<h2 id="results-executive-reporting">4 Results &amp; Executive Reporting<a class="anchor" aria-label="anchor" href="#results-executive-reporting"></a>
+</h2>
+<div class="section level3">
+<h3 id="granular-grid-percentage-composition-d4h_grid_composition">4.1 Granular Grid Percentage Composition
+(<code>d4h_grid_composition</code>)<a class="anchor" aria-label="anchor" href="#granular-grid-percentage-composition-d4h_grid_composition"></a>
+</h3>
+<p>To address operational planning, <code><a href="../reference/d4h_grid_composition.html">d4h_grid_composition()</a></code>
+computes the exact percentage composition of physical features per
+operational grid cell: houses/dwellings (<code>pct_houses</code>),
+standing water bodies (<code>pct_water</code>), vegetative canopy
+(<code>pct_vegetation</code>), and bare soil/terrain
+(<code>pct_bare_soil</code>), identifying the dominant land cover class
+and assigning priority tiers for environmental surveillance:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Compute percentage composition and sectoral priority stratification per grid unit</span></span>
+<span><span class="va">grid_composition</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_grid_composition.html">d4h_grid_composition</a></span><span class="op">(</span></span>
+<span>  grid           <span class="op">=</span> <span class="va">grid_sf</span>,</span>
+<span>  water          <span class="op">=</span> <span class="va">water_sf</span>,</span>
+<span>  buildings      <span class="op">=</span> <span class="va">buildings_sf</span>,</span>
+<span>  ndvi_raster    <span class="op">=</span> <span class="va">r_ndvi</span>,</span>
+<span>  veg_threshold  <span class="op">=</span> <span class="fl">0.30</span>,</span>
+<span>  soil_threshold <span class="op">=</span> <span class="fl">0.15</span>,</span>
+<span>  out_xlsx       <span class="op">=</span> <span class="st">"salidas/Executive_Summary_Case03_Segmentation.xlsx"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Inspect first grid cells with explicit percentage breakdown</span></span>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_drop_geometry</a></span><span class="op">(</span><span class="va">grid_composition</span><span class="op">)</span>, <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
 <pre class="text"><code>==============================================================================
        DRONES4HEALTH - GRID FEATURE PERCENTAGE COMPOSITION SUMMARY
 ==============================================================================
