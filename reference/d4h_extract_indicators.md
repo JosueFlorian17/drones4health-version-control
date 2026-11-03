@@ -190,12 +190,12 @@ containing:
 
 ## Details
 
-Modeled after the `land4health` multi-indicator extraction framework.
-The function operates directly on drone orthomosaics or multispectral
-bands without requiring a manual region input. If an operational grid is
-not provided via `grid`, an operative surveillance grid is automatically
-generated across the valid flight footprint using `cell_size` (default:
-50 m), `area_m2`, or `n_cells`.
+Provides a flexible, unified pipeline for automated batch extraction of
+biophysical indices. The function operates directly on drone
+orthomosaics or multispectral bands without requiring a manual region
+input. If an operational grid is not provided via `grid`, an operative
+surveillance grid is automatically generated across the valid flight
+footprint using `cell_size` (default: 50 m), `area_m2`, or `n_cells`.
 
 ## Examples
 

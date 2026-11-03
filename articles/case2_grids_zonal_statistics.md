@@ -100,9 +100,10 @@ head(grid_summary_ndvi)
 
 ### 3.5 Multi-Indicator Extraction (`d4h_extract_indicators`)
 
-Modeled after `land4health`,
+The
 [`d4h_extract_indicators()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_extract_indicators.md)
-allows extracting multiple environmental indicators simultaneously:
+function provides a unified interface to compute and extract multiple
+environmental indicators simultaneously across the flight scene:
 
 ``` r
 
