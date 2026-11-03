@@ -39,63 +39,30 @@ library(terra)
 library(ggplot2)
 ```
 
-### 3.2 Spatial Data Preparation & Multi-Band Metadata Inspection
+### 3.2 Spatial Data Preparation & Automated Metadata Ingestion
 
-Before computing biophysical indices, inspecting the physical raster
-dimensions, Ground Sampling Distance (GSD), georeferencing, and scene
-bounding box is critical. We use
-[`d4h_raster_metadata()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_raster_metadata.md)
-(or alias
-[`d4h_metadata()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_raster_metadata.md))
-to extract structured spatial metadata directly:
+In operational drone processing pipelines, manual inspection and
+coordinate extraction of individual bands is unneeded. In
+`drones4health`, all physical dimensions (column/row widths, total pixel
+counts), Ground Sampling Distance (GSD, e.g. 9.92 cm/px), coordinate
+systems (EPSG:32718 / WGS 84 UTM 18S), and bounding boxes (177.014 ha \|
+1,609.5 m x 1,099.8 m) are automatically ingested internally by
+[`d4h_read_stack()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_read_stack.md)
+and reported in downstream functions like
+[`d4h_executive_summary()`](https://josueflorian17.github.io/drones4health-version-control/reference/d4h_executive_summary.md).
 
 ``` r
 
-# 1. Ingest and inspect drone orthomosaic metadata
-path_nir <- "img/Ohuay_NIR.tif"
-path_r   <- "img/Ohuay_R.tif"
-path_g   <- "img/Ohuay_G.tif"
-
-# Inspect structured metadata for all drone channels
-meta <- d4h_raster_metadata(c(path_nir, path_r))
-```
-
-``` text
-====================================================================
- RASTER METADATA SUMMARY: Ohuay_NIR.tif
-====================================================================
-
-[+] DIMENSIONS AND STRUCTURE:
-  - Width (Columns)      : 16,223 px
-  - Height (Rows)        : 11,086 px
-  - Total Pixels         : 179,848,178 px
-  - Number of Bands      : 1
-  - Data Type (dtype)    : uint16
-  - NoData Value         : None
-
-[+] SPATIAL RESOLUTION (PIXEL SIZE / GSD):
-  - Resolution X         : 0.099209 m
-  - Resolution Y         : 0.099209 m
-  - Pixel Size (GSD)     : 9.92 cm x 9.92 cm (or 0.0992 m)
-
-[+] GEO-REFERENCING AND COORDINATE SYSTEM:
-  - CRS                  : WGS 84 / UTM zone 18S
-  - EPSG Code            : EPSG:32718
-  - Projected (Meters)   : Yes
-
-[+] SPATIAL BOUNDS (BOUNDING BOX):
-  - X Min (West)         : 857,987.45
-  - X Max (East)         : 859,596.91
-  - Y Min (South)        : 8,505,398.13
-  - Y Max (North)        : 8,506,497.96
-  - Field Dimensions     : 1,609.5 m x 1,099.8 m
-  - Bounding Box Area    : 177.014 ha (1,770,138.8 m2)
-====================================================================
+# 1. Define paths to drone orthomosaic channels
+path_rgb <- "img/Ohuay_D.tif"    # High-resolution RGB orthomosaic
+path_nir <- "img/Ohuay_NIR.tif"  # Dedicated 16-bit Near-Infrared channel
+path_r   <- "img/Ohuay_R.tif"    # Dedicated 16-bit Red channel
+path_g   <- "img/Ohuay_G.tif"    # Dedicated 16-bit Green channel
 ```
 
 ``` r
 
-# Option B: Ingest a multi-band stacked raster with automated band validation
+# Option B: Ingest a multi-band stacked raster with automated band and metadata validation
 # If any required band is missing, d4h_read_stack halts with an informative error
 # r_stack <- d4h_read_stack(
 #   file_path      = "img/Ohuay_Stack.tif",
@@ -232,14 +199,6 @@ print(exec_summary_case01)
  4. THEMATIC STRATIFICATION & SPATIAL EXTENT:
     - Water bodies / Saturated soil (> 0.0)     :   8.4 % ( 10.28 ha)
     - Unsaturated terrestrial surface (<= 0.0)  :  91.6 % (112.07 ha)
-==============================================================================
-    - Tukey IQR Fences    : Lower < -0.794 | Upper > 0.410
-    - Outliers Detected   : 4,112 pixels (0.63% of valid pixels)
-    - Spatial Diagnostics : Homogeneous distribution (extreme values < 1%)
-
- 4. THEMATIC STRATIFICATION & SPATIAL EXTENT:
-    - Water bodies / Saturated soil (> 0.0)     :  18.6 % ( 12.02 ha)
-    - Unsaturated terrestrial surface (<= 0.0)  :  81.4 % ( 52.61 ha)
 
 ==============================================================================
 ```
