@@ -128,11 +128,11 @@ statistics, and Euclidean distance to water</em></p>
 <div class="section level2">
 <h2 id="objective">1 Objective<a class="anchor" aria-label="anchor" href="#objective"></a>
 </h2>
-<p>Ingest georeferenced household GPS points from Excel or CSV files,
-generate targeted focal buffers (in meters or grid units), compute zonal
-statistics strictly within the peridomestic flight envelope, and
-calculate minimum Euclidean distances from each dwelling to nearest
-water bodies with proximity decay modeling.</p>
+<p>Ingest georeferenced household GPS points from Excel files or
+rasters, generate targeted focal buffers (in meters or grid units),
+compute zonal statistics strictly within the peridomestic flight
+envelope, and calculate minimum Euclidean distances from each dwelling
+to nearest water bodies with proximity decay modeling.</p>
 <div class="text-center my-3">
 <p><img src="../reference/figures/05_focal_houses_buffer_ndvi.png" class="img-fluid rounded border shadow-sm" alt="Peridomestic Buffer Analysis over Drone Orthomosaic" width="85%"></p>
 </div>
@@ -219,7 +219,7 @@ Excel file (<code>nuevas_casas_localizadas.xlsx</code>):</p>
 <span><span class="va">path_dem</span> <span class="op">&lt;-</span> <span class="st">"img/Ohuay_D.tif"</span></span>
 <span></span>
 <span><span class="co"># Inspect ingested coordinates</span></span>
-<span><span class="va">houses_df</span> <span class="op">&lt;-</span> <span class="fu">readxl</span><span class="fu">::</span><span class="fu">read_excel</span><span class="op">(</span><span class="va">houses_file</span><span class="op">)</span></span>
+<span><span class="va">houses_df</span> <span class="op">&lt;-</span> <span class="fu">readxl</span><span class="fu">::</span><span class="fu"><a href="https://readxl.tidyverse.org/reference/read_excel.html" class="external-link">read_excel</a></span><span class="op">(</span><span class="va">houses_file</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">houses_df</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lat"</span>, <span class="st">"lon"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -237,11 +237,9 @@ grid summaries, and renders an automated visualization:</p>
 <span>  indicator        <span class="op">=</span> <span class="st">"NDVI"</span>,</span>
 <span>  houses           <span class="op">=</span> <span class="va">houses_file</span>,</span>
 <span>  radius           <span class="op">=</span> <span class="fl">3</span>,             <span class="co"># 3 grid units</span></span>
-<span>  cell_size        <span class="op">=</span> <span class="fl">50</span>,            <span class="co"># 50m cell size -&gt; 150m buffer radius</span></span>
-<span>  radius_in_meters <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  grid             <span class="op">=</span> <span class="va">grid_hex</span>,      <span class="co"># Ingests existing hexagonal grid</span></span>
 <span>  nir              <span class="op">=</span> <span class="va">path_nir</span>,</span>
 <span>  red              <span class="op">=</span> <span class="va">path_r</span>,</span>
-<span>  square           <span class="op">=</span> <span class="cn">FALSE</span>,         <span class="co"># Hexagonal grid within buffer</span></span>
 <span>  mask_outside     <span class="op">=</span> <span class="cn">TRUE</span>,          <span class="co"># Masks non-focal areas outside buffer</span></span>
 <span>  house_color      <span class="op">=</span> <span class="st">"red"</span>,</span>
 <span>  house_size       <span class="op">=</span> <span class="fl">2.5</span>,</span>
@@ -374,46 +372,47 @@ distance to water sources and proximity exposure decay modeling
 <span>  digits           <span class="op">=</span> <span class="fl">3</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">houses_exec_summary</span><span class="op">)</span></span></code></pre></div>
-<pre class="text"><code>==============================================================================
+<pre class="text"><code>
+==============================================================================
              DRONES4HEALTH - EXECUTIVE SUMMARY REPORT
 ==============================================================================
 
- INDICATOR: FOCAL_BUFFER_NDVI
+ INDICATOR: NDVI
 ------------------------------------------------------------------------------
  1. SPATIAL COVERAGE AND RESOLUTION:
-    - Pixel Resolution    : 99.21 cm
-    - Surveyed Area       : 55.765 ha (557,650 m2 across peridomestic buffers)
-    - Evaluated Pixels    : 562,110 (86.9% valid buffer footprint coverage)
+    - Pixel Resolution    : 9.92 cm x 9.92 cm (or 0.0992 m)
+    - Scene Dimensions    : 11,370 px x 9,006 px (102,398,220 total pixels, FLT4S)
+    - Scene Bounding Box  : 100.784 ha (1,007,845 m2 | 1,128 m x 893.5 m)
+    - Coordinate System   : EPSG:32718 (WGS 84 / UTM zone 18S)
+    - Surveyed Area       : 54.768 ha (547,681.4 m2)
+    - Evaluated Pixels    : 543,614 sampled (~55,645,074 valid total, 54.3% footprint coverage)
 
  2. GLOBAL DESCRIPTIVE STATISTICAL MOMENTS:
-    - Arithmetic Mean     : 0.282 (+/- 0.221 SD)
-    - Coeff. of Variation : 78.4 %
-    - Overall Range [Min,Max]: [-0.485, 0.946] (Span: 1.431)
-    - Median (Q50)        : 0.245
-    - Interquartile Range : [0.112, 0.428] (IQR: 0.316)
-    - Central 90% Span    : [-0.042, 0.698] (P05 - P95)
+    - Arithmetic Mean     : 0.23 (+/- 0.279 SD)
+    - Coeff. of Variation : 121.2 %
+    - Overall Range [Min,Max]: [-0.97, 0.998] (Span: 1.968)
+    - Median (Q50)        : 0.168
+    - Interquartile Range : [0.01, 0.441] (IQR: 0.431)
+    - Central 90% Span    : [-0.138, 0.733] (P05 - P95)
 
  3. SPATIAL OUTLIER DIAGNOSTICS (TUKEY IQR):
-    - Tukey IQR Fences    : Lower &lt; -0.362 | Upper &gt; 0.902
-    - Outliers Detected   : 3,412 pixels (0.61% of valid buffer pixels)
+    - Tukey IQR Fences    : Lower &lt; -0.636 | Upper &gt; 1.087
+    - Outliers Detected   : 379 pixels (0.07% of valid pixels)
     - Spatial Diagnostics : Homogeneous distribution (extreme values &lt; 1%)
 
  4. THEMATIC STRATIFICATION &amp; SPATIAL EXTENT:
-    - Water / Substrate degradation (&lt; 0.0)     :   6.8 % (  3.79 ha)
-    - Bare soil / Sparse canopy [0.0, 0.2)      :  35.4 % ( 19.74 ha)
-    - Moderate vegetation / Transition [0.2, 0.5):  38.6 % ( 21.53 ha)
-    - Dense vegetation / High vigor [&gt;= 0.5)    :  19.2 % ( 10.71 ha)
+    - Water / Substrate degradation (&lt; 0.0)     :  23.1 % ( 12.63 ha)
+    - Bare soil / Sparse canopy [0.0, 0.2)      :  30.9 % ( 16.92 ha)
+    - Moderate vegetation / Transition [0.2, 0.5):  25.2 % ( 13.80 ha)
+    - Dense vegetation / High vigor [&gt;= 0.5)    :  20.8 % ( 11.41 ha)
 
 ------------------------------------------------------------------------------
  5. HOUSEHOLD WATER PROXIMITY &amp; EXPOSURE ASSESSMENT:
     - Total Households Evaluated : 55 dwellings
-    - Euclidean Distance to Water: Mean = 214.6 m (Min = 34.2 m, Max = 458.0 m)
+    - Euclidean Distance to Water: Mean = 12.4 m (Min = 0.0 m, Max = 32.5 m)
 
     - Proximity Exposure Stratification:
-      * Immediate Proximity (&lt;50m) :   1 houses (  1.8%) | Mean dist:  34.2 m
-      * High Proximity (50-100m)   :   3 houses (  5.5%) | Mean dist:  78.4 m
-      * Moderate Proximity (100-200m): 24 houses ( 43.6%) | Mean dist: 154.2 m
-      * Distal (&gt;200m)             :  27 houses ( 49.1%) | Mean dist: 284.6 m
+      * Critical (&lt;50m)             :  55 houses (100.0%) | Mean dist:  12.4 m
 
 ==============================================================================</code></pre>
 </div>
@@ -616,7 +615,7 @@ Households)<a class="anchor" aria-label="anchor" href="#sheet-4-household_water_
 </tbody>
 </table>
 <div class="text-center my-3">
-<p><img src="../reference/figures/01_orthomosaic_rgb.png" class="img-fluid rounded border shadow-sm" alt="Households and Breeding Sites Mapping" width="85%"></p>
+<p><img src="../reference/figures/05_focal_houses_buffer_ndvi.png" class="img-fluid rounded border shadow-sm" alt="Households and Breeding Sites Mapping" width="85%"></p>
 </div>
 </div>
 </div>

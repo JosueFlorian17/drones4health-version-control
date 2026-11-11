@@ -262,7 +262,7 @@ renders an interactive <code>mapview</code> web map:</p>
 <span><span class="op">)</span></span>
 <span><span class="va">m_interactive</span></span></code></pre></div>
 <div class="text-center my-3">
-<p><img src="../reference/figures/01_mapview_basemap.png" class="img-fluid rounded border shadow-sm" alt="Interactive Mapview Web Map with Basemap Background" width="85%"></p>
+<p><img src="../reference/figures/ndvi-interactive.png" class="img-fluid rounded border shadow-sm" alt="Interactive Mapview Web Map with Basemap Background" width="85%"></p>
 </div>
 <hr>
 </div>
@@ -287,29 +287,32 @@ distributions for both NDVI and NDWI:</p>
 <span>  digits      <span class="op">=</span> <span class="fl">3</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">exec_summary_case01</span><span class="op">)</span></span></code></pre></div>
-<pre class="text"><code>==============================================================================
+<pre class="text"><code>
+==============================================================================
              DRONES4HEALTH - EXECUTIVE SUMMARY REPORT
 ==============================================================================
 
  INDICATOR: NDVI
 ------------------------------------------------------------------------------
  1. SPATIAL COVERAGE AND RESOLUTION:
-    - Pixel Resolution    : 9.92 cm
+    - Pixel Resolution    : 9.92 cm x 9.92 cm (or 0.0992 m)
+    - Scene Dimensions    : 16,223 px x 11,086 px (179,848,178 total pixels, FLT4S)
     - Scene Bounding Box  : 177.014 ha (1,770,139 m2 | 1,609.5 m x 1,099.8 m)
-    - Surveyed Area       : 116.002 ha (1,160,022 m2)
-    - Evaluated Pixels    : 655,753 sampled (~117,857,018 valid total, 65.5% footprint coverage)
+    - Coordinate System   : EPSG:32718 (WGS 84 / UTM zone 18S)
+    - Surveyed Area       : 115.999 ha (1,159,986 m2)
+    - Evaluated Pixels    : 655,747 sampled (~117,855,940 valid total, 65.5% footprint coverage)
 
  2. GLOBAL DESCRIPTIVE STATISTICAL MOMENTS:
     - Arithmetic Mean     : 0.239 (+/- 0.27 SD)
     - Coeff. of Variation : 113.2 %
-    - Overall Range [Min,Max]: [-0.962, 1] (Span: 1.962)
+    - Overall Range [Min,Max]: [-0.962, 0.993] (Span: 1.955)
     - Median (Q50)        : 0.178
     - Interquartile Range : [0.039, 0.416] (IQR: 0.377)
     - Central 90% Span    : [-0.105, 0.745] (P05 - P95)
 
  3. SPATIAL OUTLIER DIAGNOSTICS (TUKEY IQR):
     - Tukey IQR Fences    : Lower &lt; -0.526 | Upper &gt; 0.981
-    - Outliers Detected   : 1,599 pixels (0.24% of valid pixels)
+    - Outliers Detected   : 1,594 pixels (0.24% of valid pixels)
     - Spatial Diagnostics : Homogeneous distribution (extreme values &lt; 1%)
 
  4. THEMATIC STRATIFICATION &amp; SPATIAL EXTENT:
@@ -323,27 +326,29 @@ distributions for both NDVI and NDWI:</p>
  INDICATOR: NDWI
 ------------------------------------------------------------------------------
  1. SPATIAL COVERAGE AND RESOLUTION:
-    - Pixel Resolution    : 5.62 cm
-    - Scene Bounding Box  : 184.790 ha (1,847,897 m2 | 1,699.2 m x 1,087.5 m)
-    - Surveyed Area       : 122.350 ha (1,223,500 m2)
-    - Evaluated Pixels    : 656,624 sampled (~387,187,000 valid total, 66.2% footprint coverage)
+    - Pixel Resolution    : 5.62 cm x 5.62 cm (or 0.0562 m)
+    - Scene Dimensions    : 30,223 px x 19,342 px (584,573,266 total pixels, FLT4S)
+    - Scene Bounding Box  : 184.79 ha (1,847,897 m2 | 1,699.2 m x 1,087.5 m)
+    - Coordinate System   : EPSG:32718 (WGS 84 / UTM zone 18S)
+    - Surveyed Area       : 120.025 ha (1,200,251 m2)
+    - Evaluated Pixels    : 650,042 sampled (~379,693,420 valid total, 65% footprint coverage)
 
  2. GLOBAL DESCRIPTIVE STATISTICAL MOMENTS:
-    - Arithmetic Mean     : -0.194 (+/- 0.241 SD)
-    - Coeff. of Variation : 124.2 %
-    - Overall Range [Min,Max]: [-0.985, 0.923] (Span: 1.908)
-    - Median (Q50)        : -0.158
-    - Interquartile Range : [-0.342, -0.041] (IQR: 0.301)
-    - Central 90% Span    : [-0.641, 0.185] (P05 - P95)
+    - Arithmetic Mean     : 0.371 (+/- 0.311 SD)
+    - Coeff. of Variation : 83.9 %
+    - Overall Range [Min,Max]: [-0.992, 0.974] (Span: 1.966)
+    - Median (Q50)        : 0.449
+    - Interquartile Range : [0.237, 0.558] (IQR: 0.321)
+    - Central 90% Span    : [-0.288, 0.781] (P05 - P95)
 
  3. SPATIAL OUTLIER DIAGNOSTICS (TUKEY IQR):
-    - Tukey IQR Fences    : Lower &lt; -0.794 | Upper &gt; 0.411
-    - Outliers Detected   : 8,120 pixels (1.24% of valid pixels)
-    - Spatial Diagnostics : Moderate dispersion (localized spatial anomalies)
+    - Tukey IQR Fences    : Lower &lt; -0.245 | Upper &gt; 1.04
+    - Outliers Detected   : 39,969 pixels (6.15% of valid pixels)
+    - Spatial Diagnostics : High dispersion / significant anomaly presence or boundary effects
 
  4. THEMATIC STRATIFICATION &amp; SPATIAL EXTENT:
-    - Water bodies / Saturated soil (&gt; 0.0)     :   8.4 % ( 10.28 ha)
-    - Unsaturated terrestrial surface (&lt;= 0.0)  :  91.6 % (112.07 ha)
+    - Water bodies / Saturated soil (&gt; 0.0)     :  86.8 % (104.23 ha)
+    - Unsaturated terrestrial surface (&lt;= 0.0)  :  13.2 % ( 15.80 ha)
 
 ==============================================================================</code></pre>
 </div>
@@ -399,7 +404,7 @@ lower/upper fences, outlier counts, and distribution diagnoses.</li>
 <th align="left">Max</th>
 <th align="left">IQR</th>
 <th align="left">Outliers_Pct</th>
-<th align="left">Outlier_Diagnostics</th>
+<th align="left"></th>
 </tr></thead>
 <tbody>
 <tr class="odd">
@@ -416,7 +421,7 @@ lower/upper fences, outlier counts, and distribution diagnoses.</li>
 <td align="left">0.990</td>
 <td align="left">0.347</td>
 <td align="left">0.82%</td>
-<td align="left">Homogeneous (&lt; 1%)</td>
+<td align="left"></td>
 </tr>
 <tr class="even">
 <td align="left"><strong>NDWI</strong></td>
@@ -432,7 +437,7 @@ lower/upper fences, outlier counts, and distribution diagnoses.</li>
 <td align="left">0.923</td>
 <td align="left">0.301</td>
 <td align="left">0.63%</td>
-<td align="left">Homogeneous (&lt; 1%)</td>
+<td align="left"></td>
 </tr>
 </tbody>
 </table>
@@ -515,7 +520,7 @@ lower/upper fences, outlier counts, and distribution diagnoses.</li>
 <th align="left">High_Outliers</th>
 <th align="left">Total_Outliers</th>
 <th align="left">Outlier_Pct</th>
-<th align="left">Diagnosis</th>
+<th align="left"></th>
 </tr></thead>
 <tbody>
 <tr class="odd">
@@ -526,7 +531,7 @@ lower/upper fences, outlier counts, and distribution diagnoses.</li>
 <td align="left">3,248</td>
 <td align="left">5,388</td>
 <td align="left">0.82%</td>
-<td align="left">Homogeneous distribution</td>
+<td align="left"></td>
 </tr>
 <tr class="even">
 <td align="left"><strong>NDWI</strong></td>
@@ -536,7 +541,7 @@ lower/upper fences, outlier counts, and distribution diagnoses.</li>
 <td align="left">2,292</td>
 <td align="left">4,112</td>
 <td align="left">0.63%</td>
-<td align="left">Homogeneous distribution</td>
+<td align="left"></td>
 </tr>
 </tbody>
 </table>
