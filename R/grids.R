@@ -56,6 +56,7 @@ d4h_summarize_grid <- function(raster_in, cell_size = 20, square = TRUE, discard
 #'   grid3 <- d4h_make_grid(aoi = aoi_file, n_cells = 100, square = FALSE)
 #' }
 #' }
+#' @keywords internal
 #' @export
 d4h_make_grid <- function(aoi,
                           cell_size = NULL,

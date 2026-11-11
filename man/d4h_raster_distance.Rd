@@ -4,7 +4,12 @@
 \alias{d4h_raster_distance}
 \title{Continuous Euclidean Distance Raster from Risk Sources}
 \usage{
-d4h_raster_distance(sources, raster_ref)
+d4h_raster_distance(
+  sources,
+  raster_ref = NULL,
+  template_raster = NULL,
+  max_dist_m = NULL
+)
 }
 \arguments{
 \item{sources}{\code{sf} or \code{SpatVector} spatial object containing risk source polygons/points.}

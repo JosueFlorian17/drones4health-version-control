@@ -133,7 +133,7 @@ surveillance grids and extracting zonal summary metrics</em></p>
 statistics per cell, identify spatial anomalies using Tukey IQR outlier
 fences, and export multi-sheet executive spreadsheets.</p>
 <div class="text-center my-3">
-<p><img src="../reference/figures/03_hexagonal_grid_zonal_ndvi.png" class="img-fluid rounded border shadow-sm" alt="Hexagonal Surveillance Grid over Orthomosaic" width="85%"></p>
+<p><img src="../reference/figures/ndvi-mean-grid.png" class="img-fluid rounded border shadow-sm" alt="Hexagonal Surveillance Grid over Orthomosaic" width="85%"></p>
 </div>
 <hr>
 </div>
@@ -154,14 +154,10 @@ fences, and export multi-sheet executive spreadsheets.</p>
 <tbody>
 <tr class="odd">
 <td align="left"><strong>Operational Grid</strong></td>
-<td align="left">
-<code><a href="../reference/d4h_make_grid.html">d4h_make_grid()</a></code> /
-<code><a href="../reference/d4h_hex_grid.html">d4h_hex_grid()</a></code>
-</td>
-<td align="left">Generates regular hexagonal or square surveillance
-partitions using 3 mutually exclusive sizing modes
-(<code>cell_size</code>, <code>area_m2</code>, or
-<code>n_cells</code>).</td>
+<td align="left"><code><a href="../reference/d4h_hex_grid.html">d4h_hex_grid()</a></code></td>
+<td align="left">Generates regular hexagonal surveillance partitions
+using 3 mutually exclusive sizing modes (<code>cell_size</code>,
+<code>area_m2</code>, or <code>n_cells</code>).</td>
 </tr>
 <tr class="even">
 <td align="left"><strong>Executive Summary (DF / SF)</strong></td>
@@ -248,7 +244,7 @@ surveyed flight footprint (e.g., <code>n_cells = 100</code>).</li>
 <code><a href="../reference/d4h_executive_summary.html">d4h_executive_summary()</a></code>, which automatically detects the
 grid and returns a complete <code>sf</code> object:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Seamless pipe from grid to executive summary</span></span>
+<code class="sourceCode R"><span></span>
 <span><span class="va">grid_summary_ndvi</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_executive_summary.html">d4h_executive_summary</a></span><span class="op">(</span></span>
 <span>  raster_in <span class="op">=</span> <span class="va">r_ndvi</span>,</span>
 <span>  grid      <span class="op">=</span> <span class="va">grid_hex</span>,</span>
@@ -266,7 +262,7 @@ grid and returns a complete <code>sf</code> object:</p>
 interface to compute and extract multiple environmental indicators
 simultaneously across the flight scene:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Extract NDVI and NDWI in a single pipe call</span></span>
+<code class="sourceCode R"><span><span class="co"># Extract NDVI and NDWI in a single call</span></span>
 <span><span class="va">indicators_sf</span> <span class="op">&lt;-</span> <span class="va">grid_hex</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/d4h_extract_indicators.html">d4h_extract_indicators</a></span><span class="op">(</span></span>
 <span>    bands <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ndvi"</span>, <span class="st">"ndwi"</span><span class="op">)</span>,</span>
@@ -287,8 +283,7 @@ IQR), micro-environmental composition (<code>pct_vegetation</code>,
 <code>pct_bare_soil</code>), and surveillance priorities per grid unit,
 exporting directly to Excel:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Multi-moment executive summary aggregated by grid cell (returns both $df and $sf)</span></span>
-<span><span class="va">grid_exec_summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_executive_summary.html">d4h_executive_summary</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">grid_exec_summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_executive_summary.html">d4h_executive_summary</a></span><span class="op">(</span></span>
 <span>  raster_in   <span class="op">=</span> <span class="va">r_ndvi</span>,</span>
 <span>  by          <span class="op">=</span> <span class="st">"grid"</span>,</span>
 <span>  cell_size   <span class="op">=</span> <span class="fl">50</span>,</span>
@@ -297,14 +292,14 @@ exporting directly to Excel:</p>
 <span>  digits      <span class="op">=</span> <span class="fl">3</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Inspect clean tabular data frame ($df)</span></span>
+<span><span class="co"># Inspect data frame</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">grid_exec_summary</span><span class="op">$</span><span class="va">df</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"grid_id"</span>, <span class="st">"area_m2"</span>, <span class="st">"pct_vegetation"</span>, <span class="st">"pct_bare_soil"</span>, <span class="st">"NDVI_mean"</span>, <span class="st">"NDVI_sd"</span>, <span class="st">"NDVI_median"</span>, <span class="st">"dominant_class"</span>, <span class="st">"surveillance_priority"</span><span class="op">)</span><span class="op">]</span>, <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
-<pre class="text"><code>  grid_id area_m2 pct_vegetation pct_bare_soil NDVI_mean NDVI_sd NDVI_median dominant_class surveillance_priority
-1   H0001 2165.06          65.00         35.00        NA      NA          NA     Vegetation                   Low
-2   H0002 2165.06          65.00         35.00        NA      NA          NA     Vegetation                   Low
+<pre class="text"><code>  grid_id area_m2 pct_vegetation pct_bare_soil NDVI_mean NDVI_sd NDVI_median dominant_class 
+1   H0001 2165.06          65.00         35.00        NA      NA          NA     Vegetation                   
+2   H0002 2165.06          65.00         35.00        NA      NA          NA     Vegetation                   
 3   H0003 2165.06          14.80         85.20     0.028   0.187       0.002      Bare Soil              Moderate
-4   H0004 2165.06          64.20         35.80     0.234   0.379       0.151     Vegetation                   Low
-5   H0005 2165.06          93.80          6.20     0.679   0.297       0.865     Vegetation                   Low</code></pre>
+4   H0004 2165.06          64.20         35.80     0.234   0.379       0.151     Vegetation                   
+5   H0005 2165.06          93.80          6.20     0.679   0.297       0.865     Vegetation                   </code></pre>
 </div>
 <div class="section level3">
 <h3 id="cartographic-visualization-interactive-grid-mapping">3.6 Cartographic Visualization &amp; Interactive Grid Mapping<a class="anchor" aria-label="anchor" href="#cartographic-visualization-interactive-grid-mapping"></a>

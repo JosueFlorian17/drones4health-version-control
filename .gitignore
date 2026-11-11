@@ -34,3 +34,10 @@ __pycache__/
 r-academy/
 
 other-package-reference/
+.Renviron
+.Rprofile
+build_*.py
+sections_*.py
+
+/.quarto/
+**/*.quarto_ipynb

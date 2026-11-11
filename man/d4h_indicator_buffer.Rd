@@ -7,9 +7,14 @@
 d4h_indicator_buffer(
   indicator = "NDVI",
   houses,
-  radius = 3,
+  radius_m = NULL,
+  radius_grids = NULL,
+  radius = NULL,
   cell_size = 50,
   radius_in_meters = FALSE,
+  meters = NULL,
+  grids = NULL,
+  grid = NULL,
   nir = NULL,
   red = NULL,
   green = NULL,
@@ -25,7 +30,11 @@ d4h_indicator_buffer(
   palette = "viridis",
   limits = NULL,
   title = NULL,
-  plot = TRUE
+  plot = TRUE,
+  interactive = FALSE,
+  bbox = TRUE,
+  scale_bar = TRUE,
+  north_arrow = TRUE
 )
 }
 \arguments{
@@ -35,11 +44,21 @@ Alternatively, pass a custom function \code{function(...)} or a pre-calculated S
 
 \item{houses}{Character path, data.frame, SpatVector, or sf object containing house coordinates (e.g., CSV with lon/lat or x/y columns).}
 
-\item{radius}{Numeric. Buffer radius surrounding each house. Defined in number of grid cells (default: 3). If \code{radius_in_meters = TRUE}, interpreted directly as meters.}
+\item{radius_m}{Numeric (optional). Buffer radius surrounding each house in meters (e.g., \code{radius_m = 150}). Mutually exclusive with \code{radius_grids}.}
+
+\item{radius_grids}{Numeric (optional). Buffer radius surrounding each house measured in number of grid units (e.g., \code{radius_grids = 3}). Mutually exclusive with \code{radius_m}.}
+
+\item{radius}{Numeric (deprecated alias for radius distance).}
 
 \item{cell_size}{Numeric. Grid cell size in meters used to establish grid scale and calculate buffer distances (default: 50).}
 
-\item{radius_in_meters}{Logical. If FALSE (default), total buffer distance is \code{radius * cell_size}. If TRUE, total buffer distance is \code{radius}.}
+\item{radius_in_meters}{Logical (deprecated, use \code{radius_m} directly).}
+
+\item{meters}{Alias for \code{radius_m}.}
+
+\item{grids}{Alias for \code{radius_grids}.}
+
+\item{grid}{SpatVector, sf, or character path (optional). An already existing spatial grid (e.g. from \code{d4h_hex_grid}). When provided, grid cells intersecting the household buffers are automatically extracted, and \code{cell_size} / \code{square} are automatically inferred.}
 
 \item{nir}{SpatRaster or character path. Near-Infrared band (optional, required for multispectral indices).}
 
@@ -71,7 +90,11 @@ Alternatively, pass a custom function \code{function(...)} or a pre-calculated S
 
 \item{title}{Character. Custom plot title (optional).}
 
-\item{plot}{Logical. If TRUE (default), returns a list with the raster, grid summary, and ggplot. If FALSE, skips rendering.}
+\item{plot}{Logical. If TRUE (default), returns a list with the raster, grid summary, and ggplot / mapview. If FALSE, skips rendering.}
+
+\item{interactive}{Logical. If TRUE, generates an interactive WebGIS mapview widget. If FALSE (default), generates a publication-ready ggplot2 graphic.}
+
+\item{bbox}{Logical. If TRUE (default), keeps default plot coordinate bounding box and gridlines. If FALSE, tightly fits geometry without extra margins.}
 }
 \value{
 A list containing:

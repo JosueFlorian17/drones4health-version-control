@@ -148,7 +148,6 @@ reference:
   - title: "Spatial Grids & Zonation"
     desc: "Operational surveillance grids (hexagons/squares), grid-level distance-to-water proximity exposure modeling, land cover percentage composition, and zonal summary statistics extraction."
     contents:
-      - d4h_make_grid
       - d4h_hex_grid
       - d4h_grid_distance_to_water
       - d4h_grid_composition

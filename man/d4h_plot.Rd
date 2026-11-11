@@ -26,7 +26,12 @@ d4h_plot(
   max_pixels = 5e+05,
   zcol = NULL,
   ortho = NULL,
-  general = FALSE
+  general = FALSE,
+  bbox = TRUE,
+  scale_bar = TRUE,
+  north_arrow = TRUE,
+  scale = NULL,
+  north = NULL
 )
 }
 \arguments{
@@ -71,6 +76,8 @@ d4h_plot(
 \item{ortho}{SpatRaster or character path. Optional high-resolution RGB orthomosaic to render as an underlay base layer beneath grids, vectors, or point features.}
 
 \item{general}{Logical. If TRUE, transforms continuous raster layers into homogeneous mosaics filled with the overall global mean value across valid pixels before plotting (default: FALSE).}
+
+\item{bbox}{Logical. If \code{TRUE} (default), expands the cartographic bounding box and renders coordinate gridlines. If \code{FALSE}, fits the canvas strictly to the spatial footprint, eliminating unnecessary white margins and outer rectangular whitespace around masked buffers.}
 }
 \value{
 A \code{ggplot} object (if \code{interactive = FALSE}) or an interactive \code{mapview} / \code{leaflet} slider widget (if \code{interactive = TRUE}).

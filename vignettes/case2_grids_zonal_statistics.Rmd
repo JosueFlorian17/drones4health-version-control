@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 Partition the continuous flight mosaic into regular spatial grids (hexagonal or square) with custom parameters, extract zonal summary statistics per cell, identify spatial anomalies using Tukey IQR outlier fences, and export multi-sheet executive spreadsheets.
 
 <div class="text-center my-3">
-  <img src="../reference/figures/03_hexagonal_grid_zonal_ndvi.png" class="img-fluid rounded border shadow-sm" alt="Hexagonal Surveillance Grid over Orthomosaic" width="85%">
+  <img src="../reference/figures/ndvi-mean-grid.png" class="img-fluid rounded border shadow-sm" alt="Hexagonal Surveillance Grid over Orthomosaic" width="85%">
 </div>
 
 ---
@@ -31,7 +31,7 @@ Partition the continuous flight mosaic into regular spatial grids (hexagonal or 
 
 | Variable / Target | Function | Description |
 | :--- | :--- | :--- |
-| **Operational Grid** | `d4h_make_grid()` / `d4h_hex_grid()` | Generates regular hexagonal or square surveillance partitions using 3 mutually exclusive sizing modes (`cell_size`, `area_m2`, or `n_cells`). |
+| **Operational Grid** | `d4h_hex_grid()` | Generates regular hexagonal surveillance partitions using 3 mutually exclusive sizing modes (`cell_size`, `area_m2`, or `n_cells`). |
 | **Executive Summary (DF / SF)** | `d4h_executive_summary()` | Extracts multi-moment statistics and outlier diagnostics, returning both a spatial `sf` object and a clean tabular `data.frame`. |
 | **Multi-Indicator Extraction** | `d4h_extract_indicators()` | Simultaneously calculates and extracts multiple biophysical/terrain indicators (`ndvi`, `ndwi`, `savi`, `vari`, `slope`, etc.) per region. |
 | **Unified Visualization** | `d4h_plot()` | Unified static and interactive maps with continuous, discrete, or homogeneous baselines. |
@@ -88,7 +88,7 @@ head(grid_hex)
 The generated grid directly feeds into `d4h_executive_summary()`, which automatically detects the grid and returns a complete `sf` object:
 
 ```r
-# Seamless pipe from grid to executive summary
+
 grid_summary_ndvi <- d4h_executive_summary(
   raster_in = r_ndvi,
   grid      = grid_hex,
@@ -104,7 +104,7 @@ head(grid_summary_ndvi)
 The `d4h_extract_indicators()` function provides a unified interface to compute and extract multiple environmental indicators simultaneously across the flight scene:
 
 ```r
-# Extract NDVI and NDWI in a single pipe call
+# Extract NDVI and NDWI in a single call
 indicators_sf <- grid_hex |>
   d4h_extract_indicators(
     bands = c("ndvi", "ndwi"),
@@ -122,7 +122,6 @@ head(indicators_sf)
 We execute a comprehensive statistical report evaluating descriptive moments (mean, standard deviation, coefficient of variation, median, IQR), micro-environmental composition (`pct_vegetation`, `pct_bare_soil`), and surveillance priorities per grid unit, exporting directly to Excel:
 
 ```{r}
-# Multi-moment executive summary aggregated by grid cell (returns both $df and $sf)
 grid_exec_summary <- d4h_executive_summary(
   raster_in   = r_ndvi,
   by          = "grid",
@@ -132,17 +131,17 @@ grid_exec_summary <- d4h_executive_summary(
   digits      = 3
 )
 
-# Inspect clean tabular data frame ($df)
+# Inspect data frame
 head(grid_exec_summary$df[, c("grid_id", "area_m2", "pct_vegetation", "pct_bare_soil", "NDVI_mean", "NDVI_sd", "NDVI_median", "dominant_class", "surveillance_priority")], 5)
 ```
 
 ```text
-  grid_id area_m2 pct_vegetation pct_bare_soil NDVI_mean NDVI_sd NDVI_median dominant_class surveillance_priority
-1   H0001 2165.06          65.00         35.00        NA      NA          NA     Vegetation                   Low
-2   H0002 2165.06          65.00         35.00        NA      NA          NA     Vegetation                   Low
+  grid_id area_m2 pct_vegetation pct_bare_soil NDVI_mean NDVI_sd NDVI_median dominant_class 
+1   H0001 2165.06          65.00         35.00        NA      NA          NA     Vegetation                   
+2   H0002 2165.06          65.00         35.00        NA      NA          NA     Vegetation                   
 3   H0003 2165.06          14.80         85.20     0.028   0.187       0.002      Bare Soil              Moderate
-4   H0004 2165.06          64.20         35.80     0.234   0.379       0.151     Vegetation                   Low
-5   H0005 2165.06          93.80          6.20     0.679   0.297       0.865     Vegetation                   Low
+4   H0004 2165.06          64.20         35.80     0.234   0.379       0.151     Vegetation                   
+5   H0005 2165.06          93.80          6.20     0.679   0.297       0.865     Vegetation                   
 ```
 
 ### 3.6 Cartographic Visualization & Interactive Grid Mapping

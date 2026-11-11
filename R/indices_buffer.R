@@ -9,9 +9,14 @@
 #' Supported character names: \code{"NDVI"}, \code{"NDWI"}, \code{"SAVI"}, \code{"DVI"}, \code{"GNDVI"}, \code{"NDRE"}, \code{"EVI"}, \code{"VARI"}, \code{"TVI"}, \code{"MSAVI2"}, \code{"IRHE"}, \code{"IMSR"}, \code{"IRTS"}, \code{"slope"}, \code{"twi"}, \code{"dsm"}, \code{"rgb"}.
 #' Alternatively, pass a custom function \code{function(...)} or a pre-calculated SpatRaster.
 #' @param houses Character path, data.frame, SpatVector, or sf object containing house coordinates (e.g., CSV with lon/lat or x/y columns).
-#' @param radius Numeric. Buffer radius surrounding each house. Defined in number of grid cells (default: 3). If \code{radius_in_meters = TRUE}, interpreted directly as meters.
+#' @param radius_m Numeric (optional). Buffer radius surrounding each house in meters (e.g., \code{radius_m = 150}). Mutually exclusive with \code{radius_grids}.
+#' @param radius_grids Numeric (optional). Buffer radius surrounding each house measured in number of grid units (e.g., \code{radius_grids = 3}). Mutually exclusive with \code{radius_m}.
+#' @param radius Numeric (deprecated alias for radius distance).
 #' @param cell_size Numeric. Grid cell size in meters used to establish grid scale and calculate buffer distances (default: 50).
-#' @param radius_in_meters Logical. If FALSE (default), total buffer distance is \code{radius * cell_size}. If TRUE, total buffer distance is \code{radius}.
+#' @param radius_in_meters Logical (deprecated, use \code{radius_m} directly).
+#' @param meters Alias for \code{radius_m}.
+#' @param grids Alias for \code{radius_grids}.
+#' @param grid SpatVector, sf, or character path (optional). An already existing spatial grid (e.g. from \code{d4h_hex_grid}). When provided, grid cells intersecting the household buffers are automatically extracted, and \code{cell_size} / \code{square} are automatically inferred.
 #' @param nir SpatRaster or character path. Near-Infrared band (optional, required for multispectral indices).
 #' @param red SpatRaster or character path. Red band (optional).
 #' @param green SpatRaster or character path. Green band (optional).
@@ -27,7 +32,9 @@
 #' @param palette Character. Color palette name ("viridis", "magma", "terrain", "spectral") or custom color vector (default: "viridis").
 #' @param limits Numeric vector c(min, max) to fix color scale limits (default: NULL).
 #' @param title Character. Custom plot title (optional).
-#' @param plot Logical. If TRUE (default), returns a list with the raster, grid summary, and ggplot. If FALSE, skips rendering.
+#' @param plot Logical. If TRUE (default), returns a list with the raster, grid summary, and ggplot / mapview. If FALSE, skips rendering.
+#' @param interactive Logical. If TRUE, generates an interactive WebGIS mapview widget. If FALSE (default), generates a publication-ready ggplot2 graphic.
+#' @param bbox Logical. If TRUE (default), keeps default plot coordinate bounding box and gridlines. If FALSE, tightly fits geometry without extra margins.
 #' @return A list containing:
 #' \itemize{
 #'   \item \code{raster}: The targeted cropped SpatRaster of the computed indicator.
@@ -72,9 +79,14 @@
 #' @export
 d4h_indicator_buffer <- function(indicator = "NDVI",
                                  houses,
-                                 radius = 3,
+                                 radius_m = NULL,
+                                 radius_grids = NULL,
+                                 radius = NULL,
                                  cell_size = 50,
                                  radius_in_meters = FALSE,
+                                 meters = NULL,
+                                 grids = NULL,
+                                 grid = NULL,
                                  nir = NULL,
                                  red = NULL,
                                  green = NULL,
@@ -90,10 +102,74 @@ d4h_indicator_buffer <- function(indicator = "NDVI",
                                  palette = "viridis",
                                  limits = NULL,
                                  title = NULL,
-                                 plot = TRUE) {
+                                 plot = TRUE,
+                                 interactive = FALSE,
+                                 bbox = TRUE,
+                                 scale_bar = TRUE,
+                                 north_arrow = TRUE,
+                                 scale_pos = "bl",
+                                 north_pos = "tr") {
 
-  # 1. Calcular distancia de buffer en metros
-  buffer_dist_m <- if (isTRUE(radius_in_meters)) as.numeric(radius) else as.numeric(radius) * as.numeric(cell_size)
+  # 1. Resolver y unificar grilla preexistente si se proporciona
+  sf_grid_input <- NULL
+  if (!is.null(grid)) {
+    if (is.list(grid) && !inherits(grid, c("sf", "SpatVector")) && !is.null(grid$sf)) {
+      grid <- grid$sf
+    }
+    sf_grid_input <- if (inherits(grid, "SpatVector")) {
+      sf::st_as_sf(grid)
+    } else if (inherits(grid, "sf")) {
+      grid
+    } else {
+      sf::st_read(grid, quiet = TRUE)
+    }
+
+    if (missing(cell_size) || is.null(cell_size)) {
+      if ("area_m2" %in% names(sf_grid_input)) {
+        a_m2 <- mean(sf_grid_input$area_m2, na.rm = TRUE)
+        cell_size <- round(sqrt(a_m2 / (sqrt(3) / 2)), 1)
+      } else {
+        a_m2 <- as.numeric(mean(sf::st_area(sf_grid_input), na.rm = TRUE))
+        cell_size <- round(sqrt(a_m2), 1)
+      }
+    }
+    if (missing(square)) {
+      square <- FALSE
+    }
+  }
+
+  # Resolver aliases de metros y grillas
+  if (is.null(radius_m) && !is.null(meters)) radius_m <- meters
+  if (is.null(radius_grids) && !is.null(grids)) radius_grids <- grids
+
+  # Mapear argumento historico 'radius' si se especifico
+  if (!is.null(radius)) {
+    if (isTRUE(radius_in_meters)) {
+      if (is.null(radius_m)) radius_m <- radius
+    } else {
+      if (is.null(radius_grids)) radius_grids <- radius
+    }
+  }
+
+  # Validacion de exclusividad mutua entre metros y grillas
+  if (!is.null(radius_m) && !is.null(radius_grids)) {
+    stop("Arguments 'radius_m' (meters) and 'radius_grids' (grids) are mutually exclusive. Please specify either meters or grids, not both.", call. = FALSE)
+  }
+
+  # Calculo de distancia e impresion explicativa bidireccional
+  buffer_dist_m <- 150.0
+  if (!is.null(radius_m)) {
+    buffer_dist_m <- as.numeric(radius_m)
+    equiv_grids <- round(buffer_dist_m / as.numeric(cell_size), 1)
+    message(sprintf("✔ Buffer radius: %.1f m (enclosing ~%.1f grid cells of %.1f m)", buffer_dist_m, equiv_grids, as.numeric(cell_size)))
+  } else if (!is.null(radius_grids)) {
+    buffer_dist_m <- as.numeric(radius_grids) * as.numeric(cell_size)
+    message(sprintf("✔ Buffer radius: %g grid cells (enclosing %.1f m at %.1f m cell size)", as.numeric(radius_grids), buffer_dist_m, as.numeric(cell_size)))
+  } else {
+    buffer_dist_m <- 150.0
+    equiv_grids <- round(buffer_dist_m / as.numeric(cell_size), 1)
+    message(sprintf("✔ Buffer radius: %.1f m (enclosing ~%.1f grid cells of %.1f m)", buffer_dist_m, equiv_grids, as.numeric(cell_size)))
+  }
   if (buffer_dist_m <= 0) buffer_dist_m <- 1.0
 
   # 2. Identificar el raster de referencia inicial para CRS y resolucion
@@ -241,7 +317,21 @@ d4h_indicator_buffer <- function(indicator = "NDVI",
   }
 
   # 9. Extraer resumen zonal por grilla dentro de la zona focal
-  grid_focal <- d4h_summarize_grid(r_res, cell_size = cell_size, square = square, discard_na = TRUE)
+  grid_focal <- if (!is.null(sf_grid_input)) {
+    if (sf::st_crs(sf_grid_input) != target_crs) {
+      sf_grid_input <- sf::st_transform(sf_grid_input, target_crs)
+    }
+    inter_cells <- which(lengths(sf::st_intersects(sf_grid_input, buf_sf)) > 0)
+    if (length(inter_cells) > 0) {
+      grid_sub <- sf_grid_input[inter_cells, ]
+      sum_res <- d4h_executive_summary(raster_in = r_res, grid = grid_sub, out_xlsx = NULL)
+      if (is.list(sum_res) && !is.null(sum_res$sf)) sum_res$sf else sum_res
+    } else {
+      sf_grid_input[0, ]
+    }
+  } else {
+    d4h_summarize_grid(r_res, cell_size = cell_size, square = square, discard_na = TRUE)
+  }
 
   # 10. Ploteo especializado con casas y contorno del buffer
   p_out <- NULL
@@ -250,23 +340,24 @@ d4h_indicator_buffer <- function(indicator = "NDVI",
       title
     } else {
       ind_name <- if (is.character(indicator)) toupper(indicator) else "Indicator"
-      sprintf("%s in Household Catchment Area (Radius: %g grids / %g m)", ind_name, radius, round(buffer_dist_m))
+      sprintf("%s in Household Catchment Area (Radius %g m - ~%.1f grids)", ind_name, round(buffer_dist_m), round(buffer_dist_m / as.numeric(cell_size), 1))
     }
 
     # Render focal indicator
     p_out <- d4h_plot(
-      x           = r_res,
+      x           = list(raster = r_res, houses = sf_houses_focal, buffer = buf_sf, grid = if (!is.null(sf_grid_input)) grid_focal else NULL),
+      interactive = interactive,
       palette     = palette,
       limits      = limits,
-      houses      = sf_houses_focal,
       house_color = house_color,
       house_size  = house_size,
-      title       = title_str
+      title       = title_str,
+      bbox        = bbox,
+      scale_bar   = scale_bar,
+      north_arrow = north_arrow,
+      scale_pos   = scale_pos,
+      north_pos   = north_pos
     )
-
-    # Add buffer boundary
-    p_out <- p_out +
-      ggplot2::geom_sf(data = buf_sf, fill = NA, color = "black", linetype = "dashed", linewidth = 0.5)
   }
 
   out <- list(
@@ -285,7 +376,14 @@ d4h_indicator_buffer <- function(indicator = "NDVI",
 print.d4h_buffer_analysis <- function(x, ...) {
   cat("\n=== DRONES4HEALTH: FOCAL BUFFER ANALYSIS ===\n")
   cat(sprintf("Houses analyzed in focus area : %d buildings\n", nrow(x$houses)))
-  cat(sprintf("Grid cells covered            : %d cells\n", nrow(x$grid)))
+  n_cells <- if (inherits(x$grid, "sf") || inherits(x$grid, "data.frame")) {
+    nrow(x$grid)
+  } else if (is.list(x$grid) && !is.null(x$grid$sf)) {
+    nrow(x$grid$sf)
+  } else {
+    0L
+  }
+  cat(sprintf("Grid cells covered            : %d cells\n", n_cells))
   cat(sprintf("Resulting raster layer        : %s\n", names(x$raster)[1]))
   print(x$raster)
   if (!is.null(x$plot)) {

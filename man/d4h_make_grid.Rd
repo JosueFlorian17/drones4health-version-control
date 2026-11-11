@@ -66,3 +66,4 @@ if (interactive()) {
 \references{
 Carr, D. B., Olsen, A. R., & White, D. (1992). Hexagon mosaic maps for display of univariate and bivariate data. \emph{Cartography and Geographic Information Systems}, 19(4), 228-236. \doi{10.1559/152304092783721231}
 }
+\keyword{internal}

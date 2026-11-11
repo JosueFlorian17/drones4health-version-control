@@ -28,6 +28,7 @@
 #' @param zcol Character. Optional column name to color/fill spatial vector features (e.g., \code{"proximity_level"}, \code{"risk_level"}, or \code{"dist_water_m"}).
 #' @param ortho SpatRaster or character path. Optional high-resolution RGB orthomosaic to render as an underlay base layer beneath grids, vectors, or point features.
 #' @param general Logical. If TRUE, transforms continuous raster layers into homogeneous mosaics filled with the overall global mean value across valid pixels before plotting (default: FALSE).
+#' @param bbox Logical. If \code{TRUE} (default), expands the cartographic bounding box and renders coordinate gridlines. If \code{FALSE}, fits the canvas strictly to the spatial footprint, eliminating unnecessary white margins and outer rectangular whitespace around masked buffers.
 #' @return A \code{ggplot} object (if \code{interactive = FALSE}) or an interactive \code{mapview} / \code{leaflet} slider widget (if \code{interactive = TRUE}).
 #' @examples
 #' \donttest{
@@ -60,7 +61,25 @@ d4h_plot <- function(x = NULL, y = NULL, interactive = FALSE, grid = NULL, house
                      houses_filter_extent = FALSE, house_color = "red", house_size = 2.0,
                      rgb_bands = NULL, palette = "viridis", palette_y = "magma",
                      limits = NULL, limits_y = NULL, title = NULL, max_pixels = 500000,
-                     zcol = NULL, ortho = NULL, general = FALSE) {
+                     zcol = NULL, ortho = NULL, general = FALSE, bbox = TRUE,
+                     scale_bar = TRUE, north_arrow = TRUE, scale_pos = "bl", north_pos = "tr",
+                     scale = NULL, north = NULL, raster_in = NULL) {
+
+  if (is.null(x) && !is.null(raster_in)) x <- raster_in
+  if (!is.null(scale)) scale_bar <- scale
+  if (!is.null(north)) north_arrow <- north
+
+  # Support buffer analysis compound object (from d4h_indicator_buffer)
+  buffer_poly <- NULL
+  if (inherits(x, "d4h_buffer_analysis") || (is.list(x) && all(c("raster", "houses", "buffer") %in% names(x)))) {
+    buffer_poly <- x$buffer
+    if (is.null(houses)) houses <- x$houses
+    if (is.null(grid) && !is.null(x$grid)) grid <- x$grid
+    x <- x$raster
+  }
+  if (!is.null(y) && (inherits(y, "d4h_buffer_analysis") || (is.list(y) && all(c("raster", "houses", "buffer") %in% names(y))))) {
+    y <- y$raster
+  }
 
   # Support compound result object with $sf (e.g. from d4h_executive_summary or d4h_extract_indicators)
   if (is.list(x) && !inherits(x, c("sf", "SpatVector", "SpatRaster")) && !is.null(x$sf)) {
@@ -236,9 +255,9 @@ d4h_plot <- function(x = NULL, y = NULL, interactive = FALSE, grid = NULL, house
       m <- leaflet::leaflet() |>
         leaflet::addMapPane("leftPane", zIndex = 410) |>
         leaflet::addMapPane("rightPane", zIndex = 420) |>
-        leaflet::addProviderTiles("OpenStreetMap", group = "OpenStreetMap") |>
         leaflet::addProviderTiles("Esri.WorldImagery", group = "Satellite") |>
-        leaflet::addLayersControl(baseGroups = c("OpenStreetMap", "Satellite"), position = "topright") |>
+        leaflet::addProviderTiles("CartoDB.Positron", group = "CartoDB") |>
+        leaflet::addLayersControl(baseGroups = c("Satellite", "CartoDB"), position = "topright") |>
         leaflet::addRasterImage(
           rx_prep,
           colors = pal_x_info$fn,
@@ -337,7 +356,12 @@ d4h_plot <- function(x = NULL, y = NULL, interactive = FALSE, grid = NULL, house
         title                = name_x,
         zcol                 = zcol,
         ortho                = ortho,
-        max_pixels           = max_pixels
+        max_pixels           = max_pixels,
+        bbox                 = bbox,
+        scale_bar            = scale_bar,
+        north_arrow          = north_arrow,
+        scale_pos            = scale_pos,
+        north_pos            = north_pos
       )
 
       p2 <- d4h_plot(
@@ -355,7 +379,12 @@ d4h_plot <- function(x = NULL, y = NULL, interactive = FALSE, grid = NULL, house
         title                = name_y,
         zcol                 = zcol,
         ortho                = ortho,
-        max_pixels           = max_pixels
+        max_pixels           = max_pixels,
+        bbox                 = bbox,
+        scale_bar            = scale_bar,
+        north_arrow          = north_arrow,
+        scale_pos            = scale_pos,
+        north_pos            = north_pos
       )
 
       p_combined <- if (requireNamespace("cowplot", quietly = TRUE)) {
@@ -395,16 +424,16 @@ d4h_plot <- function(x = NULL, y = NULL, interactive = FALSE, grid = NULL, house
       stop("For interactive visualization ('interactive = TRUE'), install mapview and raster: install.packages(c('mapview', 'raster'))", call. = FALSE)
     }
 
+    if (requireNamespace("mapview", quietly = TRUE)) {
+      mapview::mapviewOptions(na.color = "transparent")
+    }
+
     col_fun <- if (palette == "viridis") {
       viridisLite::viridis
     } else if (palette == "magma") {
       viridisLite::magma
-    } else if (palette == "spectral") {
-      if (requireNamespace("RColorBrewer", quietly = TRUE)) {
-        grDevices::colorRampPalette(RColorBrewer::brewer.pal(11, "Spectral"))
-      } else {
-        grDevices::colorRampPalette(c("#9e0142", "#d53e4f", "#f46d43", "#fdae61", "#fee08b", "#e6f598", "#abdda4", "#66c2a5", "#3288bd", "#5e4fa2"))
-      }
+    } else if (tolower(palette) %in% c("spectral", "rdylgn")) {
+      grDevices::colorRampPalette(c("#d73027", "#f46d43", "#fdae61", "#fee08b", "#ffffbf", "#d9ef8b", "#a6d96a", "#66bd63", "#1a9850", "#006837"))
     } else if (palette == "terrain") {
       grDevices::terrain.colors
     } else if (is.character(palette) && length(palette) > 1) {
@@ -416,6 +445,8 @@ d4h_plot <- function(x = NULL, y = NULL, interactive = FALSE, grid = NULL, house
     m <- if (inherits(x, "SpatRaster")) {
       r_work <- x[[1]]
       var_name <- if (!is.null(title)) title else names(r_work)[1]
+      var_name <- gsub("[/\\\\:*?\"<>|]", "_", var_name)
+      if (is.null(var_name) || nchar(trimws(var_name)) == 0L) var_name <- "Raster_Layer"
       r_work[is.nan(r_work) | is.infinite(r_work) | r_work == 0] <- NA
 
       total_cells <- terra::ncell(r_work)
@@ -423,19 +454,22 @@ d4h_plot <- function(x = NULL, y = NULL, interactive = FALSE, grid = NULL, house
         agg_fact <- ceiling(sqrt(total_cells / max_pixels))
         r_work <- terra::aggregate(r_work, fact = agg_fact, fun = "mean", na.rm = TRUE)
       }
-      clean_basemaps <- c("OpenStreetMap", "Esri.WorldImagery")
+      clean_basemaps <- c("Esri.WorldImagery", "CartoDB.Positron")
       r_raster <- raster::raster(r_work)
+      names(r_raster) <- gsub("[/\\\\:*?\"<>|]", "_", names(r_raster))
       if (!is.null(limits)) {
         at_vals <- seq(limits[1], limits[2], length.out = 20)
-        mapview::mapview(r_raster, col.regions = col_fun, layer.name = var_name, at = at_vals, map.types = clean_basemaps)
+        mapview::mapview(r_raster, col.regions = col_fun, layer.name = var_name, at = at_vals, na.color = "transparent", map.types = clean_basemaps)
       } else {
-        mapview::mapview(r_raster, col.regions = col_fun, layer.name = var_name, map.types = clean_basemaps)
+        mapview::mapview(r_raster, col.regions = col_fun, layer.name = var_name, na.color = "transparent", map.types = clean_basemaps)
       }
     } else if (inherits(x, "SpatVector") || inherits(x, "sf")) {
-      clean_basemaps <- c("OpenStreetMap", "Esri.WorldImagery")
+      clean_basemaps <- c("Esri.WorldImagery", "CartoDB.Positron")
       sf_x <- if (inherits(x, "SpatVector")) sf::st_as_sf(x) else x
       fill_c <- if (!is.null(zcol)) {
         zcol
+      } else if ("surveillance_priority" %in% names(sf_x)) {
+        "surveillance_priority"
       } else if ("proximity_level" %in% names(sf_x)) {
         "proximity_level"
       } else if ("risk_level" %in% names(sf_x)) {
@@ -443,17 +477,46 @@ d4h_plot <- function(x = NULL, y = NULL, interactive = FALSE, grid = NULL, house
       } else if ("proximity_score" %in% names(sf_x)) {
         "proximity_score"
       } else {
-        num_cols <- names(sf_x)[sapply(sf_x, is.numeric)]
-        setdiff(num_cols, c("id", "grid_id", "row", "col"))[1]
+        mean_cols <- grep("(_mean|_media)$", names(sf_x), value = TRUE)
+        if (length(mean_cols) > 0) {
+          mean_cols[1]
+        } else {
+          num_cols <- names(sf_x)[sapply(sf_x, is.numeric)]
+          ign_cols <- c("id", "grid_id", "row", "col", "area_m2", "centroid_x", "centroid_y", "pixeles",
+                        names(sf_x)[grepl("_pixeles$", names(sf_x))])
+          cand <- setdiff(num_cols, ign_cols)
+          if (length(cand) > 0) cand[1] else num_cols[1]
+        }
       }
 
+      layer_lbl <- if (!is.null(title)) gsub("[/\\\\:*?\"<>|]", "_", title) else if (!is.null(fill_c)) fill_c else "Spatial_Layer"
+      at_vals <- if (!is.null(limits)) seq(limits[1], limits[2], length.out = 20) else NULL
       if (!is.null(fill_c) && !is.na(fill_c) && fill_c %in% names(sf_x)) {
-        mapview::mapview(sf_x, zcol = fill_c, layer.name = if (!is.null(title)) title else fill_c, map.types = clean_basemaps)
+        if (!is.null(at_vals) && is.numeric(sf_x[[fill_c]])) {
+          mapview::mapview(sf_x, zcol = fill_c, col.regions = col_fun, at = at_vals, alpha.regions = 0.65, layer.name = layer_lbl, map.types = clean_basemaps)
+        } else {
+          mapview::mapview(sf_x, zcol = fill_c, col.regions = col_fun, alpha.regions = 0.65, layer.name = layer_lbl, map.types = clean_basemaps)
+        }
       } else {
-        mapview::mapview(sf_x, layer.name = if (!is.null(title)) title else "Spatial Layer", map.types = clean_basemaps)
+        mapview::mapview(sf_x, layer.name = layer_lbl, map.types = clean_basemaps)
       }
     } else {
       stop("Interactive mapview requires a SpatRaster, SpatVector, or sf object.", call. = FALSE)
+    }
+
+    if (!is.null(ortho)) {
+      r_ortho <- if (is.character(ortho)) terra::rast(ortho) else ortho
+      if (terra::ncell(r_ortho) > max_pixels) {
+        fact <- ceiling(sqrt(terra::ncell(r_ortho) / max_pixels))
+        r_ortho <- terra::aggregate(r_ortho, fact = fact, fun = "mean", na.rm = TRUE)
+      }
+      if (terra::nlyr(r_ortho) >= 3) {
+        rb <- raster::brick(r_ortho[[1:3]])
+        m <- mapview::viewRGB(rb, 1, 2, 3, layer.name = "Orthomosaic (RGB)", map.types = clean_basemaps) + m
+      } else {
+        r_single <- raster::raster(r_ortho[[1]])
+        m <- mapview::mapview(r_single, layer.name = "Orthomosaic", map.types = clean_basemaps) + m
+      }
     }
 
     if (!is.null(water)) {
@@ -468,7 +531,19 @@ d4h_plot <- function(x = NULL, y = NULL, interactive = FALSE, grid = NULL, house
 
     if (!is.null(houses)) {
       sf_h <- .d4h_prepare_houses_sf(houses, x, houses_filter_extent)
-      m <- m + mapview::mapview(sf_h, col.regions = house_color, cex = house_size * 2, layer.name = "Houses", map.types = clean_basemaps)
+      has_prox <- any(c("proximity_level", "risk_level") %in% names(sf_h))
+      if (has_prox) {
+        col_prox <- if ("proximity_level" %in% names(sf_h)) "proximity_level" else "risk_level"
+        m <- m + mapview::mapview(sf_h, zcol = col_prox, cex = house_size * 2.5, layer.name = "Household Priority",
+                                  col.regions = c("#d90429", "#f48c06", "#ffd166", "#2b9348"), map.types = clean_basemaps)
+      } else {
+        m <- m + mapview::mapview(sf_h, col.regions = house_color, cex = house_size * 2, layer.name = "Houses", map.types = clean_basemaps)
+      }
+    }
+
+    if (!is.null(buffer_poly)) {
+      sf_b <- if (inherits(buffer_poly, "SpatVector")) sf::st_as_sf(buffer_poly) else buffer_poly
+      m <- m + mapview::mapview(sf_b, color = "black", alpha.regions = 0, lwd = 2.0, layer.name = "Buffer Boundary", map.types = clean_basemaps)
     }
 
     return(m)
@@ -526,6 +601,10 @@ d4h_plot <- function(x = NULL, y = NULL, interactive = FALSE, grid = NULL, house
     has_ortho <- FALSE
     if (!is.null(ortho)) {
       r_ortho <- if (is.character(ortho)) terra::rast(ortho) else ortho
+      if (terra::ncell(r_ortho) > max_pixels) {
+        fact <- ceiling(sqrt(terra::ncell(r_ortho) / max_pixels))
+        r_ortho <- terra::aggregate(r_ortho, fact = fact, fun = "mean", na.rm = TRUE)
+      }
       if (requireNamespace("tidyterra", quietly = TRUE)) {
         if (terra::nlyr(r_ortho) >= 3) {
           p <- p + tidyterra::geom_spatraster_rgb(data = r_ortho, r = 1, g = 2, b = 3)
@@ -544,6 +623,8 @@ d4h_plot <- function(x = NULL, y = NULL, interactive = FALSE, grid = NULL, house
 
     fill_col <- if (!is.null(zcol)) {
       zcol
+    } else if ("surveillance_priority" %in% names(sf_obj)) {
+      "surveillance_priority"
     } else if ("proximity_level" %in% names(sf_obj)) {
       "proximity_level"
     } else if ("risk_level" %in% names(sf_obj)) {
@@ -551,11 +632,19 @@ d4h_plot <- function(x = NULL, y = NULL, interactive = FALSE, grid = NULL, house
     } else if ("proximity_score" %in% names(sf_obj)) {
       "proximity_score"
     } else {
-      num_cols <- names(sf_obj)[sapply(sf_obj, is.numeric)]
-      setdiff(num_cols, c("id", "grid_id", "row", "col"))[1]
+      mean_cols <- grep("(_mean|_media)$", names(sf_obj), value = TRUE)
+      if (length(mean_cols) > 0) {
+        mean_cols[1]
+      } else {
+        num_cols <- names(sf_obj)[sapply(sf_obj, is.numeric)]
+        ign_cols <- c("id", "grid_id", "row", "col", "area_m2", "centroid_x", "centroid_y", "pixeles",
+                      names(sf_obj)[grepl("_pixeles$", names(sf_obj))])
+        cand <- setdiff(num_cols, ign_cols)
+        if (length(cand) > 0) cand[1] else num_cols[1]
+      }
     }
 
-    poly_alpha <- if (has_ortho) 0.55 else 0.85
+    poly_alpha <- if (has_ortho) 0.85 else 0.95
 
     if (!is.null(fill_col) && !is.na(fill_col) && fill_col %in% names(sf_obj)) {
       if (fill_col %in% c("proximity_level", "risk_level")) {
@@ -576,9 +665,25 @@ d4h_plot <- function(x = NULL, y = NULL, interactive = FALSE, grid = NULL, house
             drop = FALSE
           )
       } else if (is.numeric(sf_obj[[fill_col]])) {
+        legend_name <- if (!is.null(title)) title else if (grepl("ndvi", fill_col, ignore.case = TRUE)) "Mean NDVI" else fill_col
         p <- p +
-          ggplot2::geom_sf(data = sf_obj, ggplot2::aes(fill = .data[[fill_col]]), color = "grey35", linewidth = 0.25, alpha = poly_alpha) +
-          ggplot2::scale_fill_viridis_c(name = if (!is.null(title)) title else fill_col, option = palette, na.value = "transparent", limits = limits)
+          ggplot2::geom_sf(data = sf_obj, ggplot2::aes(fill = .data[[fill_col]]), color = "grey40", linewidth = 0.25, alpha = poly_alpha)
+
+        if (tolower(palette) %in% c("rdylgn", "spectral")) {
+          p <- p + ggplot2::scale_fill_gradientn(
+            name   = legend_name,
+            colors = c("#d73027", "#f46d43", "#fdae61", "#fee08b", "#ffffbf", "#d9ef8b", "#a6d96a", "#66bd63", "#1a9850", "#006837"),
+            limits = if (!is.null(limits)) limits else c(-0.5, 1.0),
+            breaks = c(-0.5, 0.0, 0.5, 1.0),
+            na.value = "transparent"
+          )
+        } else if (palette %in% c("magma", "inferno", "plasma", "viridis", "cividis", "rocket", "mako", "turbo")) {
+          p <- p + ggplot2::scale_fill_viridis_c(name = legend_name, option = palette, na.value = "transparent", limits = limits)
+        } else if (length(palette) > 1) {
+          p <- p + ggplot2::scale_fill_gradientn(name = legend_name, colors = palette, limits = limits, na.value = "transparent")
+        } else {
+          p <- p + ggplot2::scale_fill_viridis_c(name = legend_name, option = "viridis", na.value = "transparent", limits = limits)
+        }
       } else {
         p <- p +
           ggplot2::geom_sf(data = sf_obj, ggplot2::aes(fill = .data[[fill_col]]), color = "grey35", linewidth = 0.25, alpha = poly_alpha) +
@@ -627,22 +732,72 @@ d4h_plot <- function(x = NULL, y = NULL, interactive = FALSE, grid = NULL, house
     p <- p + ggplot2::geom_sf(data = sf_water, fill = water_color, color = "#01579B", alpha = 0.65, linewidth = 0.3)
   }
 
+  # Overlay buffer boundary if present
+  if (!is.null(buffer_poly)) {
+    sf_b <- if (inherits(buffer_poly, "SpatVector")) sf::st_as_sf(buffer_poly) else buffer_poly
+    p <- p + ggplot2::geom_sf(data = sf_b, fill = NA, color = "black", linetype = "dashed", linewidth = 0.65)
+  }
+
   # Overlay optional houses
   if (!is.null(houses)) {
     sf_houses <- .d4h_prepare_houses_sf(houses, x, houses_filter_extent)
-    p <- p +
-      ggplot2::geom_sf(data = sf_houses, color = house_color, size = house_size, shape = 21, fill = house_color, alpha = 0.9)
+    has_prox <- any(c("proximity_level", "risk_level") %in% names(sf_houses))
+    if (has_prox) {
+      col_prox <- if ("proximity_level" %in% names(sf_houses)) "proximity_level" else "risk_level"
+      p <- p +
+        ggplot2::geom_sf(data = sf_houses, ggplot2::aes(color = .data[[col_prox]]), size = house_size, alpha = 0.95) +
+        ggplot2::scale_color_manual(
+          name = "Epidemiological Priority",
+          values = c(
+            "Critical (<50m)"     = "#d90429",
+            "Critico (<50m)"      = "#d90429",
+            "High (50-100m)"      = "#f48c06",
+            "Alto (50-100m)"      = "#f48c06",
+            "Moderate (100-200m)" = "#ffd166",
+            "Moderado (100-200m)" = "#ffd166",
+            "Low (>200m)"         = "#2b9348",
+            "Bajo (>200m)"        = "#2b9348"
+          ),
+          drop = FALSE
+        )
+    } else {
+      p <- p +
+        ggplot2::geom_sf(data = sf_houses, color = house_color, size = house_size, shape = 21, fill = house_color, alpha = 0.9)
+    }
   }
 
   p <- p +
-    ggplot2::coord_sf() +
+    ggplot2::coord_sf(expand = isTRUE(bbox)) +
     ggplot2::theme_minimal() +
     ggplot2::theme(
-      panel.grid = ggplot2::element_blank(),
+      panel.grid = if (isTRUE(bbox)) ggplot2::element_line(color = "grey90", linewidth = 0.2) else ggplot2::element_blank(),
       axis.title = ggplot2::element_blank(),
       panel.background = ggplot2::element_rect(fill = "transparent", color = NA),
       plot.background = ggplot2::element_rect(fill = "transparent", color = NA)
     )
+
+  # Adicionar escala metrica y norte cartografico en modo estatico
+  if (inherits(x, c("SpatRaster", "SpatVector", "sf"))) {
+    if (isTRUE(scale_bar) && requireNamespace("ggspatial", quietly = TRUE)) {
+      p <- p + ggspatial::annotation_scale(
+        location   = scale_pos,
+        width_hint = 0.22,
+        style      = "bar",
+        text_cex   = 0.72,
+        pad_x      = ggplot2::unit(0.5, "cm"),
+        pad_y      = ggplot2::unit(0.5, "cm")
+      )
+    }
+    if (isTRUE(north_arrow) && requireNamespace("ggspatial", quietly = TRUE)) {
+      p <- p + ggspatial::annotation_north_arrow(
+        location    = north_pos,
+        which_north = "true",
+        pad_x       = ggplot2::unit(0.5, "cm"),
+        pad_y       = ggplot2::unit(0.5, "cm"),
+        style       = ggspatial::north_arrow_fancy_orienteering(text_size = 7)
+      )
+    }
+  }
 
   if (!is.null(title)) p <- p + ggplot2::labs(title = title)
 

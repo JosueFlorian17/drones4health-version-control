@@ -44,6 +44,9 @@ d4h_mapview_swipe <- function(x, y, grid = NULL, basemap = TRUE, col_x = "viridi
 
   # 2. Internal helper function to process, optimize and reproject layers
   .prep_swipe_layer <- function(r_in, max_px, label) {
+    if (inherits(r_in, "d4h_buffer_analysis") || (is.list(r_in) && !is.null(r_in$raster))) {
+      r_in <- r_in$raster
+    }
     if (inherits(r_in, c("sf", "SpatVector"))) {
       ext_b <- terra::ext(terra::vect(r_in))
       crs_b <- if (inherits(r_in, "sf")) sf::st_crs(r_in)$wkt else terra::crs(r_in)

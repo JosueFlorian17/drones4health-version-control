@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 
 ## 1 Objective
 
-Ingest georeferenced household GPS points from Excel or CSV files, generate targeted focal buffers (in meters or grid units), compute zonal statistics strictly within the peridomestic flight envelope, and calculate minimum Euclidean distances from each dwelling to nearest water bodies with proximity decay modeling.
+Ingest georeferenced household GPS points from Excel files or rasters, generate targeted focal buffers (in meters or grid units), compute zonal statistics strictly within the peridomestic flight envelope, and calculate minimum Euclidean distances from each dwelling to nearest water bodies with proximity decay modeling.
 
 <div class="text-center my-3">
   <img src="../reference/figures/05_focal_houses_buffer_ndvi.png" class="img-fluid rounded border shadow-sm" alt="Peridomestic Buffer Analysis over Drone Orthomosaic" width="85%">
@@ -84,11 +84,9 @@ res_buffer <- d4h_indicator_buffer(
   indicator        = "NDVI",
   houses           = houses_file,
   radius           = 3,             # 3 grid units
-  cell_size        = 50,            # 50m cell size -> 150m buffer radius
-  radius_in_meters = FALSE,
+  grid             = grid_hex,      # Ingests existing hexagonal grid
   nir              = path_nir,
   red              = path_r,
-  square           = FALSE,         # Hexagonal grid within buffer
   mask_outside     = TRUE,          # Masks non-focal areas outside buffer
   house_color      = "red",
   house_size       = 2.5,
@@ -188,46 +186,47 @@ print(houses_exec_summary)
 ```
 
 ```text
+
 ==============================================================================
              DRONES4HEALTH - EXECUTIVE SUMMARY REPORT
 ==============================================================================
 
- INDICATOR: FOCAL_BUFFER_NDVI
+ INDICATOR: NDVI
 ------------------------------------------------------------------------------
  1. SPATIAL COVERAGE AND RESOLUTION:
-    - Pixel Resolution    : 99.21 cm
-    - Surveyed Area       : 55.765 ha (557,650 m2 across peridomestic buffers)
-    - Evaluated Pixels    : 562,110 (86.9% valid buffer footprint coverage)
+    - Pixel Resolution    : 9.92 cm x 9.92 cm (or 0.0992 m)
+    - Scene Dimensions    : 11,370 px x 9,006 px (102,398,220 total pixels, FLT4S)
+    - Scene Bounding Box  : 100.784 ha (1,007,845 m2 | 1,128 m x 893.5 m)
+    - Coordinate System   : EPSG:32718 (WGS 84 / UTM zone 18S)
+    - Surveyed Area       : 54.768 ha (547,681.4 m2)
+    - Evaluated Pixels    : 543,614 sampled (~55,645,074 valid total, 54.3% footprint coverage)
 
  2. GLOBAL DESCRIPTIVE STATISTICAL MOMENTS:
-    - Arithmetic Mean     : 0.282 (+/- 0.221 SD)
-    - Coeff. of Variation : 78.4 %
-    - Overall Range [Min,Max]: [-0.485, 0.946] (Span: 1.431)
-    - Median (Q50)        : 0.245
-    - Interquartile Range : [0.112, 0.428] (IQR: 0.316)
-    - Central 90% Span    : [-0.042, 0.698] (P05 - P95)
+    - Arithmetic Mean     : 0.23 (+/- 0.279 SD)
+    - Coeff. of Variation : 121.2 %
+    - Overall Range [Min,Max]: [-0.97, 0.998] (Span: 1.968)
+    - Median (Q50)        : 0.168
+    - Interquartile Range : [0.01, 0.441] (IQR: 0.431)
+    - Central 90% Span    : [-0.138, 0.733] (P05 - P95)
 
  3. SPATIAL OUTLIER DIAGNOSTICS (TUKEY IQR):
-    - Tukey IQR Fences    : Lower < -0.362 | Upper > 0.902
-    - Outliers Detected   : 3,412 pixels (0.61% of valid buffer pixels)
+    - Tukey IQR Fences    : Lower < -0.636 | Upper > 1.087
+    - Outliers Detected   : 379 pixels (0.07% of valid pixels)
     - Spatial Diagnostics : Homogeneous distribution (extreme values < 1%)
 
  4. THEMATIC STRATIFICATION & SPATIAL EXTENT:
-    - Water / Substrate degradation (< 0.0)     :   6.8 % (  3.79 ha)
-    - Bare soil / Sparse canopy [0.0, 0.2)      :  35.4 % ( 19.74 ha)
-    - Moderate vegetation / Transition [0.2, 0.5):  38.6 % ( 21.53 ha)
-    - Dense vegetation / High vigor [>= 0.5)    :  19.2 % ( 10.71 ha)
+    - Water / Substrate degradation (< 0.0)     :  23.1 % ( 12.63 ha)
+    - Bare soil / Sparse canopy [0.0, 0.2)      :  30.9 % ( 16.92 ha)
+    - Moderate vegetation / Transition [0.2, 0.5):  25.2 % ( 13.80 ha)
+    - Dense vegetation / High vigor [>= 0.5)    :  20.8 % ( 11.41 ha)
 
 ------------------------------------------------------------------------------
  5. HOUSEHOLD WATER PROXIMITY & EXPOSURE ASSESSMENT:
     - Total Households Evaluated : 55 dwellings
-    - Euclidean Distance to Water: Mean = 214.6 m (Min = 34.2 m, Max = 458.0 m)
+    - Euclidean Distance to Water: Mean = 12.4 m (Min = 0.0 m, Max = 32.5 m)
 
     - Proximity Exposure Stratification:
-      * Immediate Proximity (<50m) :   1 houses (  1.8%) | Mean dist:  34.2 m
-      * High Proximity (50-100m)   :   3 houses (  5.5%) | Mean dist:  78.4 m
-      * Moderate Proximity (100-200m): 24 houses ( 43.6%) | Mean dist: 154.2 m
-      * Distal (>200m)             :  27 houses ( 49.1%) | Mean dist: 284.6 m
+      * Critical (<50m)             :  55 houses (100.0%) | Mean dist:  12.4 m
 
 ==============================================================================
 ```
@@ -267,5 +266,5 @@ The workbook exported to `salidas/Executive_Summary_Case04_Houses_Proximity.xlsx
 | **Distal (>200m)** | 27 | 49.1% | 284.6 m | 204.2 m | 458.0 m |
 
 <div class="text-center my-3">
-  <img src="../reference/figures/01_orthomosaic_rgb.png" class="img-fluid rounded border shadow-sm" alt="Households and Breeding Sites Mapping" width="85%">
+  <img src="../reference/figures/05_focal_houses_buffer_ndvi.png" class="img-fluid rounded border shadow-sm" alt="Households and Breeding Sites Mapping" width="85%">
 </div>

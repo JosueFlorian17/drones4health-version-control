@@ -558,8 +558,35 @@ d4h_distance_to_water <- function(buildings, sources, decay_lambda = 100.0, buff
   if (!is.null(proximity_labels)) {
     risk_labels <- proximity_labels
   }
+
+  if (is.character(buildings) && length(buildings) == 1L) {
+    if (grepl("\\.(xlsx|xls)$", buildings, ignore.case = TRUE)) {
+      df_b <- as.data.frame(readxl::read_excel(buildings))
+      lon_c <- grep("^(lon|lng|long|longitude|x)$", names(df_b), ignore.case = TRUE, value = TRUE)[1]
+      lat_c <- grep("^(lat|latitude|y)$", names(df_b), ignore.case = TRUE, value = TRUE)[1]
+      buildings <- sf::st_as_sf(df_b, coords = c(lon_c, lat_c), crs = 4326)
+    } else if (grepl("\\.csv$", buildings, ignore.case = TRUE)) {
+      df_b <- utils::read.csv(buildings)
+      lon_c <- grep("^(lon|lng|long|longitude|x)$", names(df_b), ignore.case = TRUE, value = TRUE)[1]
+      lat_c <- grep("^(lat|latitude|y)$", names(df_b), ignore.case = TRUE, value = TRUE)[1]
+      buildings <- sf::st_as_sf(df_b, coords = c(lon_c, lat_c), crs = 4326)
+    } else {
+      buildings <- sf::st_read(buildings, quiet = TRUE)
+    }
+  } else if (is.data.frame(buildings) && !inherits(buildings, "sf")) {
+    lon_c <- grep("^(lon|lng|long|longitude|x)$", names(buildings), ignore.case = TRUE, value = TRUE)[1]
+    lat_c <- grep("^(lat|latitude|y)$", names(buildings), ignore.case = TRUE, value = TRUE)[1]
+    buildings <- sf::st_as_sf(buildings, coords = c(lon_c, lat_c), crs = 4326)
+  }
+
+  if (inherits(sources, "SpatVector")) {
+    sources <- sf::st_as_sf(sources)
+  } else if (is.character(sources) && length(sources) == 1L) {
+    sources <- sf::st_read(sources, quiet = TRUE)
+  }
+
   if (!inherits(buildings, "sf") || !inherits(sources, "sf")) {
-    stop("'buildings' and 'sources' must be sf spatial objects.", call. = FALSE)
+    stop("'buildings' and 'sources' must be sf spatial objects or valid spatial filepaths.", call. = FALSE)
   }
 
   if (nrow(buildings) == 0L || nrow(sources) == 0L) {
@@ -619,13 +646,31 @@ d4h_distance_to_water <- function(buildings, sources, decay_lambda = 100.0, buff
 #' }
 #' }
 #' @export
-d4h_raster_distance <- function(sources, raster_ref) {
+d4h_raster_distance <- function(sources, raster_ref = NULL, template_raster = NULL, max_dist_m = NULL) {
+  if (is.null(raster_ref) && !is.null(template_raster)) {
+    raster_ref <- template_raster
+  }
+  if (is.null(raster_ref)) {
+    stop("You must provide 'raster_ref' or 'template_raster'.", call. = FALSE)
+  }
   r_ref <- .ensure_raster(raster_ref, mask_zeros = FALSE)
+
+  if (terra::ncell(r_ref) > 1000000) {
+    fact <- ceiling(sqrt(terra::ncell(r_ref) / 1000000))
+    r_ref <- terra::aggregate(r_ref, fact = fact, fun = "mean", na.rm = TRUE)
+  }
 
   sources_vect <- if (inherits(sources, "sf")) terra::vect(sources) else sources
 
   r_rasterized <- terra::rasterize(sources_vect, r_ref, field = 1, background = NA)
   dist_raster <- terra::distance(r_rasterized)
+
+  # Mask continuous distance surface to valid pixels of reference raster (crop outer NA areas)
+  dist_raster <- terra::mask(dist_raster, r_ref)
+
+  if (!is.null(max_dist_m) && is.numeric(max_dist_m)) {
+    dist_raster <- terra::clamp(dist_raster, lower = 0, upper = max_dist_m)
+  }
 
   names(dist_raster) <- "dist_to_source_m"
   dist_raster

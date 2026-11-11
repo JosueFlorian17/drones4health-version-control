@@ -1,0 +1,358 @@
+---
+title: "Guía del Instructor y Participantes: Taller Drones4Health"
+subtitle: "Protocolo de Instalación, Casos de Uso y Solución de Problemas en Vivo"
+author: "Equipo Drones4Health / Health Innovation"
+date: today
+lang: es
+format:
+  typst:
+    papersize: a4
+    margin:
+      x: 2cm
+      y: 2.2cm
+    toc: true
+    toc-title: "Contenido de la Guía"
+    number-sections: true
+    section-numbering: "1.1.1"
+---
+
+# Introducción y Objetivos del Taller
+
+El paquete **`drones4health`** ha sido diseñado para la vigilancia eco-epidemiológica de precisión utilizando imágenes capturadas por vehículos aéreos no tripulados (drones). Permite ingerir ortomosaicos de ultra-alta resolución espacial, calcular métricas biofísicas, generar particiones espaciales regulares (grillas hexagonales o cuadradas), segmentar cuerpos de agua y viviendas, y modelar el riesgo por proximidad a criaderos de vectores de enfermedades como malaria y dengue.
+
+Esta guía detalla los pasos de instalación desde cero, el código ejecutable para cada caso de uso, y un catálogo exhaustivo de los errores más comunes que pueden experimentar los participantes junto con sus soluciones inmediatas.
+
+---
+
+# Requisitos del Sistema y Preparación Previa
+
+Para asegurar que todos los participantes puedan ejecutar el flujo de trabajo sin saturar la memoria ni el disco de sus equipos, deben cumplir con los siguientes requerimientos mínimos:
+
+* **Versión de R:** **R $\ge$ 4.2.0** (Recomendado: R 4.3 o R 4.4). Las versiones de R 3.x **no son compatibles** debido al operador `|>` y las versiones modernas de `terra` y `sf`.
+* **Entorno de Desarrollo:** **RStudio** actualizado.
+* **Memoria RAM:** Mínimo **8 GB** (Recomendado: **16 GB** para procesamiento fluido).
+* **Espacio Libre en Disco:** Mínimo **15 a 20 GB** en la unidad de trabajo (para almacenar los ortomosaicos y los archivos raster temporales que genera `terra`).
+
+## Estructura de Carpetas del Taller
+
+Pide a los participantes crear una carpeta de trabajo (por ejemplo `taller_drones/`) con la siguiente estructura:
+
+```text
+taller_drones/
+├── img/
+│   ├── Ohuay_D.tif                   # Ortomosaico multiespectral / RGB
+│   ├── Ohuay_NIR.tif                 # Canal Infrarrojo Cercano
+│   ├── Ohuay_R.tif                   # Canal Rojo
+│   └── Ohuay_G.tif                   # Canal Verde (opcional si se extrae de D)
+├── nuevas_casas_localizadas.xlsx     # Coordenadas GPS de viviendas
+└── salidas/                          # Carpeta donde se guardarán mapas y Excels
+```
+
+---
+
+# Protocolo de Instalación en Dos Pasos
+
+Para no colapsar la conexión a internet durante el taller, es fundamental ejecutar la instalación en este orden exacto:
+
+## Paso 1: Instalación de Librerías Base de CRAN
+
+Cada participante debe ejecutar primero la instalación de los paquetes espaciales y de visualización estándar de CRAN:
+
+```r
+install.packages(c(
+  "terra", "sf", "ggplot2", "mapview", "leaflet", 
+  "leaflet.extras2", "readxl", "openxlsx", "viridisLite", 
+  "ggspatial", "remotes"
+))
+```
+
+## Paso 2: Instalación de `drones4health` desde GitHub
+
+Una vez instaladas las dependencias, se descarga e instala el paquete desde GitHub usando el argumento clave `upgrade = "never"`. Este parámetro evita que la consola interactiva se pause preguntando al usuario si desea actualizar paquetes existentes:
+
+```r
+remotes::install_github("healthinnovation/drone4health", upgrade = "never")
+library(drones4health)
+```
+
+Al finalizar, la consola debe mostrar el mensaje: `* DONE (drones4health)`.
+
+---
+
+# Configuración Inicial Crítica de Memoria y Temporales
+
+Antes de cargar los ortomosaicos, se debe configurar la ruta de archivos temporales. Esto previene que el disco principal del usuario se llene durante las operaciones de raster:
+
+```r
+# Redirigir temporales a una unidad con suficiente espacio (ej. E:/ o D:/)
+Sys.setenv(TMPDIR = "E:/Rtmp", TEMP = "E:/Rtmp", TMP = "E:/Rtmp")
+terra::terraOptions(tempdir = "E:/Rtmp", memfrac = 0.6)
+
+# Crear directorio de salidas
+dir.create("salidas", showWarnings = FALSE, recursive = TRUE)
+```
+
+---
+
+# Guía Paso a Paso de los Casos de Uso
+
+## Caso 1: Cálculo de Métricas Biofísicas (NDVI y NDWI)
+
+Este caso permite cuantificar el vigor vegetal y la presencia de agua superficial a partir de las bandas espectrales.
+
+```r
+library(drones4health)
+library(terra)
+library(ggplot2)
+
+path_rgb <- "img/Ohuay_D.tif"
+path_nir <- "img/Ohuay_NIR.tif"
+path_r   <- "img/Ohuay_R.tif"
+path_g   <- "img/Ohuay_G.tif"
+
+# 1. Cálculo de índices
+r_ndvi <- d4h_ndvi(nir = path_nir, red = path_r)
+r_ndwi <- d4h_ndwi(green = path_g, nir = path_nir)
+
+# 2. Mapa estático de publicación con norte y escala
+p_ndvi <- d4h_plot(
+  x           = r_ndvi,
+  interactive = FALSE,
+  palette     = "viridis",
+  title       = "UAV Canopy Density (NDVI)",
+  limits      = c(-0.1, 0.9),
+  north_pos   = "tr",
+  scale_pos   = "bl"
+)
+ggsave("salidas/case1_ndvi_static.png", p_ndvi, width = 10, height = 7, dpi = 300)
+
+# 3. Exploración interactiva con cortina deslizante (Swipe)
+m_swipe <- d4h_plot(
+  x           = r_ndvi,
+  y           = r_ndwi,
+  palette     = "viridis",
+  palette_y   = "spectral",
+  title       = "NDVI vs NDWI",
+  interactive = TRUE
+)
+
+# 4. Reporte ejecutivo multi-momento exportado a Excel
+exec_summary_c1 <- d4h_executive_summary(
+  raster_in   = list(r_ndvi, r_ndwi),
+  by          = "general",
+  out_xlsx    = "salidas/Executive_Summary_Case01_Metrics.xlsx"
+)
+print(exec_summary_c1)
+```
+
+## Caso 2: Grillas de Vigilancia y Estadísticas Zonales
+
+Particiona el mosaico en celdas regulares (ej. hexágonos de 50 metros) y resume las métricas por cada unidad territorial operativa.
+
+```r
+# 1. Generación de grilla hexagonal paramétrica
+grid_hex <- d4h_hex_grid(aoi = r_ndvi, cell_size = 50)
+
+# 2. Resumen ejecutivo zonal por celda con exportación a Excel
+grid_summary_ndvi <- d4h_executive_summary(
+  raster_in = r_ndvi,
+  grid      = grid_hex,
+  out_xlsx  = "salidas/Executive_Summary_Case02_Grids.xlsx"
+)
+
+# 3. Visualización temática con paleta de alerta RdYlGn
+p_grid <- d4h_plot(
+  x           = grid_summary_ndvi,
+  zcol        = "NDVI_mean",
+  interactive = FALSE,
+  palette     = "RdYlGn",
+  limits      = c(-0.5, 1.0),
+  title       = "Mean NDVI (50m Hexagons)",
+  north_pos   = "tr",
+  scale_pos   = "bl"
+)
+ggsave("salidas/case2_hex_grid.png", p_grid, width = 10, height = 7, dpi = 300)
+
+# 4. Visualización con ortomosaico de fondo
+p_grid_ortho <- d4h_plot(
+  x           = grid_summary_ndvi,
+  zcol        = "NDVI_mean",
+  ortho       = path_rgb,
+  interactive = FALSE,
+  palette     = "RdYlGn",
+  limits      = c(-0.5, 1.0),
+  title       = "Mean NDVI with Orthomosaic Underlay",
+  north_pos   = "tr",
+  scale_pos   = "bl"
+)
+ggsave("salidas/case2_hex_grid_ortho.png", p_grid_ortho, width = 10, height = 7, dpi = 300)
+```
+
+## Caso 3: Segmentación Física de Cuerpos de Agua y Viviendas
+
+Extrae polígonos vectoriales de cuerpos de agua y techos de viviendas sin requerir librerías externas de Python.
+
+```r
+# 1. Segmentación de agua con filtro óptico de oscuridad
+water_sf <- d4h_segment_water(
+  raster_in            = r_ndwi,
+  rgb_raster           = path_rgb,
+  threshold            = 0.0,
+  is_ndwi              = TRUE,
+  max_water_brightness = 95.0,
+  min_area_m2          = 2.0,
+  method               = "spectral"
+)
+
+# 2. Segmentación de techos por reflectancia óptica y exclusión de vegetación
+buildings_sf <- d4h_segment_buildings(
+  rgb_raster     = path_rgb,
+  ndvi_raster    = r_ndvi,
+  min_area_m2    = 12.0,
+  max_area_m2    = 600.0,
+  brightness_min = 135.0,
+  ndvi_max       = 0.25,
+  method         = "spectral"
+)
+
+# 3. Consolidación de capas y resumen físico
+features_sf <- d4h_combine_features(
+  water     = water_sf,
+  buildings = buildings_sf
+)
+print(features_sf)
+
+# 4. Asignación zonal de elementos a la grilla de vigilancia
+grid_features_summary <- d4h_executive_summary(
+  raster_in = r_ndvi,
+  grid      = grid_hex,
+  features  = features_sf,
+  out_xlsx  = "salidas/Executive_Summary_Case03_Features.xlsx"
+)
+```
+
+## Caso 4: Viviendas GPS, Búferes Focales y Distancia al Agua
+
+Modela la exposición peridomiciliaria de viviendas de campo frente a criaderos acuáticos.
+
+```r
+houses_file <- "nuevas_casas_localizadas.xlsx"
+
+# 1. Búfer focal de vuelo vectorial (150 metros)
+res_buffer <- d4h_indicator_buffer(
+  indicator    = "NDVI",
+  houses       = houses_file,
+  radius_m     = 150,
+  grid         = grid_hex,
+  nir          = path_nir,
+  red          = path_r,
+  mask_outside = TRUE,
+  palette      = "viridis",
+  limits       = c(0.1, 0.9),
+  title        = "Peridomestic Vector Radius (150m) - Focal NDVI",
+  plot         = TRUE,
+  north_pos    = "tr",
+  scale_pos    = "bl"
+)
+ggsave("salidas/case4_buffer_focal.png", res_buffer$plot, width = 10, height = 7, dpi = 300)
+
+# 2. Distancia euclidiana puntual y decaimiento exponencial
+casas_sf <- res_buffer$houses
+water_proximity_sf <- d4h_distance_to_water(
+  buildings        = casas_sf,
+  sources          = water_sf,
+  decay_lambda     = 100.0,
+  buffer_breaks    = c(50, 100, 200),
+  proximity_labels = c("Inmediata (<50m)", "Alta (50-100m)", "Moderada (100-200m)", "Baja (>200m)")
+)
+
+# 3. Superficie continua de distancia euclidiana (m)
+r_dist_water <- d4h_raster_distance(
+  sources    = water_sf,
+  raster_ref = r_ndwi
+)
+
+p_dist <- d4h_plot(
+  x         = r_dist_water,
+  title     = "Continuous Euclidean Distance to Water (m)",
+  palette   = "magma",
+  north_pos = "tr",
+  scale_pos = "bl"
+)
+ggsave("salidas/case4_distance_surface.png", p_dist, width = 10, height = 7, dpi = 300)
+
+# 4. Reporte ejecutivo integrado con estratificación de viviendas
+houses_exec_summary <- d4h_executive_summary(
+  raster_in        = res_buffer$raster,
+  houses_proximity = water_proximity_sf,
+  by               = "general",
+  out_xlsx         = "salidas/Executive_Summary_Case04_Houses_Proximity.xlsx"
+)
+print(houses_exec_summary)
+```
+
+---
+
+# Catálogo de Errores Frecuentes y Soluciones
+
+A continuación se listan los problemas típicos durante el taller y cómo orientar a los participantes para resolverlos de inmediato:
+
+## Error: "No space left on device" o Desbordamiento de Disco
+* **Síntoma:** Error durante `d4h_ndvi()` o `d4h_raster_distance()` como `_tiffWriteProc: No space left on device` o `cannot read from spat_...tif`.
+* **Causa:** El paquete `terra` escribe bloques de memoria temporal en el disco C: del sistema. Con ortomosaicos de más de 100 millones de píxeles, la carpeta temporal puede ocupar entre 5 y 10 GB.
+* **Solución Rápida:** Redirigir el temporal a otra partición o unidad externa con espacio:
+```r
+Sys.setenv(TMPDIR = "D:/Rtmp", TEMP = "D:/Rtmp", TMP = "D:/Rtmp")
+terra::terraOptions(tempdir = "D:/Rtmp")
+```
+
+## Error: Archivo de Banda Verde Ilegible o Corrupto
+* **Síntoma:** `Cannot open TIFF header` o error al invocar `d4h_ndwi()` usando `Ohuay_G.tif`.
+* **Causa:** El archivo TIFF individual se encuentra dañado o incompleto.
+* **Solución Rápida:** Extraer la banda verde directamente desde la segunda capa del ortomosaico multiespectral `Ohuay_D.tif`:
+```r
+r_g <- terra::rast("img/Ohuay_D.tif")[[2]]
+r_ndwi <- d4h_ndwi(green = r_g, nir = path_nir)
+```
+
+## Error de Sintaxis por Versión Antigua de R (R 3.x o R < 4.1.0)
+* **Síntoma:** `Error: unexpected SPECIAL in "|>"`.
+* **Causa:** El operador de tubería nativo `|>` solo existe a partir de R 4.1.0. Además, `drones4health` exige `R (>= 4.2.0)`.
+* **Solución Rápida:** El usuario debe actualizar su versión de R descargando el instalador oficial desde [CRAN](https://cran.r-project.org/). No es posible trabajar en R 3.x.
+
+## La Consola se Bloquea al Instalar desde GitHub
+* **Síntoma:** Aparece el menú interactivo: `These packages have more recent versions available... Which would you like to update?` y la instalación no avanza.
+* **Causa:** La función `install_github()` detecta paquetes locales desactualizados y pausa esperando entrada de teclado.
+* **Solución Rápida:** Indicar al alumno que pulse la tecla **Enter** (o escriba `3` para *None*) en la consola, o instruirles a ejecutar siempre:
+```r
+remotes::install_github("healthinnovation/drone4health", upgrade = "never")
+```
+
+## Error al Ejecutar Segmentación con SAM (`method = "sam"`)
+* **Síntoma:** `Error: Using 'method = sam' requires the R package 'reticulate'` o falta de módulo `torch`.
+* **Causa:** El método SAM es un modelo de Deep Learning de Meta que requiere un entorno de Python configurado y 375 MB de pesos.
+* **Solución Rápida:** Indicar al participante que use el método espectral nativo:
+```r
+method = "spectral"
+```
+Este método está 100% implementado en R puro (`terra` + `sf`), no requiere Python ni descargas externas y procesa los techos de calamina y agua en segundos.
+
+## Error "403 Forbidden" en Mapas Interactivos
+* **Síntoma:** El mapa interactivo muestra mosaicos grises con el mensaje `403 Access Blocked`.
+* **Causa:** OpenStreetMap bloquea accesos masivos desde direcciones IP compartidas (como las redes Wi-Fi de universidades o salas de conferencia).
+* **Solución Rápida:** `drones4health` ya utiliza por defecto los servidores de satélite de Esri y CartoDB (`map.types = c("Esri.WorldImagery", "CartoDB.Positron")`), los cuales no presentan restricciones de bloqueo institucional.
+
+---
+
+# Checklist Rápido para el Instructor
+
+| Momento | Acción Clave | Comando R de Verificación |
+| :--- | :--- | :--- |
+| **08:45 (Recepción)** | Verificar versión de R | `getRversion() >= "4.2.0"` |
+| **09:00 (Inicio)** | Instalar paquetes CRAN | `install.packages(...)` |
+| **09:15** | Instalar paquete GitHub | `remotes::install_github("healthinnovation/drone4health", upgrade = "never")` |
+| **09:30** | Configurar carpeta temporal | `terra::terraOptions(tempdir = "E:/Rtmp")` |
+| **09:45 (Caso 1)** | Cargar librería e índices | `r_ndvi <- d4h_ndvi(path_nir, path_r)` |
+| **10:30 (Caso 2)** | Grilla hexagonal 50m | `d4h_hex_grid(r_ndvi, cell_size = 50)` |
+| **11:15 (Caso 3)** | Segmentación espectral | `d4h_segment_water(method = "spectral")` |
+| **12:00 (Caso 4)** | Búferes y distancias | `d4h_indicator_buffer(radius_m = 150)` |
