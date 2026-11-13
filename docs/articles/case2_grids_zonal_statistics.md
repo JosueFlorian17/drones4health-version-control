@@ -163,7 +163,7 @@ function, switching between static and interactive modes:
 
 # 1. Publication-quality ggplot2 mapping of zonal indicators (interactive = FALSE)
 p_grid <- d4h_plot(
-  x           = grid_summary_ndvi,
+  x           = grid_exec_summary,
   interactive = FALSE,
   palette     = "viridis",
   title       = "Zonal Surveillance Grid (50m Hexagons)"
@@ -172,7 +172,7 @@ print(p_grid)
 
 # 2. Interactive web map exploration via mapview (interactive = TRUE)
 m_grid <- d4h_plot(
-  x           = grid_summary_ndvi,
+  x           = grid_exec_summary,
   interactive = TRUE,
   palette     = "viridis",
   title       = "Zonal Surveillance Grid (50m Hexagons)"

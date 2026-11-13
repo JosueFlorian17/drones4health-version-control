@@ -84,9 +84,11 @@ res_buffer <- d4h_indicator_buffer(
   indicator        = "NDVI",
   houses           = houses_file,
   radius           = 3,             # 3 grid units
-  grid             = grid_hex,      # Ingests existing hexagonal grid
+  cell_size        = 50,            # 50m cell size -> 150m buffer radius
+  radius_in_meters = FALSE,
   nir              = path_nir,
   red              = path_r,
+  square           = FALSE,         # Hexagonal grid within buffer
   mask_outside     = TRUE,          # Masks non-focal areas outside buffer
   house_color      = "red",
   house_size       = 2.5,

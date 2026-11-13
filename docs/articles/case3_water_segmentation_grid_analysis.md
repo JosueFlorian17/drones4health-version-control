@@ -97,20 +97,18 @@ water_sf <- d4h_segment_water(
 print(water_sf)
 ```
 
-### 3.4 Residential Building Footprint Segmentation (SAM Deep Learning)
+### 3.4 Residential Building Footprint Segmentation
 
-We extract residential dwellings and structures using Meta’s
-foundational Segment Anything Model (SAM) directly on the natural
-visible RGB imagery:
+We extract residential dwellings and structures using spectral and brightness thresholding directly on the natural visible RGB imagery (or optionally via Meta's Segment Anything Model `method = "sam"` when Python/reticulate and SAM weights are configured):
 
 ``` r
 
-# Segment residential house footprints using SAM foundational computer vision
+# Segment residential house footprints using native spectral/optical thresholding
 buildings_sf <- d4h_segment_buildings(
   rgb_raster     = path_rgb,
   min_area_m2    = 12.0,
   max_area_m2    = 600.0,
-  method         = "sam"         # Foundational computer vision segmentation
+  method         = "spectral"    # Native fast spectral thresholding
 )
 
 # Inspect detected building polygons
@@ -230,7 +228,7 @@ class and assigning priority tiers for environmental surveillance:
 
 # Compute percentage composition and sectoral priority stratification per grid unit
 grid_composition <- d4h_grid_composition(
-  grid           = grid_sf,
+  grid           = grid_hex,
   water          = water_sf,
   buildings      = buildings_sf,
   ndvi_raster    = r_ndvi,
