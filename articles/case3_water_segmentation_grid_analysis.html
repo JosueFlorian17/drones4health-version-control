@@ -252,19 +252,19 @@ clamping:</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">water_sf</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="residential-building-footprint-segmentation-sam-deep-learning">3.4 Residential Building Footprint Segmentation (SAM Deep
-Learning)<a class="anchor" aria-label="anchor" href="#residential-building-footprint-segmentation-sam-deep-learning"></a>
+<h3 id="residential-building-footprint-segmentation">3.4 Residential Building Footprint Segmentation<a class="anchor" aria-label="anchor" href="#residential-building-footprint-segmentation"></a>
 </h3>
-<p>We extract residential dwellings and structures using Meta’s
-foundational Segment Anything Model (SAM) directly on the natural
-visible RGB imagery:</p>
+<p>We extract residential dwellings and structures using spectral and
+brightness thresholding directly on the natural visible RGB imagery (or
+optionally via Meta’s Segment Anything Model <code>method = "sam"</code>
+when Python/reticulate and SAM weights are configured):</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Segment residential house footprints using SAM foundational computer vision</span></span>
+<code class="sourceCode R"><span><span class="co"># Segment residential house footprints using native spectral/optical thresholding</span></span>
 <span><span class="va">buildings_sf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_segment_buildings.html">d4h_segment_buildings</a></span><span class="op">(</span></span>
 <span>  rgb_raster     <span class="op">=</span> <span class="va">path_rgb</span>,</span>
 <span>  min_area_m2    <span class="op">=</span> <span class="fl">12.0</span>,</span>
 <span>  max_area_m2    <span class="op">=</span> <span class="fl">600.0</span>,</span>
-<span>  method         <span class="op">=</span> <span class="st">"sam"</span>         <span class="co"># Foundational computer vision segmentation</span></span>
+<span>  method         <span class="op">=</span> <span class="st">"spectral"</span>    <span class="co"># Native fast spectral thresholding</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Inspect detected building polygons</span></span>
@@ -377,7 +377,7 @@ and assigning priority tiers for environmental surveillance:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Compute percentage composition and sectoral priority stratification per grid unit</span></span>
 <span><span class="va">grid_composition</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/d4h_grid_composition.html">d4h_grid_composition</a></span><span class="op">(</span></span>
-<span>  grid           <span class="op">=</span> <span class="va">grid_sf</span>,</span>
+<span>  grid           <span class="op">=</span> <span class="va">grid_hex</span>,</span>
 <span>  water          <span class="op">=</span> <span class="va">water_sf</span>,</span>
 <span>  buildings      <span class="op">=</span> <span class="va">buildings_sf</span>,</span>
 <span>  ndvi_raster    <span class="op">=</span> <span class="va">r_ndvi</span>,</span>

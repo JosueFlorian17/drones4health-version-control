@@ -237,9 +237,11 @@ grid summaries, and renders an automated visualization:</p>
 <span>  indicator        <span class="op">=</span> <span class="st">"NDVI"</span>,</span>
 <span>  houses           <span class="op">=</span> <span class="va">houses_file</span>,</span>
 <span>  radius           <span class="op">=</span> <span class="fl">3</span>,             <span class="co"># 3 grid units</span></span>
-<span>  grid             <span class="op">=</span> <span class="va">grid_hex</span>,      <span class="co"># Ingests existing hexagonal grid</span></span>
+<span>  cell_size        <span class="op">=</span> <span class="fl">50</span>,            <span class="co"># 50m cell size -&gt; 150m buffer radius</span></span>
+<span>  radius_in_meters <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  nir              <span class="op">=</span> <span class="va">path_nir</span>,</span>
 <span>  red              <span class="op">=</span> <span class="va">path_r</span>,</span>
+<span>  square           <span class="op">=</span> <span class="cn">FALSE</span>,         <span class="co"># Hexagonal grid within buffer</span></span>
 <span>  mask_outside     <span class="op">=</span> <span class="cn">TRUE</span>,          <span class="co"># Masks non-focal areas outside buffer</span></span>
 <span>  house_color      <span class="op">=</span> <span class="st">"red"</span>,</span>
 <span>  house_size       <span class="op">=</span> <span class="fl">2.5</span>,</span>
